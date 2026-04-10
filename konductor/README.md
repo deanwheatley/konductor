@@ -16,50 +16,206 @@ The Konductor solves "collision debt" — the accumulated cost of merge conflict
 | 🟠 Collision Course | 3 | Someone is modifying the same files as you |
 | 🔴 Merge Hell | 4 | Divergent changes on the same files across branches |
 
-## Quick Start
+## Setup and Installation
+
+### Prerequisites
+
+- Node.js 20 or later
+- npm
+- Kiro IDE (for MCP integration) or any MCP-compatible client
+
+### Step 1: Clone the repository
 
 ```bash
-# Install
-npm install konductor
-
-# Run with stdio transport (local, single-user)
-npx konductor
-
-# Run with SSE transport (remote, multi-user)
-KONDUCTOR_PORT=3100 KONDUCTOR_API_KEY=your-secret npx konductor --sse
+git clone https://github.com/deanwheatley/konductor.git
+cd konductor/konductor
 ```
 
-### MCP Client Configuration (Kiro)
+### Step 2: Install dependencies
 
-**Local (stdio)** — add to `.kiro/settings/mcp.json`:
+```bash
+npm install
+```
+
+### Step 3: Build the project
+
+```bash
+npm run build
+```
+
+This compiles TypeScript to JavaScript in the `dist/` directory.
+
+### Step 4: Verify the build (optional)
+
+Run the test suite to make sure everything is working:
+
+```bash
+npm test
+```
+
+You should see all 50 tests pass.
+
+## Running the Konductor
+
+### Option A: Local mode (stdio) — single user
+
+This is the simplest setup. The Konductor runs as a child process managed by your MCP client (e.g. Kiro). You don't need to start it manually — just configure it and your client launches it on demand.
+
+Skip to [Connecting to Kiro](#connecting-to-kiro) below.
+
+### Option B: Shared mode (SSE) — multi-user on a network
+
+Run the Konductor as a standalone HTTP server so multiple teammates can connect.
+
+First, configure your environment. Copy the example env file and set your API key:
+
+```bash
+cp .env.local.example .env.local
+```
+
+Edit `.env.local`:
+
+```bash
+KONDUCTOR_PORT=4000
+KONDUCTOR_API_KEY=my-team-secret
+```
+
+Then start the server:
+
+```bash
+node dist/index.js --sse
+```
+
+The server reads `.env.local` automatically — no need to pass env vars on the command line. You should see:
+
+```
+Konductor SSE server listening on port 3010
+```
+
+You can also override values from the command line (CLI env vars take precedence over `.env.local`):
+
+```bash
+KONDUCTOR_PORT=4000 node dist/index.js --sse
+```
+
+Verify it's running:
+
+```bash
+curl -H "Authorization: Bearer my-team-secret" http://localhost:3010/health
+# → {"status":"ok"}
+```
+
+Leave this running in a terminal (or use a process manager like `pm2`). Teammates connect their MCP clients to this instance.
+
+## Connecting to Kiro
+
+### For local mode (stdio)
+
+1. Open your Kiro workspace
+2. Create or edit the file `.kiro/settings/mcp.json` in your workspace root
+3. Add the following configuration (adjust the path to where you cloned the repo):
 
 ```json
 {
   "mcpServers": {
     "konductor": {
-      "command": "npx",
-      "args": ["konductor"],
+      "command": "node",
+      "args": ["/absolute/path/to/konductor/konductor/dist/index.js"],
       "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions"]
     }
   }
 }
 ```
 
-**Remote (SSE)** — connect to a shared Konductor instance:
+4. Kiro will detect the config change and connect to the Konductor automatically. You can verify by opening the MCP Servers panel in Kiro — you should see "konductor" listed as connected.
+
+### For shared mode (SSE)
+
+1. Make sure the Konductor SSE server is running (see Option B above)
+2. Create or edit `.kiro/settings/mcp.json` in your workspace root
+
+**Connecting from the same machine:**
 
 ```json
 {
   "mcpServers": {
     "konductor": {
-      "url": "http://your-host:3100/sse",
+      "url": "http://localhost:3010/sse",
       "headers": {
-        "Authorization": "Bearer your-secret"
+        "Authorization": "Bearer my-team-secret"
       },
       "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions"]
     }
   }
 }
 ```
+
+**Connecting from another machine on the network:**
+
+Use the hostname or IP of the machine running the server. For example, if the server is running on `LT-DWHEATLEY-2.local` (IP `192.168.68.74`):
+
+```json
+{
+  "mcpServers": {
+    "konductor": {
+      "url": "http://LT-DWHEATLEY-2.local:3010/sse",
+      "headers": {
+        "Authorization": "Bearer my-team-secret"
+      },
+      "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions"]
+    }
+  }
+}
+```
+
+Or using the IP directly:
+
+```json
+{
+  "mcpServers": {
+    "konductor": {
+      "url": "http://192.168.68.74:3010/sse",
+      "headers": {
+        "Authorization": "Bearer my-team-secret"
+      },
+      "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions"]
+    }
+  }
+}
+```
+
+3. Replace the API key with whatever you set in `.env.local` on the server machine.
+
+## Using the Konductor
+
+Once connected, you can invoke the tools from Kiro's chat or let steering rules call them automatically.
+
+### Try it out manually
+
+Ask Kiro in chat:
+
+> "Register a session for user alice on repo acme/app, branch main, files src/index.ts and src/utils.ts"
+
+Kiro will call `register_session` and return the collision state (likely "Solo" if you're the only one).
+
+Then simulate a second user:
+
+> "Register a session for user bob on repo acme/app, branch main, files src/index.ts"
+
+Now check status:
+
+> "Check the collision status for alice on repo acme/app"
+
+You should see "Collision Course" since both alice and bob are touching `src/index.ts`.
+
+### Quick reference
+
+| What you want to do | Tool to call |
+|---|---|
+| Start tracking your work | `register_session` |
+| See if anyone overlaps with you | `check_status` |
+| Stop tracking when you're done | `deregister_session` |
+| See who's active in a repo | `list_sessions` |
 
 ## Configuration
 
@@ -310,12 +466,16 @@ npx konductor
 Starts an HTTP server with Server-Sent Events transport. Teammates on the same network can connect their agents to a shared Konductor instance.
 
 ```bash
-KONDUCTOR_PORT=3100 KONDUCTOR_API_KEY=your-secret npx konductor --sse
+# Using .env.local (recommended)
+node dist/index.js --sse
+
+# Or with inline env vars
+KONDUCTOR_PORT=3010 KONDUCTOR_API_KEY=my-team-secret node dist/index.js --sse
 ```
 
 | Env Variable | Default | Description |
 |---|---|---|
-| `KONDUCTOR_PORT` | `3100` | Port for the SSE HTTP server |
+| `KONDUCTOR_PORT` | `3010` | Port for the SSE HTTP server |
 | `KONDUCTOR_API_KEY` | *(none)* | Shared API key for `Authorization: Bearer` auth. If unset, auth is disabled. |
 
 SSE endpoints:
@@ -325,9 +485,17 @@ SSE endpoints:
 
 ## Environment Variables
 
+Environment variables can be set in a `.env.local` file in the `konductor/` directory, or passed on the command line. CLI env vars take precedence over `.env.local`.
+
+Copy the example to get started:
+
+```bash
+cp .env.local.example .env.local
+```
+
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `KONDUCTOR_PORT` | `3100` | Port for SSE HTTP server. Setting this also enables SSE mode. |
+| `KONDUCTOR_PORT` | `3010` | Port for SSE HTTP server. Setting this also enables SSE mode. |
 | `KONDUCTOR_API_KEY` | *(none)* | Shared API key for SSE `Authorization: Bearer` auth. If unset, auth is disabled. |
 | `KONDUCTOR_CONFIG` | `./konductor.yaml` | Path to the YAML configuration file. |
 
