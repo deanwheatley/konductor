@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "konductor": {
+      "command": "npx",
+      "args": ["konductor"],
+      "autoApprove": [
+        "register_session",
+        "check_status",
+        "deregister_session",
+        "list_sessions"
+      ]
+    }
+  }
+}

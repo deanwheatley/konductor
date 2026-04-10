@@ -1,0 +1,25 @@
+# Konductor Configuration
+# ========================
+# This file controls collision state rules and heartbeat behavior.
+# The Konductor watches this file for changes and hot-reloads automatically.
+
+# How long (in seconds) before an idle session is considered stale.
+# Sessions without a heartbeat within this window are excluded from
+# collision calculations.
+heartbeat_timeout_seconds: 300
+
+# Per-state configuration. Each state can define:
+#   message:           Human-readable description shown to the user
+#   block_submissions: (future) If true, block code submissions at this state
+states:
+  solo:
+    message: "You're the only one here. Go wild."
+  neighbors:
+    message: "Others are in this repo, but touching different files."
+  crossroads:
+    message: "Heads up — others are working in the same directories."
+  collision_course:
+    message: "Warning — someone is modifying the same files as you."
+  merge_hell:
+    message: "Critical — multiple divergent changes on the same files."
+    block_submissions: false

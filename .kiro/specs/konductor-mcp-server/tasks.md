@@ -1,0 +1,169 @@
+# Implementation Plan
+
+- [x] 1. Initialize project and set up tooling
+  - Initialize npm project with TypeScript, Vitest, fast-check
+  - Configure `tsconfig.json` for Node.js 20+ with ES modules
+  - Install dependencies: `@modelcontextprotocol/sdk`, `uuid`, `yaml`, `fast-check`
+  - Create `src/types.ts` with all shared interfaces and enums (WorkSession, CollisionState, CollisionResult, KonductorConfig, Action)
+  - Create initial `konductor/README.md` with project overview and quick start placeholder
+  - _Requirements: 8.1_
+
+- [x] 2. Implement PersistenceStore
+  - [x] 2.1 Implement PersistenceStore with atomic JSON file writes
+    - Create `src/persistence-store.ts` implementing `IPersistenceStore`
+    - Implement `save()` using atomic write (write to temp file, rename)
+    - Implement `load()` with JSON parsing and structure validation
+    - Handle corrupted files by backing up and starting fresh
+    - Update README with persistence details
+    - _Requirements: 6.1, 6.2, 6.3, 6.4_
+  - [x] 2.2 Write property test: Work session serialization round-trip
+    - **Property 9: Work session serialization round-trip**
+    - **Validates: Requirements 6.5**
+    - Create `src/persistence-store.test.ts`
+    - Generate random valid WorkSession objects with fast-check
+    - Verify `load(save(sessions))` produces equivalent sessions
+  - [x] 2.3 Write unit tests for PersistenceStore
+    - Test loading from empty/missing file
+    - Test loading from corrupted file (backup behavior)
+    - Test atomic write behavior
+    - _Requirements: 6.1, 6.2_
+
+- [x] 3. Implement SessionManager
+  - [x] 3.1 Implement SessionManager with in-memory store and persistence
+    - Create `src/session-manager.ts` implementing `ISessionManager`
+    - Implement `register()` — create session with UUID, timestamp, persist
+    - Implement `update()` — update file list, refresh heartbeat, persist
+    - Implement `deregister()` — remove session, persist
+    - Implement `heartbeat()` — refresh lastHeartbeat timestamp
+    - Implement `getActiveSessions()` — filter by repo, exclude stale
+    - Implement `cleanupStale()` — remove sessions past timeout
+    - Load existing sessions from PersistenceStore on construction
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
+  - [x] 3.2 Write property test: Registration preserves session data
+    - **Property 1: Registration preserves session data**
+    - **Validates: Requirements 1.1, 1.2**
+    - Create `src/session-manager.test.ts`
+    - Generate random userId, repo, branch, files
+    - Register then retrieve, verify fields match
+  - [x] 3.3 Write property test: Session update reflects new files
+    - **Property 2: Session update reflects new files**
+    - **Validates: Requirements 1.3**
+    - Register a session, update with random new file list, verify files match
+  - [x] 3.4 Write property test: Deregistration removes session
+    - **Property 3: Deregistration removes session**
+    - **Validates: Requirements 1.4**
+    - Register a session, deregister, verify absent from active sessions
+  - [x] 3.5 Write property test: Stale sessions excluded
+    - **Property 4: Stale sessions are excluded from active queries**
+    - **Validates: Requirements 1.5**
+    - Generate sessions with varying heartbeat ages, verify only fresh ones returned
+  - [x] 3.6 Write property test: List sessions returns non-stale for repo
+    - **Property 8: List sessions returns exactly the non-stale sessions for a repo**
+    - **Validates: Requirements 5.5**
+    - Generate sessions across multiple repos, some stale, verify list_sessions filters correctly
+  - [x] 3.7 Write unit tests for SessionManager
+    - Test register with duplicate user+repo (should update)
+    - Test deregister with invalid session ID
+    - Test heartbeat refreshes timestamp
+    - _Requirements: 1.1, 1.4, 1.5_
+
+- [x] 4. Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 5. Implement CollisionEvaluator
+  - [x] 5.1 Implement CollisionEvaluator as a pure function
+    - Create `src/collision-evaluator.ts` implementing `ICollisionEvaluator`
+    - Implement `evaluate()` checking overlap levels in severity order
+    - Compute shared files (exact path match), shared directories (directory prefix match)
+    - Return highest applicable CollisionState with overlapping sessions, shared files, shared directories
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 3.1, 3.2, 3.3_
+  - [x] 5.2 Write property test: Collision evaluator returns correct state
+    - **Property 5: Collision evaluator returns the correct state for the overlap level**
+    - **Validates: Requirements 2.2, 2.3, 2.4, 2.5, 2.6**
+    - Create `src/collision-evaluator.test.ts`
+    - Generate sessions with controlled overlap levels, verify correct state returned
+  - [x] 5.3 Write property test: Collision response includes required detail
+    - **Property 6: Collision response includes required detail for severity level**
+    - **Validates: Requirements 3.1, 3.2, 3.3**
+    - For results at each severity level, verify required fields are populated
+  - [x] 5.4 Write unit tests for CollisionEvaluator
+    - Test Solo (single session)
+    - Test Neighbors (same repo, disjoint files in different dirs)
+    - Test Crossroads (same directory, different files)
+    - Test Collision Course (same files, same branch)
+    - Test Merge Hell (same files, different branches)
+    - _Requirements: 2.2, 2.3, 2.4, 2.5, 2.6_
+
+- [x] 6. Implement SummaryFormatter
+  - [x] 6.1 Implement SummaryFormatter with round-trip format
+    - Create `src/summary-formatter.ts` implementing `ISummaryFormatter`
+    - Implement `format()` producing deterministic summary string
+    - Implement `parse()` reconstructing CollisionResult from summary string
+    - Format: `[STATE] repo:owner/repo | user:alice | overlaps:bob,carol | files:src/index.ts,src/utils.ts | dirs:src/`
+    - _Requirements: 7.1, 7.2, 7.3, 7.4_
+  - [x] 6.2 Write property test: Summary content completeness
+    - **Property 10: Summary content completeness**
+    - **Validates: Requirements 7.1, 7.3**
+    - Create `src/summary-formatter.test.ts`
+    - Generate random CollisionResults, verify summary contains state name, user, and (for high severity) overlapping users and files
+  - [x] 6.3 Write property test: Summary format round-trip
+    - **Property 11: Summary format round-trip**
+    - **Validates: Requirements 7.4**
+    - Generate random CollisionResults, verify `parse(format(result))` produces equivalent result
+  - [x] 6.4 Write unit tests for SummaryFormatter
+    - Test Solo summary content
+    - Test Merge Hell summary includes all users and files
+    - Test parse with malformed input
+    - _Requirements: 7.1, 7.2, 7.3_
+
+- [x] 7. Implement ConfigManager
+  - [x] 7.1 Implement ConfigManager with YAML loading and hot-reload
+    - Create `src/config-manager.ts` implementing `IConfigManager`
+    - Implement `load()` parsing YAML config with defaults for missing fields
+    - Implement `reload()` re-reading config file
+    - Implement `onConfigChange()` using `fs.watch` for hot-reload
+    - Implement `getTimeout()` and `getStateActions()`
+    - Create default `konductor.yaml` example config
+    - Update README with configuration reference
+    - _Requirements: 4.1, 4.2, 4.3, 4.4_
+  - [x] 7.2 Write property test: Configuration values applied correctly
+    - **Property 7: Configuration values are applied correctly**
+    - **Validates: Requirements 4.2, 4.3**
+    - Create `src/config-manager.test.ts`
+    - Generate random valid configs, verify timeout and state actions are returned correctly
+  - [x] 7.3 Write unit tests for ConfigManager
+    - Test loading with missing file (defaults used)
+    - Test loading with invalid YAML (previous config kept)
+    - Test partial config merges with defaults
+    - _Requirements: 4.1, 4.2, 4.4_
+
+- [x] 8. Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 9. Wire up MCP server with tool handlers
+  - [x] 9.1 Implement MCP server entry point with stdio and SSE transport
+    - Create `src/index.ts` as the MCP server entry point
+    - Register four MCP tools: `register_session`, `check_status`, `deregister_session`, `list_sessions`
+    - Wire tool handlers to SessionManager, CollisionEvaluator, SummaryFormatter, ConfigManager
+    - Support stdio transport (default) and SSE transport (via `--sse` flag or `KONDUCTOR_PORT` env var)
+    - Implement API key authentication for SSE mode via `Authorization: Bearer` header
+    - Add input validation for all tool parameters
+    - Update README with MCP tool reference (name, parameters, output, examples)
+    - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 9.1, 9.2, 9.3, 9.4, 9.5_
+  - [x] 9.2 Write unit tests for MCP tool handlers
+    - Test register_session creates session and returns collision state
+    - Test check_status returns correct state without modifying sessions
+    - Test deregister_session removes session
+    - Test list_sessions returns active sessions for repo
+    - Test invalid inputs return appropriate error responses
+    - Test SSE auth rejects invalid API key
+    - _Requirements: 5.2, 5.3, 5.4, 5.5, 9.4, 9.5_
+
+- [x] 10. Finalize documentation
+  - Complete README.md with all sections: overview, quick start, configuration reference, MCP tool reference, architecture, troubleshooting
+  - Add example `konductor.yaml` to the project
+  - Add example MCP client configuration for Kiro (`.kiro/settings/mcp.json` snippet)
+  - _Requirements: 8.1, 8.2, 8.3, 8.4_
+
+- [x] 11. Final Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.
