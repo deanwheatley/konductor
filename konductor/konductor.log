@@ -1,0 +1,538 @@
+[2026-04-13 14:44:25] [CONFIG] [System] Loaded config from /Users/deanwheatley/Documents/konductor/konductor/konductor.yaml (timeout: 300s)
+[2026-04-13 14:44:25] [SERVER] [System] Restored 3 sessions from persistent storage
+[2026-04-13 14:44:25] [SERVER] [System] Started with SSE transport on port 3010, verbose logging enabled
+[2026-04-13 14:44:27] [CONN] [User: 2724d9ae-70f1-4da5-bbfc-d2fa8aa1f115] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 14:44:27] [CONN] [User: 2724d9ae-70f1-4da5-bbfc-d2fa8aa1f115] Authenticated with valid API key
+[2026-04-13 14:44:46] [SESSION] [User: Dean Wheatley] Updated session d4ca2749-ce3a-4b55-8cf6-9ebc33c5fae0 files: docs/04_linked_list.py
+[2026-04-13 14:44:46] [COLLISION] [User: Dean Wheatley] Collision state: solo in deanwheatley/testrepo | files: docs/04_linked_list.py
+[2026-04-13 14:44:46] [QUERY] [User: Dean Wheatley] check_status on deanwheatley/testrepo: solo | files: docs/04_linked_list.py
+[2026-04-13 14:44:57] [SESSION] [User: Dean Wheatley] Updated session d4ca2749-ce3a-4b55-8cf6-9ebc33c5fae0 files: docs/04_linked_list.py
+[2026-04-13 14:44:57] [COLLISION] [User: Dean Wheatley] Collision state: solo in deanwheatley/testrepo | files: docs/04_linked_list.py
+[2026-04-13 14:44:57] [QUERY] [User: Dean Wheatley] check_status on deanwheatley/testrepo: solo | files: docs/04_linked_list.py
+[2026-04-13 14:44:58] [SESSION] [User: Dean Wheatley] Updated session d4ca2749-ce3a-4b55-8cf6-9ebc33c5fae0 files: docs/04_linked_list.py
+[2026-04-13 14:44:58] [COLLISION] [User: Dean Wheatley] Collision state: solo in deanwheatley/testrepo | files: docs/04_linked_list.py
+[2026-04-13 14:44:58] [QUERY] [User: Dean Wheatley] check_status on deanwheatley/testrepo: solo | files: docs/04_linked_list.py
+[2026-04-13 14:45:05] [SESSION] [User: Dean Wheatley] Updated session d4ca2749-ce3a-4b55-8cf6-9ebc33c5fae0 files: docs/08_todo.ts
+[2026-04-13 14:45:05] [COLLISION] [User: Dean Wheatley] Collision state: solo in deanwheatley/testrepo | files: docs/08_todo.ts
+[2026-04-13 14:45:05] [QUERY] [User: Dean Wheatley] check_status on deanwheatley/testrepo: solo | files: docs/08_todo.ts
+[2026-04-13 14:45:06] [SESSION] [User: Dean Wheatley] Updated session d4ca2749-ce3a-4b55-8cf6-9ebc33c5fae0 files: docs/08_todo.ts
+[2026-04-13 14:45:06] [COLLISION] [User: Dean Wheatley] Collision state: solo in deanwheatley/testrepo | files: docs/08_todo.ts
+[2026-04-13 14:45:06] [QUERY] [User: Dean Wheatley] check_status on deanwheatley/testrepo: solo | files: docs/08_todo.ts
+[2026-04-13 14:48:56] [CONFIG] [System] Loaded config from /Users/deanwheatley/Documents/konductor/konductor/konductor.yaml (timeout: 300s)
+[2026-04-13 14:48:56] [SERVER] [System] Restored 3 sessions from persistent storage
+[2026-04-13 14:48:56] [SERVER] [System] Started with SSE transport on port 3010, verbose logging enabled
+[2026-04-13 14:49:28] [CONFIG] [System] Loaded config from /Users/deanwheatley/Documents/konductor/konductor/konductor.yaml (timeout: 300s)
+[2026-04-13 14:49:28] [SERVER] [System] Restored 3 sessions from persistent storage
+[2026-04-13 14:49:28] [SERVER] [System] Started with SSE transport on port 3010, verbose logging enabled
+[2026-04-13 14:49:31] [CONN] [User: 06f6885f-09e6-4fcd-a1a7-3f86cdfcb3ee] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 14:49:31] [CONN] [User: 06f6885f-09e6-4fcd-a1a7-3f86cdfcb3ee] Authenticated with valid API key
+[2026-04-13 14:49:35] [SESSION] [User: alice] Updated session 35c6fc42-e566-406c-b215-d1b7a044910b files: src/index.ts
+[2026-04-13 14:49:35] [STATUS] [User: alice] solo in acme/app | files: src/index.ts
+[2026-04-13 14:54:33] [CONN] [User: 06f6885f-09e6-4fcd-a1a7-3f86cdfcb3ee] Disconnected
+[2026-04-13 14:54:36] [CONN] [User: 5ef6d928-0868-45c9-a27b-c543e86a2e62] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 14:54:36] [CONN] [User: 5ef6d928-0868-45c9-a27b-c543e86a2e62] Authenticated with valid API key
+[2026-04-13 14:57:51] [SESSION] [User: Dean Wheatley] Updated session d4ca2749-ce3a-4b55-8cf6-9ebc33c5fae0 files: docs/08_todo.ts, docs/06_fetch_api.ts
+[2026-04-13 14:57:51] [STATUS] [User: Dean Wheatley] solo in deanwheatley/testrepo | files: docs/08_todo.ts, docs/06_fetch_api.ts
+[2026-04-13 14:57:51] [QUERY] [User: Dean Wheatley] check_status on deanwheatley/testrepo: solo | files: docs/08_todo.ts, docs/06_fetch_api.ts
+[2026-04-13 14:59:38] [CONN] [User: 5ef6d928-0868-45c9-a27b-c543e86a2e62] Disconnected
+[2026-04-13 14:59:41] [CONN] [User: aff98637-de39-46e1-86ba-a1b49ef43da1] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 14:59:41] [CONN] [User: aff98637-de39-46e1-86ba-a1b49ef43da1] Authenticated with valid API key
+[2026-04-13 15:04:43] [CONN] [User: aff98637-de39-46e1-86ba-a1b49ef43da1] Disconnected
+[2026-04-13 15:04:46] [CONN] [User: 17706bb7-0423-4ddd-b949-93b9ed5fe996] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 15:04:46] [CONN] [User: 17706bb7-0423-4ddd-b949-93b9ed5fe996] Authenticated with valid API key
+[2026-04-13 15:09:48] [CONN] [User: 17706bb7-0423-4ddd-b949-93b9ed5fe996] Disconnected
+[2026-04-13 15:09:51] [CONN] [User: af73dd08-b448-46e8-bf76-69b361a4f945] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 15:09:51] [CONN] [User: af73dd08-b448-46e8-bf76-69b361a4f945] Authenticated with valid API key
+[2026-04-13 15:14:55] [CONN] [User: af73dd08-b448-46e8-bf76-69b361a4f945] Disconnected
+[2026-04-13 15:14:58] [CONN] [User: ac8ea8dc-2881-4bf8-9f27-6e2d9668c0de] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 15:14:58] [CONN] [User: ac8ea8dc-2881-4bf8-9f27-6e2d9668c0de] Authenticated with valid API key
+[2026-04-13 15:21:17] [CONN] [User: ac8ea8dc-2881-4bf8-9f27-6e2d9668c0de] Disconnected
+[2026-04-13 15:21:20] [CONN] [User: ea5ecb65-7c63-45ec-b25c-dcb760953443] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 15:21:20] [CONN] [User: ea5ecb65-7c63-45ec-b25c-dcb760953443] Authenticated with valid API key
+[2026-04-13 15:26:23] [CONN] [User: ea5ecb65-7c63-45ec-b25c-dcb760953443] Disconnected
+[2026-04-13 15:26:26] [CONN] [User: ae4a3f84-86ba-4937-8353-e4cef05bc52e] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 15:26:26] [CONN] [User: ae4a3f84-86ba-4937-8353-e4cef05bc52e] Authenticated with valid API key
+[2026-04-13 15:31:29] [CONN] [User: ae4a3f84-86ba-4937-8353-e4cef05bc52e] Disconnected
+[2026-04-13 15:31:32] [CONN] [User: 570d9f5d-62f6-497a-ab5a-2f883919fcef] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 15:31:32] [CONN] [User: 570d9f5d-62f6-497a-ab5a-2f883919fcef] Authenticated with valid API key
+[2026-04-13 15:36:34] [CONN] [User: 570d9f5d-62f6-497a-ab5a-2f883919fcef] Disconnected
+[2026-04-13 15:36:37] [CONN] [User: 552b2828-add4-43b7-a539-f70935816839] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 15:36:37] [CONN] [User: 552b2828-add4-43b7-a539-f70935816839] Authenticated with valid API key
+[2026-04-13 15:41:40] [CONN] [User: 552b2828-add4-43b7-a539-f70935816839] Disconnected
+[2026-04-13 15:41:43] [CONN] [User: b728e827-c3fd-47a1-b6c9-f942b8838a38] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 15:41:43] [CONN] [User: b728e827-c3fd-47a1-b6c9-f942b8838a38] Authenticated with valid API key
+[2026-04-13 15:46:46] [CONN] [User: b728e827-c3fd-47a1-b6c9-f942b8838a38] Disconnected
+[2026-04-13 15:46:49] [CONN] [User: f3632cde-f380-4c53-a2d4-123899ab3e23] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 15:46:49] [CONN] [User: f3632cde-f380-4c53-a2d4-123899ab3e23] Authenticated with valid API key
+[2026-04-13 15:51:51] [CONN] [User: f3632cde-f380-4c53-a2d4-123899ab3e23] Disconnected
+[2026-04-13 15:51:54] [CONN] [User: 310509f8-e40e-4e99-8fdb-8a690d478c53] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 15:51:54] [CONN] [User: 310509f8-e40e-4e99-8fdb-8a690d478c53] Authenticated with valid API key
+[2026-04-13 15:56:57] [CONN] [User: 310509f8-e40e-4e99-8fdb-8a690d478c53] Disconnected
+[2026-04-13 15:57:00] [CONN] [User: 0ac9c457-d1f8-4346-9101-cdae4c59698d] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 15:57:00] [CONN] [User: 0ac9c457-d1f8-4346-9101-cdae4c59698d] Authenticated with valid API key
+[2026-04-13 16:02:03] [CONN] [User: 0ac9c457-d1f8-4346-9101-cdae4c59698d] Disconnected
+[2026-04-13 16:02:06] [CONN] [User: d4112fe9-55e4-4c2b-8fc2-3e4c514f80dc] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 16:02:06] [CONN] [User: d4112fe9-55e4-4c2b-8fc2-3e4c514f80dc] Authenticated with valid API key
+[2026-04-13 16:07:09] [CONN] [User: d4112fe9-55e4-4c2b-8fc2-3e4c514f80dc] Disconnected
+[2026-04-13 16:07:12] [CONN] [User: 22ec8d18-d897-4b74-8d4b-0f746e619839] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 16:07:12] [CONN] [User: 22ec8d18-d897-4b74-8d4b-0f746e619839] Authenticated with valid API key
+[2026-04-13 16:12:15] [CONN] [User: 22ec8d18-d897-4b74-8d4b-0f746e619839] Disconnected
+[2026-04-13 16:12:18] [CONN] [User: 485a81aa-339a-4baa-9775-6393be3a4932] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 16:12:18] [CONN] [User: 485a81aa-339a-4baa-9775-6393be3a4932] Authenticated with valid API key
+[2026-04-13 16:17:20] [CONN] [User: 485a81aa-339a-4baa-9775-6393be3a4932] Disconnected
+[2026-04-13 16:17:23] [CONN] [User: cfd3b177-ddc7-4e14-bfc6-2b0edc148495] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 16:17:23] [CONN] [User: cfd3b177-ddc7-4e14-bfc6-2b0edc148495] Authenticated with valid API key
+[2026-04-13 16:22:26] [CONN] [User: cfd3b177-ddc7-4e14-bfc6-2b0edc148495] Disconnected
+[2026-04-13 16:22:29] [CONN] [User: bec1b9d3-7a9d-4140-9dca-41c18a957e6c] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 16:22:29] [CONN] [User: bec1b9d3-7a9d-4140-9dca-41c18a957e6c] Authenticated with valid API key
+[2026-04-13 16:27:32] [CONN] [User: bec1b9d3-7a9d-4140-9dca-41c18a957e6c] Disconnected
+[2026-04-13 16:27:35] [CONN] [User: 9173cb88-a872-4287-92cf-ff5275b12146] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 16:27:35] [CONN] [User: 9173cb88-a872-4287-92cf-ff5275b12146] Authenticated with valid API key
+[2026-04-13 16:32:38] [CONN] [User: 9173cb88-a872-4287-92cf-ff5275b12146] Disconnected
+[2026-04-13 16:32:41] [CONN] [User: e46e9153-a550-4516-8892-a00a0cff7e94] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 16:32:41] [CONN] [User: e46e9153-a550-4516-8892-a00a0cff7e94] Authenticated with valid API key
+[2026-04-13 16:37:43] [CONN] [User: e46e9153-a550-4516-8892-a00a0cff7e94] Disconnected
+[2026-04-13 16:37:46] [CONN] [User: dbdd96ce-00af-488e-a157-526dd9c3bb39] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 16:37:46] [CONN] [User: dbdd96ce-00af-488e-a157-526dd9c3bb39] Authenticated with valid API key
+[2026-04-13 16:42:48] [CONN] [User: dbdd96ce-00af-488e-a157-526dd9c3bb39] Disconnected
+[2026-04-13 16:42:51] [CONN] [User: 3f0f687c-d74b-41ee-b8d9-7b153c779120] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 16:42:51] [CONN] [User: 3f0f687c-d74b-41ee-b8d9-7b153c779120] Authenticated with valid API key
+[2026-04-13 16:47:53] [CONN] [User: 3f0f687c-d74b-41ee-b8d9-7b153c779120] Disconnected
+[2026-04-13 16:47:56] [CONN] [User: 532c5491-f071-4e46-8499-288505c1602a] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 16:47:56] [CONN] [User: 532c5491-f071-4e46-8499-288505c1602a] Authenticated with valid API key
+[2026-04-13 16:52:59] [CONN] [User: 532c5491-f071-4e46-8499-288505c1602a] Disconnected
+[2026-04-13 16:53:02] [CONN] [User: 06deacae-6966-40b6-b408-6d83c5648b75] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 16:53:02] [CONN] [User: 06deacae-6966-40b6-b408-6d83c5648b75] Authenticated with valid API key
+[2026-04-13 16:58:04] [CONN] [User: 06deacae-6966-40b6-b408-6d83c5648b75] Disconnected
+[2026-04-13 16:58:07] [CONN] [User: bde00abb-7cba-4c1f-a2bb-f8cf057fe478] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 16:58:07] [CONN] [User: bde00abb-7cba-4c1f-a2bb-f8cf057fe478] Authenticated with valid API key
+[2026-04-13 17:03:11] [CONN] [User: bde00abb-7cba-4c1f-a2bb-f8cf057fe478] Disconnected
+[2026-04-13 17:03:14] [CONN] [User: 84234fc2-df00-4682-94a5-b7cd904dea9e] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 17:03:14] [CONN] [User: 84234fc2-df00-4682-94a5-b7cd904dea9e] Authenticated with valid API key
+[2026-04-13 17:08:16] [CONN] [User: 84234fc2-df00-4682-94a5-b7cd904dea9e] Disconnected
+[2026-04-13 17:08:19] [CONN] [User: d1252cab-4ad9-4c3f-baab-a97d52a05e0d] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 17:08:19] [CONN] [User: d1252cab-4ad9-4c3f-baab-a97d52a05e0d] Authenticated with valid API key
+[2026-04-13 17:13:23] [CONN] [User: d1252cab-4ad9-4c3f-baab-a97d52a05e0d] Disconnected
+[2026-04-13 17:13:26] [CONN] [User: f59ec20c-9bba-4a35-ba84-49d1f8263f68] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 17:13:26] [CONN] [User: f59ec20c-9bba-4a35-ba84-49d1f8263f68] Authenticated with valid API key
+[2026-04-13 17:18:28] [CONN] [User: f59ec20c-9bba-4a35-ba84-49d1f8263f68] Disconnected
+[2026-04-13 17:18:31] [CONN] [User: 8f24bb01-aa09-4aeb-b856-e35cd72cc14a] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 17:18:31] [CONN] [User: 8f24bb01-aa09-4aeb-b856-e35cd72cc14a] Authenticated with valid API key
+[2026-04-13 17:23:34] [CONN] [User: 8f24bb01-aa09-4aeb-b856-e35cd72cc14a] Disconnected
+[2026-04-13 17:23:37] [CONN] [User: fe3af17b-21bb-46c9-bb58-4ad9d0d9c2ab] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 17:23:37] [CONN] [User: fe3af17b-21bb-46c9-bb58-4ad9d0d9c2ab] Authenticated with valid API key
+[2026-04-13 17:28:40] [CONN] [User: fe3af17b-21bb-46c9-bb58-4ad9d0d9c2ab] Disconnected
+[2026-04-13 17:28:43] [CONN] [User: def4f5c2-6e05-4514-a5a2-6a5b70978288] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 17:28:43] [CONN] [User: def4f5c2-6e05-4514-a5a2-6a5b70978288] Authenticated with valid API key
+[2026-04-13 17:33:45] [CONN] [User: def4f5c2-6e05-4514-a5a2-6a5b70978288] Disconnected
+[2026-04-13 17:33:48] [CONN] [User: 4ba7cba3-06b2-46bd-997e-1bf9267a98ea] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 17:33:48] [CONN] [User: 4ba7cba3-06b2-46bd-997e-1bf9267a98ea] Authenticated with valid API key
+[2026-04-13 17:38:52] [CONN] [User: 4ba7cba3-06b2-46bd-997e-1bf9267a98ea] Disconnected
+[2026-04-13 17:38:55] [CONN] [User: 5ffca858-5efa-4f9b-a530-4c5aa8fbb0ce] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 17:38:55] [CONN] [User: 5ffca858-5efa-4f9b-a530-4c5aa8fbb0ce] Authenticated with valid API key
+[2026-04-13 17:43:59] [CONN] [User: 5ffca858-5efa-4f9b-a530-4c5aa8fbb0ce] Disconnected
+[2026-04-13 17:44:02] [CONN] [User: df9fab98-471d-4337-8f94-0e3687c098f6] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 17:44:02] [CONN] [User: df9fab98-471d-4337-8f94-0e3687c098f6] Authenticated with valid API key
+[2026-04-13 17:49:07] [CONN] [User: df9fab98-471d-4337-8f94-0e3687c098f6] Disconnected
+[2026-04-13 17:49:10] [CONN] [User: 7fee4dc8-b21d-4287-83a3-fb6f332a615a] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 17:49:10] [CONN] [User: 7fee4dc8-b21d-4287-83a3-fb6f332a615a] Authenticated with valid API key
+[2026-04-13 17:54:14] [CONN] [User: 7fee4dc8-b21d-4287-83a3-fb6f332a615a] Disconnected
+[2026-04-13 17:54:17] [CONN] [User: ee53cca2-588c-4c24-acb5-8d91de9a9f70] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 17:54:17] [CONN] [User: ee53cca2-588c-4c24-acb5-8d91de9a9f70] Authenticated with valid API key
+[2026-04-13 17:59:20] [CONN] [User: ee53cca2-588c-4c24-acb5-8d91de9a9f70] Disconnected
+[2026-04-13 17:59:23] [CONN] [User: 6f065054-1726-4ebf-9b20-f66ace4b0afa] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 17:59:23] [CONN] [User: 6f065054-1726-4ebf-9b20-f66ace4b0afa] Authenticated with valid API key
+[2026-04-13 18:04:28] [CONN] [User: 6f065054-1726-4ebf-9b20-f66ace4b0afa] Disconnected
+[2026-04-13 18:04:31] [CONN] [User: ba5887ff-f024-4208-9742-11a9809c0daa] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 18:04:31] [CONN] [User: ba5887ff-f024-4208-9742-11a9809c0daa] Authenticated with valid API key
+[2026-04-13 18:09:35] [CONN] [User: ba5887ff-f024-4208-9742-11a9809c0daa] Disconnected
+[2026-04-13 18:09:38] [CONN] [User: 028363e7-9a65-4dd8-aff3-71bb25b20ca3] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 18:09:38] [CONN] [User: 028363e7-9a65-4dd8-aff3-71bb25b20ca3] Authenticated with valid API key
+[2026-04-13 18:14:43] [CONN] [User: 028363e7-9a65-4dd8-aff3-71bb25b20ca3] Disconnected
+[2026-04-13 18:14:46] [CONN] [User: f61c2283-46da-4551-be55-9f814591ce9f] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 18:14:46] [CONN] [User: f61c2283-46da-4551-be55-9f814591ce9f] Authenticated with valid API key
+[2026-04-13 18:19:51] [CONN] [User: f61c2283-46da-4551-be55-9f814591ce9f] Disconnected
+[2026-04-13 18:19:54] [CONN] [User: e9501f4c-4e50-4bb2-a834-5296084422fd] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 18:19:54] [CONN] [User: e9501f4c-4e50-4bb2-a834-5296084422fd] Authenticated with valid API key
+[2026-04-13 18:24:58] [CONN] [User: e9501f4c-4e50-4bb2-a834-5296084422fd] Disconnected
+[2026-04-13 18:25:01] [CONN] [User: 7dc9a9a6-70e0-4a02-99cc-3e0c2a9b6712] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 18:25:01] [CONN] [User: 7dc9a9a6-70e0-4a02-99cc-3e0c2a9b6712] Authenticated with valid API key
+[2026-04-13 18:30:04] [CONN] [User: 7dc9a9a6-70e0-4a02-99cc-3e0c2a9b6712] Disconnected
+[2026-04-13 18:30:07] [CONN] [User: 9fcfe4a5-cff8-4ffc-87c9-d89d2c9e1328] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 18:30:07] [CONN] [User: 9fcfe4a5-cff8-4ffc-87c9-d89d2c9e1328] Authenticated with valid API key
+[2026-04-13 18:35:10] [CONN] [User: 9fcfe4a5-cff8-4ffc-87c9-d89d2c9e1328] Disconnected
+[2026-04-13 18:35:13] [CONN] [User: b40fa302-3bcc-4e09-b029-1149d4eb6784] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 18:35:13] [CONN] [User: b40fa302-3bcc-4e09-b029-1149d4eb6784] Authenticated with valid API key
+[2026-04-13 18:40:15] [CONN] [User: b40fa302-3bcc-4e09-b029-1149d4eb6784] Disconnected
+[2026-04-13 18:40:18] [CONN] [User: 64e6046d-e027-4c33-ba98-dff5ddcab892] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 18:40:18] [CONN] [User: 64e6046d-e027-4c33-ba98-dff5ddcab892] Authenticated with valid API key
+[2026-04-13 18:45:21] [CONN] [User: 64e6046d-e027-4c33-ba98-dff5ddcab892] Disconnected
+[2026-04-13 18:45:24] [CONN] [User: 3565bc9b-c0d6-4656-b8b3-2e5bf1fe3d7c] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 18:45:24] [CONN] [User: 3565bc9b-c0d6-4656-b8b3-2e5bf1fe3d7c] Authenticated with valid API key
+[2026-04-13 18:50:26] [CONN] [User: 3565bc9b-c0d6-4656-b8b3-2e5bf1fe3d7c] Disconnected
+[2026-04-13 18:50:29] [CONN] [User: 0742345f-d0f5-4d6f-9a2e-91af26cec1aa] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 18:50:29] [CONN] [User: 0742345f-d0f5-4d6f-9a2e-91af26cec1aa] Authenticated with valid API key
+[2026-04-13 18:55:31] [CONN] [User: 0742345f-d0f5-4d6f-9a2e-91af26cec1aa] Disconnected
+[2026-04-13 18:55:34] [CONN] [User: 647831f4-6af3-4eec-928f-38cc587efce2] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 18:55:34] [CONN] [User: 647831f4-6af3-4eec-928f-38cc587efce2] Authenticated with valid API key
+[2026-04-13 19:00:36] [CONN] [User: 647831f4-6af3-4eec-928f-38cc587efce2] Disconnected
+[2026-04-13 19:00:39] [CONN] [User: 56ebc0d3-0002-4309-83b2-9fca80c4470e] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 19:00:39] [CONN] [User: 56ebc0d3-0002-4309-83b2-9fca80c4470e] Authenticated with valid API key
+[2026-04-13 19:05:41] [CONN] [User: 56ebc0d3-0002-4309-83b2-9fca80c4470e] Disconnected
+[2026-04-13 19:05:44] [CONN] [User: 2246401a-374e-4b33-b3c9-490dfa8c5c7c] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 19:05:44] [CONN] [User: 2246401a-374e-4b33-b3c9-490dfa8c5c7c] Authenticated with valid API key
+[2026-04-13 19:10:46] [CONN] [User: 2246401a-374e-4b33-b3c9-490dfa8c5c7c] Disconnected
+[2026-04-13 19:10:49] [CONN] [User: b4bb2f4f-cad5-4dad-9847-825a58b04790] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 19:10:49] [CONN] [User: b4bb2f4f-cad5-4dad-9847-825a58b04790] Authenticated with valid API key
+[2026-04-13 19:15:51] [CONN] [User: b4bb2f4f-cad5-4dad-9847-825a58b04790] Disconnected
+[2026-04-13 19:15:54] [CONN] [User: 3a9e0f4e-915f-4fe3-be09-ceec59d6066e] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 19:15:54] [CONN] [User: 3a9e0f4e-915f-4fe3-be09-ceec59d6066e] Authenticated with valid API key
+[2026-04-13 19:20:57] [CONN] [User: 3a9e0f4e-915f-4fe3-be09-ceec59d6066e] Disconnected
+[2026-04-13 19:21:00] [CONN] [User: b2767b08-dbfb-46fa-95b0-29e9f54c816c] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 19:21:00] [CONN] [User: b2767b08-dbfb-46fa-95b0-29e9f54c816c] Authenticated with valid API key
+[2026-04-13 19:26:02] [CONN] [User: b2767b08-dbfb-46fa-95b0-29e9f54c816c] Disconnected
+[2026-04-13 19:26:05] [CONN] [User: cba4bdb8-d1c1-4b71-bc52-9e41d61606a3] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 19:26:05] [CONN] [User: cba4bdb8-d1c1-4b71-bc52-9e41d61606a3] Authenticated with valid API key
+[2026-04-13 19:47:26] [CONN] [User: cba4bdb8-d1c1-4b71-bc52-9e41d61606a3] Disconnected
+[2026-04-13 19:47:29] [CONN] [User: 51c08d89-85e0-437c-a1f7-5a8d07cf5f8d] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 19:47:29] [CONN] [User: 51c08d89-85e0-437c-a1f7-5a8d07cf5f8d] Authenticated with valid API key
+[2026-04-13 20:07:33] [CONN] [User: 51c08d89-85e0-437c-a1f7-5a8d07cf5f8d] Disconnected
+[2026-04-13 20:07:36] [CONN] [User: bf1d7cf7-ce7b-4f69-92d6-d8c5c3254143] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 20:07:36] [CONN] [User: bf1d7cf7-ce7b-4f69-92d6-d8c5c3254143] Authenticated with valid API key
+[2026-04-13 20:28:37] [CONN] [User: bf1d7cf7-ce7b-4f69-92d6-d8c5c3254143] Disconnected
+[2026-04-13 20:28:40] [CONN] [User: 445ec067-0f91-4b52-8227-3796d3547bf3] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 20:28:40] [CONN] [User: 445ec067-0f91-4b52-8227-3796d3547bf3] Authenticated with valid API key
+[2026-04-13 20:33:43] [CONN] [User: 445ec067-0f91-4b52-8227-3796d3547bf3] Disconnected
+[2026-04-13 20:33:46] [CONN] [User: dadab164-e3f3-4ba5-94ba-37784beab683] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 20:33:46] [CONN] [User: dadab164-e3f3-4ba5-94ba-37784beab683] Authenticated with valid API key
+[2026-04-13 20:38:51] [CONN] [User: dadab164-e3f3-4ba5-94ba-37784beab683] Disconnected
+[2026-04-13 20:38:54] [CONN] [User: 3230082d-3066-4d5f-a131-1e15f1c19e9d] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 20:38:54] [CONN] [User: 3230082d-3066-4d5f-a131-1e15f1c19e9d] Authenticated with valid API key
+[2026-04-13 20:43:58] [CONN] [User: 3230082d-3066-4d5f-a131-1e15f1c19e9d] Disconnected
+[2026-04-13 20:44:01] [CONN] [User: 60e3bbe8-156c-4882-9174-57b2e40986cd] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 20:44:01] [CONN] [User: 60e3bbe8-156c-4882-9174-57b2e40986cd] Authenticated with valid API key
+[2026-04-13 20:49:05] [CONN] [User: 60e3bbe8-156c-4882-9174-57b2e40986cd] Disconnected
+[2026-04-13 20:49:08] [CONN] [User: 49c1715c-5b1e-400a-af98-89e86147850d] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 20:49:08] [CONN] [User: 49c1715c-5b1e-400a-af98-89e86147850d] Authenticated with valid API key
+[2026-04-13 20:54:13] [CONN] [User: 49c1715c-5b1e-400a-af98-89e86147850d] Disconnected
+[2026-04-13 20:54:16] [CONN] [User: c8e43714-43b2-4677-af1c-75f5ac79a285] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 20:54:16] [CONN] [User: c8e43714-43b2-4677-af1c-75f5ac79a285] Authenticated with valid API key
+[2026-04-13 20:59:20] [CONN] [User: c8e43714-43b2-4677-af1c-75f5ac79a285] Disconnected
+[2026-04-13 20:59:23] [CONN] [User: df02474d-8137-4885-930a-25e8a791e97f] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 20:59:23] [CONN] [User: df02474d-8137-4885-930a-25e8a791e97f] Authenticated with valid API key
+[2026-04-13 21:04:27] [CONN] [User: df02474d-8137-4885-930a-25e8a791e97f] Disconnected
+[2026-04-13 21:04:30] [CONN] [User: 5510b002-2e69-4026-8f81-358cb6f67285] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 21:04:30] [CONN] [User: 5510b002-2e69-4026-8f81-358cb6f67285] Authenticated with valid API key
+[2026-04-13 21:09:35] [CONN] [User: 5510b002-2e69-4026-8f81-358cb6f67285] Disconnected
+[2026-04-13 21:09:38] [CONN] [User: e8f8e223-31aa-46b0-8a02-12757e2cd4bb] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 21:09:38] [CONN] [User: e8f8e223-31aa-46b0-8a02-12757e2cd4bb] Authenticated with valid API key
+[2026-04-13 21:14:42] [CONN] [User: e8f8e223-31aa-46b0-8a02-12757e2cd4bb] Disconnected
+[2026-04-13 21:14:45] [CONN] [User: 4c4286ec-8c8f-4424-9ec1-e7a4fca0e694] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 21:14:45] [CONN] [User: 4c4286ec-8c8f-4424-9ec1-e7a4fca0e694] Authenticated with valid API key
+[2026-04-13 21:19:49] [CONN] [User: 4c4286ec-8c8f-4424-9ec1-e7a4fca0e694] Disconnected
+[2026-04-13 21:19:52] [CONN] [User: c82873c9-a1a8-4c77-ba1d-106550d31319] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 21:19:52] [CONN] [User: c82873c9-a1a8-4c77-ba1d-106550d31319] Authenticated with valid API key
+[2026-04-13 21:24:57] [CONN] [User: c82873c9-a1a8-4c77-ba1d-106550d31319] Disconnected
+[2026-04-13 21:25:00] [CONN] [User: 48ad6218-4882-4173-aaf2-05d79c74b4c6] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 21:25:00] [CONN] [User: 48ad6218-4882-4173-aaf2-05d79c74b4c6] Authenticated with valid API key
+[2026-04-13 22:11:51] [CONN] [User: 48ad6218-4882-4173-aaf2-05d79c74b4c6] Disconnected
+[2026-04-13 22:11:54] [CONN] [User: 7e667e5d-855c-4bbc-8708-149fecd02492] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 22:11:54] [CONN] [User: 7e667e5d-855c-4bbc-8708-149fecd02492] Authenticated with valid API key
+[2026-04-13 22:16:58] [CONN] [User: 7e667e5d-855c-4bbc-8708-149fecd02492] Disconnected
+[2026-04-13 22:17:01] [CONN] [User: f3d38e59-5e7b-47be-a8eb-e5aa106b1a94] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 22:17:01] [CONN] [User: f3d38e59-5e7b-47be-a8eb-e5aa106b1a94] Authenticated with valid API key
+[2026-04-13 22:22:06] [CONN] [User: f3d38e59-5e7b-47be-a8eb-e5aa106b1a94] Disconnected
+[2026-04-13 22:22:09] [CONN] [User: a8010480-1d76-4fe1-9248-b260b4b2a095] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 22:22:09] [CONN] [User: a8010480-1d76-4fe1-9248-b260b4b2a095] Authenticated with valid API key
+[2026-04-13 22:27:13] [CONN] [User: a8010480-1d76-4fe1-9248-b260b4b2a095] Disconnected
+[2026-04-13 22:27:16] [CONN] [User: c5bc279f-d230-4daf-af86-40d3b086b93b] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 22:27:16] [CONN] [User: c5bc279f-d230-4daf-af86-40d3b086b93b] Authenticated with valid API key
+[2026-04-13 22:32:20] [CONN] [User: c5bc279f-d230-4daf-af86-40d3b086b93b] Disconnected
+[2026-04-13 22:32:23] [CONN] [User: c06b8dc9-88c1-4db2-9c50-c990ef69c214] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 22:32:23] [CONN] [User: c06b8dc9-88c1-4db2-9c50-c990ef69c214] Authenticated with valid API key
+[2026-04-13 22:37:28] [CONN] [User: c06b8dc9-88c1-4db2-9c50-c990ef69c214] Disconnected
+[2026-04-13 22:37:31] [CONN] [User: 68415ffa-18f3-4953-a253-ad7659d656be] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 22:37:31] [CONN] [User: 68415ffa-18f3-4953-a253-ad7659d656be] Authenticated with valid API key
+[2026-04-13 22:42:35] [CONN] [User: 68415ffa-18f3-4953-a253-ad7659d656be] Disconnected
+[2026-04-13 22:42:38] [CONN] [User: 39dff715-47e7-4707-8d98-60cc2c0d3ffc] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 22:42:38] [CONN] [User: 39dff715-47e7-4707-8d98-60cc2c0d3ffc] Authenticated with valid API key
+[2026-04-13 22:47:42] [CONN] [User: 39dff715-47e7-4707-8d98-60cc2c0d3ffc] Disconnected
+[2026-04-13 22:47:45] [CONN] [User: bdd14d07-6d2b-4ab8-8a16-2e06ee6fa2a7] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 22:47:45] [CONN] [User: bdd14d07-6d2b-4ab8-8a16-2e06ee6fa2a7] Authenticated with valid API key
+[2026-04-13 22:52:49] [CONN] [User: bdd14d07-6d2b-4ab8-8a16-2e06ee6fa2a7] Disconnected
+[2026-04-13 22:52:52] [CONN] [User: 1cf6b629-b5ea-48c9-b66a-d2bc44b3e426] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 22:52:52] [CONN] [User: 1cf6b629-b5ea-48c9-b66a-d2bc44b3e426] Authenticated with valid API key
+[2026-04-13 22:57:57] [CONN] [User: 1cf6b629-b5ea-48c9-b66a-d2bc44b3e426] Disconnected
+[2026-04-13 22:58:00] [CONN] [User: e762be0b-55e1-4cd5-8237-c0122a7d9ac7] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 22:58:00] [CONN] [User: e762be0b-55e1-4cd5-8237-c0122a7d9ac7] Authenticated with valid API key
+[2026-04-13 23:03:04] [CONN] [User: e762be0b-55e1-4cd5-8237-c0122a7d9ac7] Disconnected
+[2026-04-13 23:03:07] [CONN] [User: b7b68957-e8f1-45ef-8de0-f86e7ebe22cc] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 23:03:07] [CONN] [User: b7b68957-e8f1-45ef-8de0-f86e7ebe22cc] Authenticated with valid API key
+[2026-04-13 23:08:11] [CONN] [User: b7b68957-e8f1-45ef-8de0-f86e7ebe22cc] Disconnected
+[2026-04-13 23:08:14] [CONN] [User: ce9d040f-3553-4c48-87fd-64504359d649] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-13 23:08:14] [CONN] [User: ce9d040f-3553-4c48-87fd-64504359d649] Authenticated with valid API key
+[2026-04-14 00:00:05] [CONN] [User: ce9d040f-3553-4c48-87fd-64504359d649] Disconnected
+[2026-04-14 00:00:08] [CONN] [User: 5e9571a9-14d8-45fd-8159-46d402644b0f] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 00:00:08] [CONN] [User: 5e9571a9-14d8-45fd-8159-46d402644b0f] Authenticated with valid API key
+[2026-04-14 00:05:13] [CONN] [User: 5e9571a9-14d8-45fd-8159-46d402644b0f] Disconnected
+[2026-04-14 00:05:16] [CONN] [User: b5f81645-f6ed-491c-bdd4-69c4e2e6ce75] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 00:05:16] [CONN] [User: b5f81645-f6ed-491c-bdd4-69c4e2e6ce75] Authenticated with valid API key
+[2026-04-14 00:10:20] [CONN] [User: b5f81645-f6ed-491c-bdd4-69c4e2e6ce75] Disconnected
+[2026-04-14 00:10:23] [CONN] [User: 6abeed85-ebf2-404f-843e-01e445720dbf] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 00:10:23] [CONN] [User: 6abeed85-ebf2-404f-843e-01e445720dbf] Authenticated with valid API key
+[2026-04-14 00:15:27] [CONN] [User: 6abeed85-ebf2-404f-843e-01e445720dbf] Disconnected
+[2026-04-14 00:15:30] [CONN] [User: ed2f6a21-963e-4630-84cf-2a5a622c96af] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 00:15:30] [CONN] [User: ed2f6a21-963e-4630-84cf-2a5a622c96af] Authenticated with valid API key
+[2026-04-14 00:20:35] [CONN] [User: ed2f6a21-963e-4630-84cf-2a5a622c96af] Disconnected
+[2026-04-14 00:20:38] [CONN] [User: 95017745-1860-4f50-8f0d-b586f8cc9e32] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 00:20:38] [CONN] [User: 95017745-1860-4f50-8f0d-b586f8cc9e32] Authenticated with valid API key
+[2026-04-14 00:25:42] [CONN] [User: 95017745-1860-4f50-8f0d-b586f8cc9e32] Disconnected
+[2026-04-14 00:25:45] [CONN] [User: c84901e6-05eb-4794-976b-32409de2a38f] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 00:25:45] [CONN] [User: c84901e6-05eb-4794-976b-32409de2a38f] Authenticated with valid API key
+[2026-04-14 00:30:49] [CONN] [User: c84901e6-05eb-4794-976b-32409de2a38f] Disconnected
+[2026-04-14 00:30:52] [CONN] [User: 9b2e8a80-b50d-4159-afda-ce4cfb532c36] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 00:30:52] [CONN] [User: 9b2e8a80-b50d-4159-afda-ce4cfb532c36] Authenticated with valid API key
+[2026-04-14 00:35:57] [CONN] [User: 9b2e8a80-b50d-4159-afda-ce4cfb532c36] Disconnected
+[2026-04-14 00:36:00] [CONN] [User: 3220dc14-5b26-4ffc-ace1-9f2e6f96c074] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 00:36:00] [CONN] [User: 3220dc14-5b26-4ffc-ace1-9f2e6f96c074] Authenticated with valid API key
+[2026-04-14 00:41:04] [CONN] [User: 3220dc14-5b26-4ffc-ace1-9f2e6f96c074] Disconnected
+[2026-04-14 00:41:07] [CONN] [User: 59559991-149d-4368-86ec-9ee5ce8b7dba] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 00:41:07] [CONN] [User: 59559991-149d-4368-86ec-9ee5ce8b7dba] Authenticated with valid API key
+[2026-04-14 00:46:11] [CONN] [User: 59559991-149d-4368-86ec-9ee5ce8b7dba] Disconnected
+[2026-04-14 00:46:14] [CONN] [User: ade69895-bf31-4a84-9d82-485096fb23bf] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 00:46:14] [CONN] [User: ade69895-bf31-4a84-9d82-485096fb23bf] Authenticated with valid API key
+[2026-04-14 00:51:19] [CONN] [User: ade69895-bf31-4a84-9d82-485096fb23bf] Disconnected
+[2026-04-14 00:51:22] [CONN] [User: b421de72-5097-4257-b341-7ae5839807ff] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 00:51:22] [CONN] [User: b421de72-5097-4257-b341-7ae5839807ff] Authenticated with valid API key
+[2026-04-14 00:56:26] [CONN] [User: b421de72-5097-4257-b341-7ae5839807ff] Disconnected
+[2026-04-14 00:56:29] [CONN] [User: 8d7981cf-56d3-4168-bb17-c688ce8d0d76] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 00:56:29] [CONN] [User: 8d7981cf-56d3-4168-bb17-c688ce8d0d76] Authenticated with valid API key
+[2026-04-14 01:48:37] [CONN] [User: 8d7981cf-56d3-4168-bb17-c688ce8d0d76] Disconnected
+[2026-04-14 01:48:40] [CONN] [User: eb41080e-6e6a-4aa8-a749-ce1c53596fa7] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 01:48:40] [CONN] [User: eb41080e-6e6a-4aa8-a749-ce1c53596fa7] Authenticated with valid API key
+[2026-04-14 01:53:44] [CONN] [User: eb41080e-6e6a-4aa8-a749-ce1c53596fa7] Disconnected
+[2026-04-14 01:53:47] [CONN] [User: 8ad646c2-e9f4-4ff5-b163-70ade9d87f61] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 01:53:47] [CONN] [User: 8ad646c2-e9f4-4ff5-b163-70ade9d87f61] Authenticated with valid API key
+[2026-04-14 01:58:52] [CONN] [User: 8ad646c2-e9f4-4ff5-b163-70ade9d87f61] Disconnected
+[2026-04-14 01:58:55] [CONN] [User: 34377db0-67a2-49d6-b98f-a04bb2327c22] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 01:58:55] [CONN] [User: 34377db0-67a2-49d6-b98f-a04bb2327c22] Authenticated with valid API key
+[2026-04-14 02:03:59] [CONN] [User: 34377db0-67a2-49d6-b98f-a04bb2327c22] Disconnected
+[2026-04-14 02:04:02] [CONN] [User: 14a4e8f0-a134-4f46-a8c9-c8f910327aae] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 02:04:02] [CONN] [User: 14a4e8f0-a134-4f46-a8c9-c8f910327aae] Authenticated with valid API key
+[2026-04-14 02:09:06] [CONN] [User: 14a4e8f0-a134-4f46-a8c9-c8f910327aae] Disconnected
+[2026-04-14 02:09:10] [CONN] [User: 853cbb2f-4c42-463c-84f2-de6e55d3c8f2] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 02:09:10] [CONN] [User: 853cbb2f-4c42-463c-84f2-de6e55d3c8f2] Authenticated with valid API key
+[2026-04-14 02:14:14] [CONN] [User: 853cbb2f-4c42-463c-84f2-de6e55d3c8f2] Disconnected
+[2026-04-14 02:14:17] [CONN] [User: 8f19bd33-2f3e-4ea1-814a-164d58c375a5] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 02:14:17] [CONN] [User: 8f19bd33-2f3e-4ea1-814a-164d58c375a5] Authenticated with valid API key
+[2026-04-14 02:19:21] [CONN] [User: 8f19bd33-2f3e-4ea1-814a-164d58c375a5] Disconnected
+[2026-04-14 02:19:24] [CONN] [User: c59a5b84-a028-4b4d-9af1-4d046144f112] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 02:19:24] [CONN] [User: c59a5b84-a028-4b4d-9af1-4d046144f112] Authenticated with valid API key
+[2026-04-14 02:24:28] [CONN] [User: c59a5b84-a028-4b4d-9af1-4d046144f112] Disconnected
+[2026-04-14 02:24:31] [CONN] [User: 9a39ea19-c1a2-445d-99ee-a20f09659a06] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 02:24:31] [CONN] [User: 9a39ea19-c1a2-445d-99ee-a20f09659a06] Authenticated with valid API key
+[2026-04-14 02:29:35] [CONN] [User: 9a39ea19-c1a2-445d-99ee-a20f09659a06] Disconnected
+[2026-04-14 02:29:39] [CONN] [User: b7553d2e-7634-4adf-a2da-13f02eb9f290] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 02:29:39] [CONN] [User: b7553d2e-7634-4adf-a2da-13f02eb9f290] Authenticated with valid API key
+[2026-04-14 02:34:43] [CONN] [User: b7553d2e-7634-4adf-a2da-13f02eb9f290] Disconnected
+[2026-04-14 02:34:46] [CONN] [User: 1ec19935-ded3-4aab-bd0b-0fe927bce6d0] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 02:34:46] [CONN] [User: 1ec19935-ded3-4aab-bd0b-0fe927bce6d0] Authenticated with valid API key
+[2026-04-14 02:39:50] [CONN] [User: 1ec19935-ded3-4aab-bd0b-0fe927bce6d0] Disconnected
+[2026-04-14 02:39:53] [CONN] [User: c5f85e96-c8d2-4fd4-b273-d39c9400545f] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 02:39:53] [CONN] [User: c5f85e96-c8d2-4fd4-b273-d39c9400545f] Authenticated with valid API key
+[2026-04-14 02:44:58] [CONN] [User: c5f85e96-c8d2-4fd4-b273-d39c9400545f] Disconnected
+[2026-04-14 02:45:01] [CONN] [User: 2fb1ae0a-6c71-46df-8586-ad2aa92e2b77] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 02:45:01] [CONN] [User: 2fb1ae0a-6c71-46df-8586-ad2aa92e2b77] Authenticated with valid API key
+[2026-04-14 03:21:44] [CONN] [User: 2fb1ae0a-6c71-46df-8586-ad2aa92e2b77] Disconnected
+[2026-04-14 03:21:47] [CONN] [User: aeec8520-4753-429a-a6b6-8d3124112d1d] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 03:21:47] [CONN] [User: aeec8520-4753-429a-a6b6-8d3124112d1d] Authenticated with valid API key
+[2026-04-14 03:42:39] [CONN] [User: aeec8520-4753-429a-a6b6-8d3124112d1d] Disconnected
+[2026-04-14 03:42:42] [CONN] [User: fcec761d-d895-42a1-814a-6972841ad153] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 03:42:42] [CONN] [User: fcec761d-d895-42a1-814a-6972841ad153] Authenticated with valid API key
+[2026-04-14 03:47:46] [CONN] [User: fcec761d-d895-42a1-814a-6972841ad153] Disconnected
+[2026-04-14 03:47:49] [CONN] [User: cc7d3d4c-b64e-49b0-9bc9-fef013324848] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 03:47:49] [CONN] [User: cc7d3d4c-b64e-49b0-9bc9-fef013324848] Authenticated with valid API key
+[2026-04-14 03:52:54] [CONN] [User: cc7d3d4c-b64e-49b0-9bc9-fef013324848] Disconnected
+[2026-04-14 03:52:57] [CONN] [User: 81c829e1-0b5b-4d3e-875b-2496375b41b2] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 03:52:57] [CONN] [User: 81c829e1-0b5b-4d3e-875b-2496375b41b2] Authenticated with valid API key
+[2026-04-14 03:58:01] [CONN] [User: 81c829e1-0b5b-4d3e-875b-2496375b41b2] Disconnected
+[2026-04-14 03:58:04] [CONN] [User: 95068da2-5150-463c-98b3-6b734d8bfc35] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 03:58:04] [CONN] [User: 95068da2-5150-463c-98b3-6b734d8bfc35] Authenticated with valid API key
+[2026-04-14 04:03:09] [CONN] [User: 95068da2-5150-463c-98b3-6b734d8bfc35] Disconnected
+[2026-04-14 04:03:12] [CONN] [User: 5c67e834-688f-4a6c-9256-688d5611ba14] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 04:03:12] [CONN] [User: 5c67e834-688f-4a6c-9256-688d5611ba14] Authenticated with valid API key
+[2026-04-14 04:08:16] [CONN] [User: 5c67e834-688f-4a6c-9256-688d5611ba14] Disconnected
+[2026-04-14 04:08:19] [CONN] [User: ec514470-2647-4989-b4c0-86630a4ab388] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 04:08:19] [CONN] [User: ec514470-2647-4989-b4c0-86630a4ab388] Authenticated with valid API key
+[2026-04-14 04:13:23] [CONN] [User: ec514470-2647-4989-b4c0-86630a4ab388] Disconnected
+[2026-04-14 04:13:26] [CONN] [User: 19c2b8cc-4622-48ae-bec9-2dcbb3ebf40f] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 04:13:26] [CONN] [User: 19c2b8cc-4622-48ae-bec9-2dcbb3ebf40f] Authenticated with valid API key
+[2026-04-14 04:18:31] [CONN] [User: 19c2b8cc-4622-48ae-bec9-2dcbb3ebf40f] Disconnected
+[2026-04-14 04:18:34] [CONN] [User: d94b2ba7-511c-4c42-a7b1-92e36f39fb42] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 04:18:34] [CONN] [User: d94b2ba7-511c-4c42-a7b1-92e36f39fb42] Authenticated with valid API key
+[2026-04-14 04:23:38] [CONN] [User: d94b2ba7-511c-4c42-a7b1-92e36f39fb42] Disconnected
+[2026-04-14 04:23:41] [CONN] [User: 8debbe9c-a952-43a6-a578-0cb5270dae8a] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 04:23:41] [CONN] [User: 8debbe9c-a952-43a6-a578-0cb5270dae8a] Authenticated with valid API key
+[2026-04-14 04:28:45] [CONN] [User: 8debbe9c-a952-43a6-a578-0cb5270dae8a] Disconnected
+[2026-04-14 04:28:48] [CONN] [User: 5acda53b-4573-48d0-b56c-4d7b8121e8b7] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 04:28:48] [CONN] [User: 5acda53b-4573-48d0-b56c-4d7b8121e8b7] Authenticated with valid API key
+[2026-04-14 04:33:52] [CONN] [User: 5acda53b-4573-48d0-b56c-4d7b8121e8b7] Disconnected
+[2026-04-14 04:33:55] [CONN] [User: 7c687c3c-8759-409e-8132-e8693a8f6425] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 04:33:55] [CONN] [User: 7c687c3c-8759-409e-8132-e8693a8f6425] Authenticated with valid API key
+[2026-04-14 04:54:13] [CONN] [User: 7c687c3c-8759-409e-8132-e8693a8f6425] Disconnected
+[2026-04-14 04:54:16] [CONN] [User: 1f083b20-dcaf-43b8-b76b-6b94c2df5cb7] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 04:54:16] [CONN] [User: 1f083b20-dcaf-43b8-b76b-6b94c2df5cb7] Authenticated with valid API key
+[2026-04-14 04:59:20] [CONN] [User: 1f083b20-dcaf-43b8-b76b-6b94c2df5cb7] Disconnected
+[2026-04-14 04:59:23] [CONN] [User: 3122437a-9df0-413d-a20b-7a89193409ec] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 04:59:23] [CONN] [User: 3122437a-9df0-413d-a20b-7a89193409ec] Authenticated with valid API key
+[2026-04-14 05:04:27] [CONN] [User: 3122437a-9df0-413d-a20b-7a89193409ec] Disconnected
+[2026-04-14 05:04:30] [CONN] [User: 852e8bf3-1165-482a-b0e5-da65d4a657c1] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 05:04:30] [CONN] [User: 852e8bf3-1165-482a-b0e5-da65d4a657c1] Authenticated with valid API key
+[2026-04-14 05:09:34] [CONN] [User: 852e8bf3-1165-482a-b0e5-da65d4a657c1] Disconnected
+[2026-04-14 05:09:37] [CONN] [User: b4597faa-997e-4470-abeb-bba7e6a0fe07] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 05:09:37] [CONN] [User: b4597faa-997e-4470-abeb-bba7e6a0fe07] Authenticated with valid API key
+[2026-04-14 05:14:41] [CONN] [User: b4597faa-997e-4470-abeb-bba7e6a0fe07] Disconnected
+[2026-04-14 05:14:44] [CONN] [User: 28911b9e-b6c5-4fdf-bd35-a4359237d6c4] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 05:14:44] [CONN] [User: 28911b9e-b6c5-4fdf-bd35-a4359237d6c4] Authenticated with valid API key
+[2026-04-14 05:19:49] [CONN] [User: 28911b9e-b6c5-4fdf-bd35-a4359237d6c4] Disconnected
+[2026-04-14 05:19:52] [CONN] [User: 5d41ceb5-f4c4-4b0a-a48b-71251d2865c3] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 05:19:52] [CONN] [User: 5d41ceb5-f4c4-4b0a-a48b-71251d2865c3] Authenticated with valid API key
+[2026-04-14 05:24:56] [CONN] [User: 5d41ceb5-f4c4-4b0a-a48b-71251d2865c3] Disconnected
+[2026-04-14 05:24:59] [CONN] [User: 3b8c8175-3559-4096-8fe4-d67a60ff16f1] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 05:24:59] [CONN] [User: 3b8c8175-3559-4096-8fe4-d67a60ff16f1] Authenticated with valid API key
+[2026-04-14 05:30:03] [CONN] [User: 3b8c8175-3559-4096-8fe4-d67a60ff16f1] Disconnected
+[2026-04-14 05:30:06] [CONN] [User: 3fdfe46e-59e7-48fb-bc96-8075e0c74bb9] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 05:30:06] [CONN] [User: 3fdfe46e-59e7-48fb-bc96-8075e0c74bb9] Authenticated with valid API key
+[2026-04-14 05:35:10] [CONN] [User: 3fdfe46e-59e7-48fb-bc96-8075e0c74bb9] Disconnected
+[2026-04-14 05:35:13] [CONN] [User: 41f43cdd-ee18-4d56-985a-c4b7ba48c70d] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 05:35:13] [CONN] [User: 41f43cdd-ee18-4d56-985a-c4b7ba48c70d] Authenticated with valid API key
+[2026-04-14 05:40:17] [CONN] [User: 41f43cdd-ee18-4d56-985a-c4b7ba48c70d] Disconnected
+[2026-04-14 05:40:20] [CONN] [User: ccf991a7-94ee-467d-b3da-265a6a162100] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 05:40:20] [CONN] [User: ccf991a7-94ee-467d-b3da-265a6a162100] Authenticated with valid API key
+[2026-04-14 05:45:25] [CONN] [User: ccf991a7-94ee-467d-b3da-265a6a162100] Disconnected
+[2026-04-14 05:45:28] [CONN] [User: 2caa126d-1d96-4bae-8f09-ca0524cafa81] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 05:45:28] [CONN] [User: 2caa126d-1d96-4bae-8f09-ca0524cafa81] Authenticated with valid API key
+[2026-04-14 05:50:32] [CONN] [User: 2caa126d-1d96-4bae-8f09-ca0524cafa81] Disconnected
+[2026-04-14 05:50:35] [CONN] [User: 174ee9b0-f919-400a-9471-022e08ba942f] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 05:50:35] [CONN] [User: 174ee9b0-f919-400a-9471-022e08ba942f] Authenticated with valid API key
+[2026-04-14 06:12:31] [CONN] [User: 174ee9b0-f919-400a-9471-022e08ba942f] Disconnected
+[2026-04-14 06:12:34] [CONN] [User: 7693010f-0bc5-4410-b0be-1fff0865ef04] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 06:12:34] [CONN] [User: 7693010f-0bc5-4410-b0be-1fff0865ef04] Authenticated with valid API key
+[2026-04-14 06:32:40] [CONN] [User: 7693010f-0bc5-4410-b0be-1fff0865ef04] Disconnected
+[2026-04-14 06:32:43] [CONN] [User: b4019563-b47a-4d3a-a041-b8fec2dbc186] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 06:32:43] [CONN] [User: b4019563-b47a-4d3a-a041-b8fec2dbc186] Authenticated with valid API key
+[2026-04-14 06:37:47] [CONN] [User: b4019563-b47a-4d3a-a041-b8fec2dbc186] Disconnected
+[2026-04-14 06:37:50] [CONN] [User: b5526107-9b2d-49b1-b5ed-75684b55b57e] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 06:37:50] [CONN] [User: b5526107-9b2d-49b1-b5ed-75684b55b57e] Authenticated with valid API key
+[2026-04-14 06:42:54] [CONN] [User: b5526107-9b2d-49b1-b5ed-75684b55b57e] Disconnected
+[2026-04-14 06:42:57] [CONN] [User: fa43dcd0-3104-4e73-ba2d-8d9d8ba6eddd] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 06:42:57] [CONN] [User: fa43dcd0-3104-4e73-ba2d-8d9d8ba6eddd] Authenticated with valid API key
+[2026-04-14 06:48:01] [CONN] [User: fa43dcd0-3104-4e73-ba2d-8d9d8ba6eddd] Disconnected
+[2026-04-14 06:48:04] [CONN] [User: 8dcdaa22-b79e-4ef4-a0c7-335a704f8e9d] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 06:48:04] [CONN] [User: 8dcdaa22-b79e-4ef4-a0c7-335a704f8e9d] Authenticated with valid API key
+[2026-04-14 06:53:09] [CONN] [User: 8dcdaa22-b79e-4ef4-a0c7-335a704f8e9d] Disconnected
+[2026-04-14 06:53:12] [CONN] [User: 7f8bcfe8-8f01-4c40-b85b-e19e5ab62db0] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 06:53:12] [CONN] [User: 7f8bcfe8-8f01-4c40-b85b-e19e5ab62db0] Authenticated with valid API key
+[2026-04-14 06:58:16] [CONN] [User: 7f8bcfe8-8f01-4c40-b85b-e19e5ab62db0] Disconnected
+[2026-04-14 06:58:19] [CONN] [User: fd9784b2-5ebd-4b29-a1e6-8987fd690296] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 06:58:19] [CONN] [User: fd9784b2-5ebd-4b29-a1e6-8987fd690296] Authenticated with valid API key
+[2026-04-14 07:03:24] [CONN] [User: fd9784b2-5ebd-4b29-a1e6-8987fd690296] Disconnected
+[2026-04-14 07:03:27] [CONN] [User: f4eeaac2-3b57-4fff-bfd2-94a79f8b1c31] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 07:03:27] [CONN] [User: f4eeaac2-3b57-4fff-bfd2-94a79f8b1c31] Authenticated with valid API key
+[2026-04-14 07:08:31] [CONN] [User: f4eeaac2-3b57-4fff-bfd2-94a79f8b1c31] Disconnected
+[2026-04-14 07:08:34] [CONN] [User: 2ebc0910-eb1c-4b32-9e7e-df2103da2a78] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 07:08:34] [CONN] [User: 2ebc0910-eb1c-4b32-9e7e-df2103da2a78] Authenticated with valid API key
+[2026-04-14 07:13:38] [CONN] [User: 2ebc0910-eb1c-4b32-9e7e-df2103da2a78] Disconnected
+[2026-04-14 07:13:41] [CONN] [User: c70d7077-280b-46b2-b1a6-57573cc2c0d2] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 07:13:41] [CONN] [User: c70d7077-280b-46b2-b1a6-57573cc2c0d2] Authenticated with valid API key
+[2026-04-14 07:18:45] [CONN] [User: c70d7077-280b-46b2-b1a6-57573cc2c0d2] Disconnected
+[2026-04-14 07:18:48] [CONN] [User: c3e2d35b-2581-48e2-a5a1-e15d3abb2a20] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 07:18:48] [CONN] [User: c3e2d35b-2581-48e2-a5a1-e15d3abb2a20] Authenticated with valid API key
+[2026-04-14 07:23:53] [CONN] [User: c3e2d35b-2581-48e2-a5a1-e15d3abb2a20] Disconnected
+[2026-04-14 07:23:56] [CONN] [User: 316913df-f16f-419b-890f-d651ab98c447] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 07:23:56] [CONN] [User: 316913df-f16f-419b-890f-d651ab98c447] Authenticated with valid API key
+[2026-04-14 07:36:47] [CONN] [User: 316913df-f16f-419b-890f-d651ab98c447] Disconnected
+[2026-04-14 07:36:50] [CONN] [User: 59dac71e-8164-4c5f-a1aa-2a1daa74563c] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 07:36:50] [CONN] [User: 59dac71e-8164-4c5f-a1aa-2a1daa74563c] Authenticated with valid API key
+[2026-04-14 07:59:05] [CONN] [User: 59dac71e-8164-4c5f-a1aa-2a1daa74563c] Disconnected
+[2026-04-14 07:59:08] [CONN] [User: 26d64101-5d0d-4de5-99fa-cba2d831572d] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 07:59:08] [CONN] [User: 26d64101-5d0d-4de5-99fa-cba2d831572d] Authenticated with valid API key
+[2026-04-14 08:16:43] [CONN] [User: 26d64101-5d0d-4de5-99fa-cba2d831572d] Disconnected
+[2026-04-14 08:16:46] [CONN] [User: fe9bf5b8-d8b7-4f9c-81c2-f019fbb6e1cb] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 08:16:46] [CONN] [User: fe9bf5b8-d8b7-4f9c-81c2-f019fbb6e1cb] Authenticated with valid API key
+[2026-04-14 08:29:12] [CONN] [User: fe9bf5b8-d8b7-4f9c-81c2-f019fbb6e1cb] Disconnected
+[2026-04-14 08:29:15] [CONN] [User: 434e6d32-b620-4835-8e19-14fbb44c2776] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 08:29:15] [CONN] [User: 434e6d32-b620-4835-8e19-14fbb44c2776] Authenticated with valid API key
+[2026-04-14 08:34:18] [CONN] [User: 434e6d32-b620-4835-8e19-14fbb44c2776] Disconnected
+[2026-04-14 08:34:21] [CONN] [User: 75e249e2-a493-4cd0-aceb-ed213e6a1e02] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 08:34:21] [CONN] [User: 75e249e2-a493-4cd0-aceb-ed213e6a1e02] Authenticated with valid API key
+[2026-04-14 08:39:23] [CONN] [User: 75e249e2-a493-4cd0-aceb-ed213e6a1e02] Disconnected
+[2026-04-14 08:39:26] [CONN] [User: 1c5e22ef-ac0b-4836-b251-4231a76a8507] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 08:39:26] [CONN] [User: 1c5e22ef-ac0b-4836-b251-4231a76a8507] Authenticated with valid API key
+[2026-04-14 08:41:33] [CONFIG] [System] Loaded config from /Users/deanwheatley/Documents/konductor/konductor/konductor.yaml (timeout: 300s)
+[2026-04-14 08:41:33] [SERVER] [System] Restored 3 sessions from persistent storage
+[2026-04-14 08:41:33] [SERVER] [System] Started with SSE transport on port 3010, verbose logging enabled
+[2026-04-14 08:41:48] [CONFIG] [System] Loaded config from /Users/deanwheatley/Documents/konductor/konductor/konductor.yaml (timeout: 300s)
+[2026-04-14 08:41:48] [SERVER] [System] Restored 3 sessions from persistent storage
+[2026-04-14 08:41:48] [SERVER] [System] Started with SSE transport on port 3010, verbose logging enabled
+[2026-04-14 08:41:49] [CONN] [User: 9c060c4e-23b6-4c1f-8d02-b681c3b7ac11] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 08:41:49] [CONN] [User: 9c060c4e-23b6-4c1f-8d02-b681c3b7ac11] Authenticated with valid API key
+[2026-04-14 08:41:55] [SESSION] [User: alice] Updated session 35c6fc42-e566-406c-b215-d1b7a044910b on #main files: src/index.ts
+[2026-04-14 08:41:55] [STATUS] [User: alice] solo in acme/app#main | files: src/index.ts
+[2026-04-14 08:42:01] [SESSION] [User: bob] Updated session f7a5a6b6-c2bd-4330-9e1b-a3ff9e590a48 on #feature-x files: src/index.ts
+[2026-04-14 08:42:01] [STATUS] [User: bob] merge_hell in acme/app#feature-x | files: src/index.ts | overlapping: alice | shared files: src/index.ts | branches: main
+[2026-04-14 08:46:51] [CONN] [User: 9c060c4e-23b6-4c1f-8d02-b681c3b7ac11] Disconnected
+[2026-04-14 08:46:54] [CONN] [User: f1b6975f-0d99-450b-89b6-69ff572c2976] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 08:46:54] [CONN] [User: f1b6975f-0d99-450b-89b6-69ff572c2976] Authenticated with valid API key
+[2026-04-14 08:51:57] [CONN] [User: f1b6975f-0d99-450b-89b6-69ff572c2976] Disconnected
+[2026-04-14 08:52:00] [CONN] [User: 1f4da5c2-cb04-46e9-9a66-70943c22d31b] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 08:52:00] [CONN] [User: 1f4da5c2-cb04-46e9-9a66-70943c22d31b] Authenticated with valid API key
+[2026-04-14 08:57:02] [CONN] [User: 1f4da5c2-cb04-46e9-9a66-70943c22d31b] Disconnected
+[2026-04-14 08:57:05] [CONN] [User: 5e999981-1c85-4628-9e0f-6fd85c98c93c] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 08:57:05] [CONN] [User: 5e999981-1c85-4628-9e0f-6fd85c98c93c] Authenticated with valid API key
+[2026-04-14 09:02:07] [CONN] [User: 5e999981-1c85-4628-9e0f-6fd85c98c93c] Disconnected
+[2026-04-14 09:02:10] [CONN] [User: 35cf7cc4-05f9-4076-a324-d851832bf917] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 09:02:10] [CONN] [User: 35cf7cc4-05f9-4076-a324-d851832bf917] Authenticated with valid API key
+[2026-04-14 09:07:12] [CONN] [User: 35cf7cc4-05f9-4076-a324-d851832bf917] Disconnected
+[2026-04-14 09:07:15] [CONN] [User: 8ca5a07d-6ba2-49dd-bd5f-ee0cba0dd94b] Connected via SSE from ::ffff:127.0.0.1
+[2026-04-14 09:07:15] [CONN] [User: 8ca5a07d-6ba2-49dd-bd5f-ee0cba0dd94b] Authenticated with valid API key
+[2026-04-14 09:07:49] [CONFIG] [System] Loaded config from /Users/deanwheatley/Documents/konductor/konductor/konductor.yaml (timeout: 300s)
+[2026-04-14 09:07:49] [SERVER] [System] Restored 3 sessions from persistent storage
+[2026-04-14 09:07:49] [SERVER] [System] Started with SSE transport on port 3010, verbose logging enabled
+[2026-04-14 09:08:05] [CONFIG] [System] Loaded config from /Users/deanwheatley/Documents/konductor/konductor/konductor.yaml (timeout: 300s)
+[2026-04-14 09:08:05] [SERVER] [System] Restored 3 sessions from persistent storage
+[2026-04-14 09:08:05] [SERVER] [System] Started with SSE transport on port 3010, verbose logging enabled
+[2026-04-14 09:08:08] [CONN] [User: session:82832f66] Connected via SSE from ::ffff:127.0.0.1 (::ffff:127.0.0.1)
+[2026-04-14 09:08:08] [CONN] [User: session:82832f66] Authenticated with valid API key
+[2026-04-14 09:08:12] [SESSION] [User: alice] Updated session 35c6fc42-e566-406c-b215-d1b7a044910b on #main files: src/index.ts, src/readme.md
+[2026-04-14 09:08:12] [STATUS] [User: alice] solo in acme/app#main | files: src/index.ts, src/readme.md
+[2026-04-14 09:08:18] [SESSION] [User: bob] Updated session f7a5a6b6-c2bd-4330-9e1b-a3ff9e590a48 on #feature-x files: src/index.ts
+[2026-04-14 09:08:18] [STATUS] [User: bob] merge_hell in acme/app#feature-x | files: src/index.ts | overlapping: alice | shared files: src/index.ts | branches: main
+[2026-04-14 09:08:25] [SESSION] [User: tom] Registered session 3053e837-3922-4e4f-9cfe-3698058db17f on acme/app#main with files: src/readme.md
+[2026-04-14 09:08:25] [STATUS] [User: tom] collision_course in acme/app#main | files: src/readme.md | overlapping: alice, bob | shared files: src/readme.md | branches: main, feature-x
+[2026-04-14 09:08:32] [QUERY] [User: alice] check_status on acme/app#main: merge_hell | files: src/index.ts, src/readme.md
+[2026-04-14 09:13:10] [CONN] [User: session:82832f66] Disconnected
+[2026-04-14 09:13:13] [CONN] [User: session:5b75264f] Connected via SSE from ::ffff:127.0.0.1 (::ffff:127.0.0.1)
+[2026-04-14 09:13:13] [CONN] [User: session:5b75264f] Authenticated with valid API key
+[2026-04-14 09:18:15] [CONN] [User: session:5b75264f] Disconnected
+[2026-04-14 09:18:18] [CONN] [User: session:ec4a5928] Connected via SSE from ::ffff:127.0.0.1 (::ffff:127.0.0.1)
+[2026-04-14 09:18:18] [CONN] [User: session:ec4a5928] Authenticated with valid API key
+[2026-04-14 09:23:21] [CONN] [User: session:ec4a5928] Disconnected
+[2026-04-14 09:23:24] [CONN] [User: session:2cca0a6f] Connected via SSE from ::ffff:127.0.0.1 (::ffff:127.0.0.1)
+[2026-04-14 09:23:24] [CONN] [User: session:2cca0a6f] Authenticated with valid API key
+[2026-04-14 09:28:27] [CONN] [User: session:2cca0a6f] Disconnected
+[2026-04-14 09:28:30] [CONN] [User: session:f37c2f58] Connected via SSE from ::ffff:127.0.0.1 (::ffff:127.0.0.1)
+[2026-04-14 09:28:30] [CONN] [User: session:f37c2f58] Authenticated with valid API key
+[2026-04-14 09:33:32] [CONN] [User: session:f37c2f58] Disconnected
+[2026-04-14 09:33:35] [CONN] [User: session:deb2a338] Connected via SSE from ::ffff:127.0.0.1 (::ffff:127.0.0.1)
+[2026-04-14 09:33:35] [CONN] [User: session:deb2a338] Authenticated with valid API key
+[2026-04-14 09:38:38] [CONN] [User: session:deb2a338] Disconnected
+[2026-04-14 09:38:41] [CONN] [User: session:0675684d] Connected via SSE from ::ffff:127.0.0.1 (::ffff:127.0.0.1)
+[2026-04-14 09:38:41] [CONN] [User: session:0675684d] Authenticated with valid API key
+[2026-04-14 09:43:44] [CONN] [User: session:0675684d] Disconnected
+[2026-04-14 09:43:47] [CONN] [User: session:1ba8fc7c] Connected via SSE from ::ffff:127.0.0.1 (::ffff:127.0.0.1)
+[2026-04-14 09:43:47] [CONN] [User: session:1ba8fc7c] Authenticated with valid API key
+[2026-04-14 09:48:49] [CONN] [User: session:1ba8fc7c] Disconnected
+[2026-04-14 09:48:52] [CONN] [User: session:d7db0e45] Connected via SSE from ::ffff:127.0.0.1 (::ffff:127.0.0.1)
+[2026-04-14 09:48:52] [CONN] [User: session:d7db0e45] Authenticated with valid API key
+[2026-04-14 09:52:37] [CONN] [User: session:d7db0e45] Disconnected

@@ -51,6 +51,7 @@ import { CollisionEvaluator } from "./collision-evaluator.js";
 import { SummaryFormatter } from "./summary-formatter.js";
 import { ConfigManager } from "./config-manager.js";
 import { PersistenceStore } from "./persistence-store.js";
+import { KonductorLogger } from "./logger.js";
 import type { CollisionResult } from "./types.js";
 
 // ---------------------------------------------------------------------------
@@ -81,13 +82,16 @@ export async function createComponents(configPath?: string, sessionsPath?: strin
   const cfgPath = configPath ?? resolve(process.cwd(), "konductor.yaml");
   const sesPath = sessionsPath ?? resolve(process.cwd(), "sessions.json");
 
-  const configManager = new ConfigManager();
+  const logger = new KonductorLogger();
+
+  const configManager = new ConfigManager(logger);
   await configManager.load(cfgPath);
 
   const persistenceStore = new PersistenceStore(sesPath);
   const sessionManager = new SessionManager(
     persistenceStore,
     () => configManager.getTimeout() * 1000,
+    logger,
   );
   await sessionManager.init();
 
@@ -99,7 +103,7 @@ export async function createComponents(configPath?: string, sessionsPath?: strin
     /* config is already updated internally */
   });
 
-  return { configManager, sessionManager, collisionEvaluator, summaryFormatter };
+  return { configManager, sessionManager, collisionEvaluator, summaryFormatter, logger };
 }
 
 
@@ -112,8 +116,9 @@ export function buildMcpServer(deps: {
   collisionEvaluator: CollisionEvaluator;
   summaryFormatter: SummaryFormatter;
   configManager: ConfigManager;
+  logger?: KonductorLogger;
 }): McpServer {
-  const { sessionManager, collisionEvaluator, summaryFormatter, configManager } = deps;
+  const { sessionManager, collisionEvaluator, summaryFormatter, configManager, logger } = deps;
 
   const mcp = new McpServer(
     { name: "konductor", version: "0.1.0" },
@@ -142,6 +147,16 @@ export function buildMcpServer(deps: {
       const result: CollisionResult = collisionEvaluator.evaluate(session, allSessions);
       result.actions = configManager.getStateActions(result.state);
       const summary = summaryFormatter.format(result);
+
+      // Log collision state
+      if (logger) {
+        const overlappingUsers = result.overlappingSessions.map((s) => s.userId);
+        const branches = [...new Set(result.overlappingSessions.map((s) => s.branch))];
+        logger.logCollisionState(userId, repo, result.state, overlappingUsers, result.sharedFiles, branches, files, branch);
+        for (const action of result.actions) {
+          logger.logCollisionAction(action.type, [userId, ...overlappingUsers], repo);
+        }
+      }
 
       return {
         content: [{
@@ -201,6 +216,14 @@ export function buildMcpServer(deps: {
       result.actions = configManager.getStateActions(result.state);
       const summary = summaryFormatter.format(result);
 
+      // Log query and collision state
+      if (logger) {
+        logger.logCheckStatus(userId, repo, result.state, querySession.files, querySession.branch || undefined);
+        const overlappingUsers = result.overlappingSessions.map((s) => s.userId);
+        const branches = [...new Set(result.overlappingSessions.map((s) => s.branch))];
+        logger.logCollisionState(userId, repo, result.state, overlappingUsers, result.sharedFiles, branches, querySession.files, querySession.branch || undefined);
+      }
+
       return {
         content: [{
           type: "text",
@@ -255,6 +278,12 @@ export function buildMcpServer(deps: {
       if (repoErr) return { content: [{ type: "text", text: JSON.stringify({ error: repoErr }) }], isError: true };
 
       const sessions = await sessionManager.getActiveSessions(repo);
+
+      // Log query
+      if (logger) {
+        logger.logListSessions(repo, sessions.length);
+      }
+
       return {
         content: [{
           type: "text",
@@ -282,7 +311,18 @@ export function buildMcpServer(deps: {
 // SSE transport with API key auth
 // ---------------------------------------------------------------------------
 
-function startSseServer(mcp: McpServer, port: number, apiKey: string | undefined) {
+function startSseServer(
+  mcp: McpServer,
+  port: number,
+  apiKey: string | undefined,
+  logger?: KonductorLogger,
+  deps?: {
+    sessionManager: SessionManager;
+    collisionEvaluator: CollisionEvaluator;
+    summaryFormatter: SummaryFormatter;
+    configManager: ConfigManager;
+  },
+) {
   const transports = new Map<string, SSEServerTransport>();
 
   const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
@@ -297,10 +337,16 @@ function startSseServer(mcp: McpServer, port: number, apiKey: string | undefined
       return;
     }
 
+    const clientIp = req.socket.remoteAddress ?? "unknown";
+
     // API key authentication
     if (apiKey) {
       const authHeader = req.headers.authorization;
       if (!authHeader || authHeader !== `Bearer ${apiKey}`) {
+        if (logger) {
+          const reason = !authHeader ? "missing API key" : "invalid API key";
+          logger.logAuthRejection(clientIp, reason);
+        }
         res.writeHead(401, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Invalid or missing API key" }));
         return;
@@ -309,11 +355,110 @@ function startSseServer(mcp: McpServer, port: number, apiKey: string | undefined
 
     const url = new URL(req.url ?? "/", `http://localhost:${port}`);
 
+    // ── REST API: register session (for file watchers) ──────────────
+    if (req.method === "POST" && url.pathname === "/api/register" && deps) {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) {
+        chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+      }
+      try {
+        const { userId, repo, branch, files } = JSON.parse(Buffer.concat(chunks).toString("utf-8"));
+        if (!userId || !repo || !branch || !files || !Array.isArray(files) || files.length === 0) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Missing required fields: userId, repo, branch, files" }));
+          return;
+        }
+        const repoErr = validateRepo(repo);
+        if (repoErr) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: repoErr }));
+          return;
+        }
+        const session = await deps.sessionManager.register(userId, repo, branch, files);
+        const allSessions = await deps.sessionManager.getActiveSessions(repo);
+        const result: CollisionResult = deps.collisionEvaluator.evaluate(session, allSessions);
+        result.actions = deps.configManager.getStateActions(result.state);
+        const summary = deps.summaryFormatter.format(result);
+        if (logger) {
+          const overlappingUsers = result.overlappingSessions.map((s) => s.userId);
+          const branches = [...new Set(result.overlappingSessions.map((s) => s.branch))];
+          logger.logCollisionState(userId, repo, result.state, overlappingUsers, result.sharedFiles, branches, files, branch);
+        }
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ sessionId: session.sessionId, collisionState: result.state, summary }));
+      } catch {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Invalid JSON body" }));
+      }
+      return;
+    }
+
+    // ── REST API: check status (for polling) ────────────────────────
+    if (req.method === "POST" && url.pathname === "/api/status" && deps) {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) {
+        chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+      }
+      try {
+        const { userId, repo, files } = JSON.parse(Buffer.concat(chunks).toString("utf-8"));
+        if (!userId || !repo) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Missing required fields: userId, repo" }));
+          return;
+        }
+        const repoErr = validateRepo(repo);
+        if (repoErr) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: repoErr }));
+          return;
+        }
+        const allSessions = await deps.sessionManager.getActiveSessions(repo);
+        const existingSession = allSessions.find((s) => s.userId === userId);
+        if (!existingSession && (!files || files.length === 0)) {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ collisionState: "none", overlappingSessions: [], sharedFiles: [], actions: [] }));
+          return;
+        }
+        const querySession = existingSession
+          ? { ...existingSession, files: files ?? existingSession.files }
+          : { sessionId: "__api_status__", userId, repo, branch: "", files: files!, createdAt: new Date().toISOString(), lastHeartbeat: new Date().toISOString() };
+        const result: CollisionResult = deps.collisionEvaluator.evaluate(querySession, allSessions);
+        result.actions = deps.configManager.getStateActions(result.state);
+        if (logger) {
+          logger.logCheckStatus(userId, repo, result.state, querySession.files, querySession.branch || undefined);
+        }
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({
+          collisionState: result.state,
+          overlappingSessions: result.overlappingSessions.map((s) => ({
+            sessionId: s.sessionId, userId: s.userId, branch: s.branch, files: s.files,
+          })),
+          sharedFiles: result.sharedFiles,
+          actions: result.actions,
+        }));
+      } catch {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Invalid JSON body" }));
+      }
+      return;
+    }
+
     if (req.method === "GET" && url.pathname === "/sse") {
       const transport = new SSEServerTransport("/messages", res);
       transports.set(transport.sessionId, transport);
+
+      if (logger) {
+        const hostname = req.headers["x-konductor-user"] as string || undefined;
+        logger.logConnection(hostname || `session:${transport.sessionId.slice(0, 8)}`, clientIp, hostname ? undefined : clientIp);
+        logger.logAuthentication(hostname || `session:${transport.sessionId.slice(0, 8)}`);
+      }
+
       res.on("close", () => {
         transports.delete(transport.sessionId);
+        if (logger) {
+          const hostname = req.headers["x-konductor-user"] as string || undefined;
+          logger.logDisconnection(hostname || `session:${transport.sessionId.slice(0, 8)}`);
+        }
       });
       await mcp.connect(transport);
       return;
@@ -341,6 +486,9 @@ function startSseServer(mcp: McpServer, port: number, apiKey: string | undefined
 
     // Health check
     if (req.method === "GET" && url.pathname === "/health") {
+      if (logger) {
+        logger.logHealthCheck(clientIp);
+      }
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ status: "ok" }));
       return;
@@ -367,13 +515,20 @@ async function main() {
 
   const components = await createComponents();
   const mcp = buildMcpServer(components);
+  const { logger } = components;
 
   if (useSSE) {
     const port = parseInt(process.env.KONDUCTOR_PORT ?? "3010", 10);
     const apiKey = process.env.KONDUCTOR_API_KEY;
-    startSseServer(mcp, port, apiKey);
+    if (logger) {
+      logger.logServerStart("SSE", port);
+    }
+    startSseServer(mcp, port, apiKey, logger, components);
   } else {
     const transport = new StdioServerTransport();
+    if (logger) {
+      logger.logServerStart("stdio");
+    }
     await mcp.connect(transport);
     console.error("Konductor MCP server running on stdio");
   }

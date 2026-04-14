@@ -12,20 +12,24 @@ import type {
   IPersistenceStore,
   WorkSession,
 } from "./types.js";
+import type { KonductorLogger } from "./logger.js";
 
 export class SessionManager implements ISessionManager {
   private sessions: Map<string, WorkSession> = new Map();
   private readonly store: IPersistenceStore;
   private readonly timeoutMs: () => number;
+  private readonly logger?: KonductorLogger;
 
   /**
    * @param store        Persistence backend for durable session storage.
    * @param timeoutMs    Function returning the stale-session timeout in milliseconds.
    *                     Using a function so it can reflect hot-reloaded config.
+   * @param logger       Optional KonductorLogger for verbose logging.
    */
-  constructor(store: IPersistenceStore, timeoutMs: () => number) {
+  constructor(store: IPersistenceStore, timeoutMs: () => number, logger?: KonductorLogger) {
     this.store = store;
     this.timeoutMs = timeoutMs;
+    this.logger = logger;
   }
 
   /** Load existing sessions from the persistence store into memory. */
@@ -33,6 +37,9 @@ export class SessionManager implements ISessionManager {
     const loaded = await this.store.load();
     for (const session of loaded) {
       this.sessions.set(session.sessionId, session);
+    }
+    if (this.logger) {
+      this.logger.logSessionsRestored(loaded.length);
     }
   }
 
@@ -53,6 +60,9 @@ export class SessionManager implements ISessionManager {
         existing.files = files;
         existing.lastHeartbeat = new Date().toISOString();
         await this.persist();
+        if (this.logger) {
+          this.logger.logSessionUpdated(userId, existing.sessionId, files, branch);
+        }
         return existing;
       }
     }
@@ -70,6 +80,9 @@ export class SessionManager implements ISessionManager {
 
     this.sessions.set(session.sessionId, session);
     await this.persist();
+    if (this.logger) {
+      this.logger.logSessionRegistered(userId, session.sessionId, repo, branch, files);
+    }
     return session;
   }
 
@@ -82,14 +95,21 @@ export class SessionManager implements ISessionManager {
     session.files = files;
     session.lastHeartbeat = new Date().toISOString();
     await this.persist();
+    if (this.logger) {
+      this.logger.logSessionUpdated(session.userId, sessionId, files, session.branch);
+    }
     return session;
   }
 
   /** Remove a session by ID. Returns true if the session existed. */
   async deregister(sessionId: string): Promise<boolean> {
+    const session = this.sessions.get(sessionId);
     const existed = this.sessions.delete(sessionId);
     if (existed) {
       await this.persist();
+      if (this.logger && session) {
+        this.logger.logSessionDeregistered(session.userId, sessionId);
+      }
     }
     return existed;
   }
@@ -138,6 +158,9 @@ export class SessionManager implements ISessionManager {
     }
     if (removed > 0) {
       await this.persist();
+      if (this.logger) {
+        this.logger.logStaleCleanup(removed, this.timeoutMs() / 1000);
+      }
     }
     return removed;
   }

@@ -76,8 +76,8 @@ cp .env.local.example .env.local
 Edit `.env.local`:
 
 ```bash
-KONDUCTOR_PORT=4000
-KONDUCTOR_API_KEY=my-team-secret
+KONDUCTOR_PORT=3010
+KONDUCTOR_API_KEY=konductor
 ```
 
 Then start the server:
@@ -101,7 +101,7 @@ KONDUCTOR_PORT=4000 node dist/index.js --sse
 Verify it's running:
 
 ```bash
-curl -H "Authorization: Bearer my-team-secret" http://localhost:3010/health
+curl -H "Authorization: Bearer konductor" http://localhost:3010/health
 # → {"status":"ok"}
 ```
 
@@ -142,7 +142,7 @@ Leave this running in a terminal (or use a process manager like `pm2`). Teammate
     "konductor": {
       "url": "http://localhost:3010/sse",
       "headers": {
-        "Authorization": "Bearer my-team-secret"
+        "Authorization": "Bearer kd-a7f3b9c2e1d4"
       },
       "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions"]
     }
@@ -160,7 +160,7 @@ Use the hostname or IP of the machine running the server. For example, if the se
     "konductor": {
       "url": "http://LT-DWHEATLEY-2.local:3010/sse",
       "headers": {
-        "Authorization": "Bearer my-team-secret"
+        "Authorization": "Bearer kd-a7f3b9c2e1d4"
       },
       "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions"]
     }
@@ -176,7 +176,7 @@ Or using the IP directly:
     "konductor": {
       "url": "http://192.168.68.74:3010/sse",
       "headers": {
-        "Authorization": "Bearer my-team-secret"
+        "Authorization": "Bearer kd-a7f3b9c2e1d4"
       },
       "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions"]
     }
@@ -185,6 +185,104 @@ Or using the IP directly:
 ```
 
 3. Replace the API key with whatever you set in `.env.local` on the server machine.
+
+## Getting Started Using the Konductor MCP Server
+
+The Konductor ships with a client bundle (`konductor/konductor_bundle/`) that handles setup. There's a one-time global step for the MCP connection, then a quick per-project install for the steering rule and hook.
+
+### First time setup (once per machine)
+
+macOS / Linux:
+
+```bash
+bash /path/to/konductor/konductor_bundle/install.sh --global
+```
+
+Windows (PowerShell):
+
+```powershell
+.\install.ps1 -Global
+```
+
+This installs the MCP config to `~/.kiro/settings/mcp.json` so every Kiro workspace can talk to the Konductor. Edit the file to set your server URL and API key.
+
+### Per-project setup (once per workspace)
+
+macOS / Linux:
+
+```bash
+bash /path/to/konductor/konductor_bundle/install.sh --workspace
+```
+
+Windows (PowerShell):
+
+```powershell
+.\install.ps1 -Workspace
+```
+
+This copies two files into `.kiro/` and two files into the project root:
+
+| File | Purpose |
+|------|---------|
+| `.kiro/steering/konductor-collision-awareness.md` | Agent auto-registers sessions and warns on collisions |
+| `.kiro/hooks/konductor-file-save.hook.md` | Registers sessions when you save files during active chat |
+| `konductor-watcher.sh` | Background file watcher with color-coded collision notifications |
+| `.konductor-watcher.env` | Watcher configuration (server URL, API key, log level, poll interval) |
+
+Or do both steps at once (first time in a new project):
+
+macOS / Linux:
+
+```bash
+bash /path/to/konductor/konductor_bundle/install.sh
+```
+
+Windows (PowerShell):
+
+```powershell
+.\install.ps1
+```
+
+### Start the file watcher
+
+After install, open a terminal in your project and run:
+
+```bash
+./konductor-watcher.sh
+```
+
+Leave it running alongside your editor. It watches for file changes, registers them with the Konductor, and polls for collision state changes from other users. Notifications are color-coded by severity — green for safe, yellow for caution, orange for warning, red for critical.
+
+Edit `.konductor-watcher.env` to set your API key and adjust settings:
+
+```env
+KONDUCTOR_URL=http://localhost:3010
+KONDUCTOR_API_KEY=your-api-key
+KONDUCTOR_LOG_LEVEL=info        # info = notifications only, debug = all API traffic
+KONDUCTOR_POLL_INTERVAL=10      # seconds between collision polls
+```
+
+### How it works
+
+Three layers cover all editing scenarios:
+
+| Layer | Covers | How |
+|-------|--------|-----|
+| Steering rule | Agent-driven file changes | Agent auto-registers before modifying files |
+| File save hook | Editor saves during active chat | Hook triggers agent to register on save |
+| File watcher | All file changes (no agent needed) | Watches filesystem + polls server for collisions |
+
+You'll see short notifications in chat:
+
+```
+🟢 Konductor: Registered session on acme/app#main (3 files)
+🟠 Konductor: Warning — bob is modifying the same files: src/index.ts. Proceed?
+✅ Konductor: Session closed.
+```
+
+The agent only pauses to ask for confirmation at Collision Course or Merge Hell. Everything else proceeds automatically.
+
+See `konductor/konductor_bundle/README.md` for the full bundle documentation.
 
 ## Using the Konductor
 
@@ -483,6 +581,10 @@ SSE endpoints:
 - `POST /messages?sessionId=<id>` — send MCP messages
 - `GET /health` — health check
 
+REST API endpoints (for file watchers and scripts):
+- `POST /api/register` — register or update a session (body: `{userId, repo, branch, files}`)
+- `POST /api/status` — check collision state (body: `{userId, repo}`, optional `files`)
+
 ## Environment Variables
 
 Environment variables can be set in a `.env.local` file in the `konductor/` directory, or passed on the command line. CLI env vars take precedence over `.env.local`.
@@ -498,6 +600,14 @@ cp .env.local.example .env.local
 | `KONDUCTOR_PORT` | `3010` | Port for SSE HTTP server. Setting this also enables SSE mode. |
 | `KONDUCTOR_API_KEY` | *(none)* | Shared API key for SSE `Authorization: Bearer` auth. If unset, auth is disabled. |
 | `KONDUCTOR_CONFIG` | `./konductor.yaml` | Path to the YAML configuration file. |
+| `VERBOSE_LOGGING` | `false` | Set to `true` to enable structured verbose logging of all server events. |
+| `LOG_TO_TERMINAL` | `false` | Set to `true` to write log entries to stderr. Requires `VERBOSE_LOGGING=true`. |
+| `LOG_TO_FILE` | `false` | Set to `true` to append log entries to a file. Requires `VERBOSE_LOGGING=true`. |
+| `LOG_FILENAME` | `konductor.log` | File path for log output when `LOG_TO_FILE=true`. |
+| `KONDUCTOR_LOG_LEVEL` | `info` | Watcher log level: `info` for color-coded notifications, `debug` for all API traffic. |
+| `KONDUCTOR_POLL_INTERVAL` | `10` | Seconds between collision state polls in the file watcher. |
+| `KONDUCTOR_LOG_FILE` | *(none)* | Optional file path for watcher log output (in addition to terminal). |
+| `KONDUCTOR_WATCH_EXTENSIONS` | `ts,tsx,js,...` | Comma-separated file extensions the watcher monitors. |
 
 ## Troubleshooting
 

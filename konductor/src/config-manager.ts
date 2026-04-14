@@ -18,6 +18,7 @@ import {
   type StateConfig,
   type Action,
 } from "./types.js";
+import type { KonductorLogger } from "./logger.js";
 
 /** Built-in defaults used when config file is missing or incomplete. */
 export const DEFAULT_CONFIG: KonductorConfig = {
@@ -109,6 +110,11 @@ export class ConfigManager implements IConfigManager {
   private configPath: string = "";
   private watcher: FSWatcher | null = null;
   private changeCallbacks: Array<(config: KonductorConfig) => void> = [];
+  private readonly logger?: KonductorLogger;
+
+  constructor(logger?: KonductorLogger) {
+    this.logger = logger;
+  }
 
   /**
    * Load configuration from a YAML file. If the file is missing or
@@ -119,6 +125,9 @@ export class ConfigManager implements IConfigManager {
 
     if (!existsSync(configPath)) {
       this.config = { ...DEFAULT_CONFIG };
+      if (this.logger) {
+        this.logger.logConfigLoaded(configPath, this.config.heartbeatTimeoutSeconds);
+      }
       return this.config;
     }
 
@@ -129,6 +138,13 @@ export class ConfigManager implements IConfigManager {
     } catch {
       // Invalid YAML or read error — keep defaults
       this.config = { ...DEFAULT_CONFIG };
+      if (this.logger) {
+        this.logger.logConfigError("Failed to parse config file");
+      }
+    }
+
+    if (this.logger) {
+      this.logger.logConfigLoaded(configPath, this.config.heartbeatTimeoutSeconds);
     }
 
     return this.config;
@@ -148,15 +164,29 @@ export class ConfigManager implements IConfigManager {
       return this.config;
     }
 
+    const previousTimeout = this.config.heartbeatTimeoutSeconds;
+
     try {
       const raw = await readFile(this.configPath, "utf-8");
       const parsed = parseYaml(raw);
       this.config = mergeWithDefaults(parsed);
+
+      if (this.logger) {
+        const changes: string[] = [];
+        if (this.config.heartbeatTimeoutSeconds !== previousTimeout) {
+          changes.push(`timeout ${previousTimeout}s → ${this.config.heartbeatTimeoutSeconds}s`);
+        }
+        this.logger.logConfigReloaded(changes.length > 0 ? changes.join(", ") : "no value changes detected");
+      }
+
       for (const cb of this.changeCallbacks) {
         cb(this.config);
       }
     } catch {
       // Invalid YAML — keep previous config
+      if (this.logger) {
+        this.logger.logConfigError("Failed to parse config on reload");
+      }
     }
 
     return this.config;

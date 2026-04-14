@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "konductor": {
+      "url": "http://localhost:3010/sse",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      },
+      "autoApprove": [
+        "register_session",
+        "check_status",
+        "deregister_session",
+        "list_sessions"
+      ]
+    }
+  }
+}
