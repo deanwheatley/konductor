@@ -93,6 +93,7 @@ export interface ISessionManager {
   deregister(sessionId: string): Promise<boolean>;
   heartbeat(sessionId: string): Promise<WorkSession>;
   getActiveSessions(repo: string): Promise<WorkSession[]>;
+  getAllActiveSessions(): Promise<WorkSession[]>;
   cleanupStale(): Promise<number>;
 }
 

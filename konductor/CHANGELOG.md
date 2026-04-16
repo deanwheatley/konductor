@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.2.0 — 2026-04-15
+
+### Added
+
+- **npx installer** (`konductor-setup`): cross-platform Node.js installer invoked via `npx konductor-setup`, replacing the manual copy-and-run bundle workflow
+- CLI flags: `--global`, `--workspace`, `--server`, `--api-key`, `--check-update`, `--version`, `--help`
+- Smart auto-mode detection: skips global setup when MCP config already exists
+- Server bundle endpoints: `GET /bundle/manifest.json` and `GET /bundle/files/:path` serve the client bundle without authentication
+- Embedded fallback: installer uses bundled files when the server is unreachable
+- Client version checking: server compares `X-Konductor-Client-Version` header and returns `updateRequired` flag when outdated
+- Auto-update via steering rule: agent runs `npx konductor-setup@latest --workspace` when server signals an update is needed
+- `.konductor-version` file written to workspace root for version tracking
+- File watcher reports client version to server on REST API calls
+- Steering rule updated to use `npx konductor-setup` instead of `bash install.sh`
+
+### Changed
+
+- Bundle README updated to recommend npx installer, shell scripts retained as fallback
+- Architecture section in README updated to document bundle endpoints
+
 ## 0.1.0 — 2026-04-10
 
 ### Added

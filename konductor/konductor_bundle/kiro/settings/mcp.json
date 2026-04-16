@@ -3,13 +3,23 @@
     "konductor": {
       "url": "http://localhost:3010/sse",
       "headers": {
-        "Authorization": "Bearer YOUR_API_KEY"
+        "Authorization": "Bearer YOUR_API_KEY",
+        "X-Konductor-User": "YOUR_USERNAME"
       },
       "autoApprove": [
         "register_session",
         "check_status",
         "deregister_session",
-        "list_sessions"
+        "list_sessions",
+        "who_is_active",
+        "who_overlaps",
+        "user_activity",
+        "risk_assessment",
+        "repo_hotspots",
+        "active_branches",
+        "coordination_advice",
+        "client_install_info",
+        "client_update_check"
       ]
     }
   }

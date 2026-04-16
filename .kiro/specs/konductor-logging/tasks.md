@@ -120,5 +120,5 @@
     - Update `konductor/README.md` Environment Variables table
     - _Requirements: 1.5, 1.6_
 
-- [ ] 7. Final Checkpoint
+- [x] 7. Final Checkpoint
   - Ensure all tests pass, ask the user if questions arise.

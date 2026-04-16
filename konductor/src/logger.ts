@@ -7,7 +7,7 @@
  * overhead when logging is off.
  */
 
-import { appendFileSync } from "node:fs";
+import { appendFileSync, statSync, renameSync, unlinkSync } from "node:fs";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -27,6 +27,7 @@ export interface LoggerOptions {
   toTerminal: boolean;
   toFile?: boolean;
   filePath?: string;
+  maxFileSize?: number; // bytes, default 10MB
 }
 
 // ---------------------------------------------------------------------------
@@ -39,6 +40,18 @@ const VALID_CATEGORIES: ReadonlySet<string> = new Set<LogCategory>([
 
 const LOG_LINE_REGEX = /^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\] \[([A-Z]+)\] \[([^\]]+)\] (.+)$/;
 
+/** Parse a size string like "10MB", "500KB", "1GB" into bytes. */
+function parseFileSize(s: string): number {
+  const m = s.trim().match(/^(\d+(?:\.\d+)?)\s*(KB|MB|GB)?$/i);
+  if (!m) return 10 * 1024 * 1024;
+  const n = parseFloat(m[1]);
+  const unit = (m[2] || "B").toUpperCase();
+  if (unit === "GB") return n * 1024 * 1024 * 1024;
+  if (unit === "MB") return n * 1024 * 1024;
+  if (unit === "KB") return n * 1024;
+  return n;
+}
+
 // ---------------------------------------------------------------------------
 // KonductorLogger
 // ---------------------------------------------------------------------------
@@ -48,6 +61,7 @@ export class KonductorLogger {
   private readonly toTerminal: boolean;
   private readonly toFile: boolean;
   private readonly filePath: string;
+  private readonly maxFileSize: number;
 
   constructor(options?: LoggerOptions) {
     if (options) {
@@ -55,11 +69,14 @@ export class KonductorLogger {
       this.toTerminal = options.toTerminal;
       this.toFile = options.toFile ?? false;
       this.filePath = options.filePath ?? "konductor.log";
+      this.maxFileSize = options.maxFileSize ?? 10 * 1024 * 1024; // 10MB
     } else {
       this.enabled = process.env.VERBOSE_LOGGING === "true";
       this.toTerminal = process.env.LOG_TO_TERMINAL === "true";
       this.toFile = process.env.LOG_TO_FILE === "true";
       this.filePath = process.env.LOG_FILENAME ?? "konductor.log";
+      const maxSizeEnv = process.env.KONDUCTOR_LOG_MAX_SIZE;
+      this.maxFileSize = maxSizeEnv ? parseFileSize(maxSizeEnv) : 10 * 1024 * 1024;
     }
   }
 
@@ -95,6 +112,10 @@ export class KonductorLogger {
     return `User: ${userId}`;
   }
 
+  private transportActor(sessionId: string): string {
+    return `Transport: ${sessionId}`;
+  }
+
   private write(entry: LogEntry): void {
     if (!this.enabled) return;
     const line = this.formatEntry(entry);
@@ -103,10 +124,28 @@ export class KonductorLogger {
     }
     if (this.toFile) {
       try {
+        this.rotateIfNeeded();
         appendFileSync(this.filePath, line + "\n");
       } catch {
         // Logging should never crash the server
       }
+    }
+  }
+
+  private rotateIfNeeded(): void {
+    try {
+      const size = statSync(this.filePath).size;
+      if (size < this.maxFileSize) return;
+
+      const backup = this.filePath + ".backup";
+      const toDelete = this.filePath + ".tobedeleted";
+
+      // Shift: .tobedeleted is deleted, .backup becomes .tobedeleted, current becomes .backup
+      try { unlinkSync(toDelete); } catch {}
+      try { renameSync(backup, toDelete); } catch {}
+      try { renameSync(this.filePath, backup); } catch {}
+    } catch {
+      // File doesn't exist yet — nothing to rotate
     }
   }
 
@@ -122,16 +161,28 @@ export class KonductorLogger {
     this.log("CONN", this.userActor(userId), `Connected via SSE from ${ip}${host}`);
   }
 
+  logTransportConnection(sessionId: string, ip: string): void {
+    this.log("CONN", this.transportActor(sessionId), `Connected via SSE from ${ip}`);
+  }
+
   logAuthentication(userId: string): void {
     this.log("CONN", this.userActor(userId), "Authenticated with valid API key");
+  }
+
+  logTransportAuthentication(sessionId: string): void {
+    this.log("CONN", this.transportActor(sessionId), "Authenticated with valid API key");
   }
 
   logDisconnection(userId: string): void {
     this.log("CONN", this.userActor(userId), "Disconnected");
   }
 
+  logTransportDisconnection(sessionId: string): void {
+    this.log("CONN", this.transportActor(sessionId), "Disconnected");
+  }
+
   logAuthRejection(ip: string, reason: string): void {
-    this.log("CONN", "System", `Auth rejected from ${ip}: ${reason}`);
+    this.log("CONN", "SYSTEM", `Auth rejected from ${ip}: ${reason}`);
   }
 
   // ── Session events ──────────────────────────────────────────────────
@@ -152,7 +203,7 @@ export class KonductorLogger {
   }
 
   logStaleCleanup(count: number, timeoutSeconds: number): void {
-    this.log("SESSION", "System", `Cleaned up ${count} stale sessions (timeout: ${timeoutSeconds}s)`);
+    this.log("SESSION", "SYSTEM", `Cleaned up ${count} stale sessions (timeout: ${timeoutSeconds}s)`);
   }
 
   // ── Status events (collision evaluation results) ─────────────────
@@ -182,38 +233,42 @@ export class KonductorLogger {
   }
 
   logCollisionAction(actionType: string, affectedUsers: string[], repo: string): void {
-    this.log("STATUS", "System",
+    this.log("STATUS", "SYSTEM",
       `Action: ${actionType} for ${affectedUsers.join(", ")} in ${repo}`);
   }
 
   // ── Config events ───────────────────────────────────────────────────
 
   logConfigLoaded(filePath: string, timeoutSeconds: number): void {
-    this.log("CONFIG", "System", `Loaded config from ${filePath} (timeout: ${timeoutSeconds}s)`);
+    this.log("CONFIG", "SYSTEM", `Loaded config from ${filePath} (timeout: ${timeoutSeconds}s)`);
   }
 
   logConfigReloaded(changes: string): void {
-    this.log("CONFIG", "System", `Config reloaded: ${changes}`);
+    this.log("CONFIG", "SYSTEM", `Config reloaded: ${changes}`);
   }
 
   logConfigError(reason: string): void {
-    this.log("CONFIG", "System", `Config error: ${reason} — retaining previous config`);
+    this.log("CONFIG", "SYSTEM", `Config error: ${reason} — retaining previous config`);
   }
 
   // ── Server events ───────────────────────────────────────────────────
 
   logServerStart(transport: string, port?: number): void {
     const portInfo = port !== undefined ? ` on port ${port}` : "";
-    this.log("SERVER", "System",
+    this.log("SERVER", "SYSTEM",
       `Started with ${transport} transport${portInfo}, verbose logging enabled`);
   }
 
   logSessionsRestored(count: number): void {
-    this.log("SERVER", "System", `Restored ${count} sessions from persistent storage`);
+    this.log("SERVER", "SYSTEM", `Restored ${count} sessions from persistent storage`);
   }
 
   logHealthCheck(ip: string): void {
-    this.log("SERVER", "System", `Health check from ${ip}`);
+    this.log("SERVER", "SYSTEM", `Health check from ${ip}`);
+  }
+
+  logClientInstall(clientIp: string, version: string): void {
+    this.log("SERVER", "SYSTEM", `Client install/update from ${clientIp} — serving bundle v${version}`);
   }
 
   // ── Query events ────────────────────────────────────────────────────
@@ -231,6 +286,11 @@ export class KonductorLogger {
   }
 
   logListSessions(repo: string, count: number): void {
-    this.log("QUERY", "System", `list_sessions on ${repo}: ${count} active sessions`);
+    this.log("QUERY", "SYSTEM", `list_sessions on ${repo}: ${count} active sessions`);
+  }
+
+  logQueryTool(toolName: string, params: Record<string, unknown>): void {
+    const paramStr = Object.entries(params).map(([k, v]) => `${k}=${v}`).join(", ");
+    this.log("QUERY", "SYSTEM", `${toolName}(${paramStr})`);
   }
 }

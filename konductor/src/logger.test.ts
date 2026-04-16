@@ -34,7 +34,8 @@ const userIdArb = fc.stringMatching(/^[a-zA-Z0-9_]{1,20}$/);
 
 const actorArb: fc.Arbitrary<string> = fc.oneof(
   userIdArb.map((id) => `User: ${id}`),
-  fc.constant("System"),
+  fc.constant("SYSTEM"),
+  fc.stringMatching(/^[a-f0-9]{1,8}$/).map((id) => `Transport: ${id}`),
 );
 
 /** Message must not contain newlines or be empty, and must not start/end with whitespace. */
@@ -62,7 +63,7 @@ describe("KonductorLogger — Property Tests", () => {
    * **Validates: Requirements 2.1, 2.2, 2.3, 2.4**
    */
   it("Property 1: Log format consistency", () => {
-    const FORMAT_REGEX = /^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\] \[(CONN|SESSION|STATUS|CONFIG|SERVER|QUERY)\] \[(User: [^\]]+|System)\] .+$/;
+    const FORMAT_REGEX = /^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\] \[(CONN|SESSION|STATUS|CONFIG|SERVER|QUERY)\] \[(User: [^\]]+|SYSTEM|Transport: [^\]]+)\] .+$/;
 
     fc.assert(
       fc.property(logEntryArb, (entry) => {
@@ -297,7 +298,7 @@ describe("KonductorLogger — Event Methods", () => {
     logger.logAuthRejection("10.0.0.99", "invalid key");
     const output = stderrSpy.mock.calls[0][0] as string;
     expect(output).toContain("[CONN]");
-    expect(output).toContain("[System]");
+    expect(output).toContain("[SYSTEM]");
     expect(output).toContain("10.0.0.99");
     expect(output).toContain("invalid key");
   });
@@ -336,7 +337,7 @@ describe("KonductorLogger — Event Methods", () => {
     logger.logStaleCleanup(3, 300);
     const output = stderrSpy.mock.calls[0][0] as string;
     expect(output).toContain("[SESSION]");
-    expect(output).toContain("[System]");
+    expect(output).toContain("[SYSTEM]");
     expect(output).toContain("3");
     expect(output).toContain("300");
   });
@@ -384,7 +385,7 @@ describe("KonductorLogger — Event Methods", () => {
     logger.logConfigLoaded("/etc/konductor.yaml", 300);
     const output = stderrSpy.mock.calls[0][0] as string;
     expect(output).toContain("[CONFIG]");
-    expect(output).toContain("[System]");
+    expect(output).toContain("[SYSTEM]");
     expect(output).toContain("/etc/konductor.yaml");
     expect(output).toContain("300");
   });
@@ -410,7 +411,7 @@ describe("KonductorLogger — Event Methods", () => {
     logger.logServerStart("stdio");
     const output = stderrSpy.mock.calls[0][0] as string;
     expect(output).toContain("[SERVER]");
-    expect(output).toContain("[System]");
+    expect(output).toContain("[SYSTEM]");
     expect(output).toContain("stdio");
     expect(output).toContain("verbose logging enabled");
   });

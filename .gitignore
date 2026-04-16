@@ -5,3 +5,12 @@ dist/
 sessions.json
 sessions.json.backup
 *.tgz
+
+# Konductor (auto-added by installer)
+konductor-watcher.mjs
+konductor-watcher-launcher.sh
+konductor-watchdog.sh
+.konductor-watcher.env
+.konductor-watcher.log
+.konductor-watchdog.pid
+.konductor-version

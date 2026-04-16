@@ -385,4 +385,42 @@ describe("SessionManager — Unit Tests", () => {
     expect(active).toHaveLength(1);
     expect(active[0].userId).toBe("bob");
   });
+
+  it("getAllActiveSessions returns sessions across multiple repos", async () => {
+    const manager = await createManager();
+    await manager.register("alice", "org/repo-a", "main", ["a.ts"]);
+    await manager.register("bob", "org/repo-b", "feature", ["b.ts"]);
+    await manager.register("carol", "org/repo-a", "dev", ["c.ts"]);
+
+    const all = await manager.getAllActiveSessions();
+    expect(all).toHaveLength(3);
+
+    const userIds = new Set(all.map((s) => s.userId));
+    expect(userIds).toEqual(new Set(["alice", "bob", "carol"]));
+
+    const repos = new Set(all.map((s) => s.repo));
+    expect(repos).toEqual(new Set(["org/repo-a", "org/repo-b"]));
+  });
+
+  it("getAllActiveSessions excludes stale sessions", async () => {
+    const timeoutMs = 50;
+    const manager = await createManager(timeoutMs);
+
+    const stale = await manager.register("alice", "org/repo-a", "main", ["a.ts"]);
+    (stale as any).lastHeartbeat = new Date(
+      Date.now() - timeoutMs - 10_000,
+    ).toISOString();
+
+    await manager.register("bob", "org/repo-b", "main", ["b.ts"]);
+
+    const all = await manager.getAllActiveSessions();
+    expect(all).toHaveLength(1);
+    expect(all[0].userId).toBe("bob");
+  });
+
+  it("getAllActiveSessions returns empty array when no sessions exist", async () => {
+    const manager = await createManager();
+    const all = await manager.getAllActiveSessions();
+    expect(all).toHaveLength(0);
+  });
 });

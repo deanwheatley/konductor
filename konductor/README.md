@@ -16,46 +16,101 @@ The Konductor solves "collision debt" — the accumulated cost of merge conflict
 | 🟠 Collision Course | 3 | Someone is modifying the same files as you |
 | 🔴 Merge Hell | 4 | Divergent changes on the same files across branches |
 
-## Setup and Installation
+## Installing Konductor (Client)
+
+This is what you need to do to get Konductor running in your project. The installer is a single `npx` command — no cloning, no copying files, no bash scripts.
+
+### Prerequisites
+
+- Node.js 20 or later
+- A running Konductor server (see [Running the Server](#running-the-konductor-server) below, or get the URL from your team)
+- Kiro IDE, or any MCP-compatible client
+
+### First-time setup (once per machine + project)
+
+```bash
+npx http://YOUR_SERVER:3010/bundle/installer.tgz --server http://YOUR_SERVER:3010 --api-key YOUR_API_KEY
+```
+
+That's it. This single command:
+1. Creates `~/.kiro/settings/mcp.json` with your server URL and API key
+2. Installs global steering rules and agent rules
+3. Deploys workspace hooks, steering rules, and the file watcher into your current project
+4. Launches the file watcher in the background
+5. Adds Konductor artifacts to `.gitignore`
+
+Replace `YOUR_SERVER` with the hostname/IP of the Konductor server and `YOUR_API_KEY` with the shared team key.
+
+### Adding Konductor to another project
+
+Just run the same command in any project directory:
+
+```bash
+npx http://YOUR_SERVER:3010/bundle/installer.tgz --server http://YOUR_SERVER:3010 --api-key YOUR_API_KEY
+```
+
+The installer detects existing global config and updates it with the correct server URL and key every time.
+
+### Updating
+
+The file watcher auto-updates when the server reports a newer version. You can also update manually by re-running the install command.
+
+### All CLI flags
+
+```
+npx http://YOUR_SERVER:3010/bundle/installer.tgz [options]
+
+Options:
+  --server <url>        Konductor server URL (required)
+  --api-key <key>       API key for authentication (recommended)
+  --version             Print installed package version
+  --help                Show help
+```
+
+### What gets installed
+
+| Location | Files | Purpose |
+|----------|-------|---------|
+| `~/.kiro/settings/mcp.json` | MCP server config | Connects your IDE to the Konductor server |
+| `~/.kiro/steering/` | Global steering rule | Agent collision awareness (all workspaces) |
+| `.kiro/steering/` | Workspace steering rule | Agent collision awareness (this project) |
+| `.kiro/hooks/` | File save + session start hooks | Triggers registration on file save |
+| `.agent/rules/` | Agent rule | Collision awareness for Antigravity |
+| Workspace root | `konductor-watcher.mjs`, launcher, watchdog | Background file watcher |
+| Workspace root | `.konductor-watcher.env` | Watcher config (preserved on reinstall) |
+| Workspace root | `.konductor-version` | Deployed version (used for auto-update) |
+
+### Offline / no server available
+
+If the server is unreachable during install, `npx` won't be able to fetch the installer tarball. Use the legacy install method below instead.
+
+### Legacy install (manual fallback)
+
+The shell-based installers (`install.sh` / `install.ps1`) in `konductor_bundle/` still work if you prefer. See `konductor/konductor_bundle/README.md`.
+
+## Running the Konductor Server
+
+This section is for whoever hosts the server. If someone on your team already runs it, you just need the URL and API key — skip to [Installing Konductor](#installing-konductor-client) above.
 
 ### Prerequisites
 
 - Node.js 20 or later
 - npm
-- Kiro IDE (for MCP integration) or any MCP-compatible client
 
-### Step 1: Clone the repository
+### Clone and build
 
 ```bash
 git clone https://github.com/deanwheatley/konductor.git
 cd konductor/konductor
-```
-
-### Step 2: Install dependencies
-
-```bash
 npm install
-```
-
-### Step 3: Build the project
-
-```bash
 npm run build
 ```
 
-This compiles TypeScript to JavaScript in the `dist/` directory.
-
-### Step 4: Verify the build (optional)
-
-Run the test suite to make sure everything is working:
+### Verify the build (optional)
 
 ```bash
 npm test
 ```
-
-You should see all 50 tests pass.
-
-## Running the Konductor
 
 ### Option A: Local mode (stdio) — single user
 
@@ -121,7 +176,7 @@ Leave this running in a terminal (or use a process manager like `pm2`). Teammate
     "konductor": {
       "command": "node",
       "args": ["/absolute/path/to/konductor/konductor/dist/index.js"],
-      "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions"]
+      "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions", "who_is_active", "who_overlaps", "user_activity", "risk_assessment", "repo_hotspots", "active_branches", "coordination_advice", "client_install_info", "client_update_check"]
     }
   }
 }
@@ -144,7 +199,7 @@ Leave this running in a terminal (or use a process manager like `pm2`). Teammate
       "headers": {
         "Authorization": "Bearer kd-a7f3b9c2e1d4"
       },
-      "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions"]
+      "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions", "who_is_active", "who_overlaps", "user_activity", "risk_assessment", "repo_hotspots", "active_branches", "coordination_advice", "client_install_info", "client_update_check"]
     }
   }
 }
@@ -162,7 +217,7 @@ Use the hostname or IP of the machine running the server. For example, if the se
       "headers": {
         "Authorization": "Bearer kd-a7f3b9c2e1d4"
       },
-      "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions"]
+      "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions", "who_is_active", "who_overlaps", "user_activity", "risk_assessment", "repo_hotspots", "active_branches", "coordination_advice", "client_install_info", "client_update_check"]
     }
   }
 }
@@ -178,7 +233,7 @@ Or using the IP directly:
       "headers": {
         "Authorization": "Bearer kd-a7f3b9c2e1d4"
       },
-      "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions"]
+      "autoApprove": ["register_session", "check_status", "deregister_session", "list_sessions", "who_is_active", "who_overlaps", "user_activity", "risk_assessment", "repo_hotspots", "active_branches", "coordination_advice", "client_install_info", "client_update_check"]
     }
   }
 }
@@ -186,127 +241,75 @@ Or using the IP directly:
 
 3. Replace the API key with whatever you set in `.env.local` on the server machine.
 
-## Getting Started Using the Konductor MCP Server
+## Talking to Konductor
 
-The Konductor ships with a client bundle (`konductor/konductor_bundle/`) that handles setup. There's a one-time global step for the MCP connection, then a quick per-project install for the steering rule and hook.
-
-### First time setup (once per machine)
-
-macOS / Linux:
-
-```bash
-bash /path/to/konductor/konductor_bundle/install.sh --global
-```
-
-Windows (PowerShell):
-
-```powershell
-.\install.ps1 -Global
-```
-
-This installs the MCP config to `~/.kiro/settings/mcp.json` so every Kiro workspace can talk to the Konductor. Edit the file to set your server URL and API key.
-
-### Per-project setup (once per workspace)
-
-macOS / Linux:
-
-```bash
-bash /path/to/konductor/konductor_bundle/install.sh --workspace
-```
-
-Windows (PowerShell):
-
-```powershell
-.\install.ps1 -Workspace
-```
-
-This copies two files into `.kiro/` and two files into the project root:
-
-| File | Purpose |
-|------|---------|
-| `.kiro/steering/konductor-collision-awareness.md` | Agent auto-registers sessions and warns on collisions |
-| `.kiro/hooks/konductor-file-save.hook.md` | Registers sessions when you save files during active chat |
-| `konductor-watcher.sh` | Background file watcher with color-coded collision notifications |
-| `.konductor-watcher.env` | Watcher configuration (server URL, API key, log level, poll interval) |
-
-Or do both steps at once (first time in a new project):
-
-macOS / Linux:
-
-```bash
-bash /path/to/konductor/konductor_bundle/install.sh
-```
-
-Windows (PowerShell):
-
-```powershell
-.\install.ps1
-```
-
-### Start the file watcher
-
-After install, open a terminal in your project and run:
-
-```bash
-./konductor-watcher.sh
-```
-
-Leave it running alongside your editor. It watches for file changes, registers them with the Konductor, and polls for collision state changes from other users. Notifications are color-coded by severity — green for safe, yellow for caution, orange for warning, red for critical.
-
-Edit `.konductor-watcher.env` to set your API key and adjust settings:
-
-```env
-KONDUCTOR_URL=http://localhost:3010
-KONDUCTOR_API_KEY=your-api-key
-KONDUCTOR_LOG_LEVEL=info        # info = notifications only, debug = all API traffic
-KONDUCTOR_POLL_INTERVAL=10      # seconds between collision polls
-```
-
-### How it works
-
-Three layers cover all editing scenarios:
-
-| Layer | Covers | How |
-|-------|--------|-----|
-| Steering rule | Agent-driven file changes | Agent auto-registers before modifying files |
-| File save hook | Editor saves during active chat | Hook triggers agent to register on save |
-| File watcher | All file changes (no agent needed) | Watches filesystem + polls server for collisions |
-
-You'll see short notifications in chat:
+You interact with Konductor by prefixing your message with `konductor,` (case-insensitive). This tells the agent the message is directed at Konductor rather than being a general coding request.
 
 ```
-🟢 Konductor: Registered session on acme/app#main (3 files)
-🟠 Konductor: Warning — bob is modifying the same files: src/index.ts. Proceed?
-✅ Konductor: Session closed.
+konductor, who else is working here?
+konductor, help
+konductor, status
 ```
 
-The agent only pauses to ask for confirmation at Collision Course or Merge Hell. Everything else proceeds automatically.
+Background operations (session registration, collision checks, deregistration) happen automatically and don't need the prefix.
 
-See `konductor/konductor_bundle/README.md` for the full bundle documentation.
+### Queries
 
-## Using the Konductor
+Ask questions about repo activity, collision risk, and coordination:
 
-Once connected, you can invoke the tools from Kiro's chat or let steering rules call them automatically.
+| What you want to know | What to say |
+|---|---|
+| Who's active in my repo? | `konductor, who else is working here?` |
+| Who's editing my files? | `konductor, who's on my files?` |
+| What is a specific user doing? | `konductor, what is bob working on?` |
+| How risky is my situation? | `konductor, how risky is my situation?` |
+| Which files have the most editors? | `konductor, what's the hottest file?` |
+| What branches are active? | `konductor, what branches are active?` |
+| Who should I coordinate with? | `konductor, who should I talk to?` |
 
-### Try it out manually
+Responses are formatted with emoji severity indicators — never raw JSON.
 
-Ask Kiro in chat:
+### Management Commands
 
-> "Register a session for user alice on repo acme/app, branch main, files src/index.ts and src/utils.ts"
+Control Konductor's lifecycle and configuration through chat:
 
-Kiro will call `register_session` and return the collision state (likely "Solo" if you're the only one).
+**Status and lifecycle:**
 
-Then simulate a second user:
+| What to say | What it does |
+|---|---|
+| `konductor, status` | Check if the MCP server and file watcher are running |
+| `konductor, turn on` | Start the file watcher and register a session |
+| `konductor, turn off` | Stop the file watcher and deregister |
+| `konductor, restart` | Restart the file watcher |
+| `konductor, reinstall` | Re-run the installer script |
 
-> "Register a session for user bob on repo acme/app, branch main, files src/index.ts"
+**Configuration:**
 
-Now check status:
+| What to say | What it does |
+|---|---|
+| `konductor, change my API key to X` | Update the Bearer token in MCP config |
+| `konductor, change my logging level to debug` | Update log level in watcher config |
+| `konductor, enable file logging` | Turn on file logging for the watcher |
+| `konductor, disable file logging` | Turn off file logging |
+| `konductor, change poll interval to 5` | Change collision poll interval (seconds) |
+| `konductor, watch only ts,tsx,js` | Limit which file extensions are watched |
+| `konductor, watch all files` | Clear the file extension filter |
+| `konductor, change my username to alice` | Update your Konductor identity |
 
-> "Check the collision status for alice on repo acme/app"
+Configuration changes that affect the watcher trigger an automatic restart.
 
-You should see "Collision Course" since both alice and bob are touching `src/index.ts`.
+**Informational:**
 
-### Quick reference
+| What to say | What it does |
+|---|---|
+| `konductor, help` | Show all available queries and commands |
+| `konductor, show my config` | Display current configuration values |
+| `konductor, config options` | List all config options with descriptions |
+| `konductor, who am I?` | Show your resolved userId, repo, and branch |
+
+### Quick reference (direct tool calls)
+
+You can also invoke tools directly if needed:
 
 | What you want to do | Tool to call |
 |---|---|
@@ -514,25 +517,279 @@ List all active (non-stale) work sessions for a repository.
 }
 ```
 
+### `who_is_active`
+
+List all active users in a repository with their branches, files, and session duration.
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `repo` | string | yes | Repository in `owner/repo` format |
+
+**Output:**
+
+```json
+{
+  "repo": "acme/app",
+  "users": [
+    {
+      "userId": "alice",
+      "branch": "main",
+      "files": ["src/index.ts", "src/utils.ts"],
+      "sessionDurationMinutes": 42
+    }
+  ],
+  "totalUsers": 1
+}
+```
+
+### `who_overlaps`
+
+Find users whose files overlap with a specific user in a repository.
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userId` | string | yes | User to check overlaps for |
+| `repo` | string | yes | Repository in `owner/repo` format |
+
+**Output:**
+
+```json
+{
+  "userId": "alice",
+  "repo": "acme/app",
+  "overlaps": [
+    {
+      "userId": "bob",
+      "branch": "feature-x",
+      "sharedFiles": ["src/index.ts"],
+      "collisionState": "collision_course"
+    }
+  ],
+  "isAlone": false
+}
+```
+
+### `user_activity`
+
+Show all active sessions for a user across all repositories.
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userId` | string | yes | User identifier |
+
+**Output:**
+
+```json
+{
+  "userId": "alice",
+  "sessions": [
+    {
+      "repo": "acme/app",
+      "branch": "main",
+      "files": ["src/index.ts"],
+      "sessionStartedAt": "2026-04-15T10:00:00.000Z",
+      "lastHeartbeat": "2026-04-15T10:42:00.000Z"
+    }
+  ],
+  "isActive": true
+}
+```
+
+### `risk_assessment`
+
+Compute a collision risk score for a user in a repository.
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userId` | string | yes | User identifier |
+| `repo` | string | yes | Repository in `owner/repo` format |
+
+**Output:**
+
+```json
+{
+  "userId": "alice",
+  "repo": "acme/app",
+  "collisionState": "collision_course",
+  "severity": 3,
+  "overlappingUserCount": 1,
+  "sharedFileCount": 1,
+  "hasCrossBranchOverlap": true,
+  "riskSummary": "High risk — 1 user editing src/index.ts on a different branch"
+}
+```
+
+### `repo_hotspots`
+
+Rank files in a repository by collision risk (number of concurrent editors).
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `repo` | string | yes | Repository in `owner/repo` format |
+
+**Output:**
+
+```json
+{
+  "repo": "acme/app",
+  "hotspots": [
+    {
+      "file": "src/index.ts",
+      "editors": [
+        { "userId": "alice", "branch": "main" },
+        { "userId": "bob", "branch": "feature-x" }
+      ],
+      "collisionState": "merge_hell"
+    }
+  ],
+  "isClear": false
+}
+```
+
+### `active_branches`
+
+List all branches with active sessions in a repository, flagging branches with cross-branch file overlap.
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `repo` | string | yes | Repository in `owner/repo` format |
+
+**Output:**
+
+```json
+{
+  "repo": "acme/app",
+  "branches": [
+    {
+      "branch": "main",
+      "users": ["alice"],
+      "files": ["src/index.ts", "src/utils.ts"],
+      "hasOverlapWithOtherBranches": true
+    },
+    {
+      "branch": "feature-x",
+      "users": ["bob"],
+      "files": ["src/index.ts"],
+      "hasOverlapWithOtherBranches": true
+    }
+  ]
+}
+```
+
+### `coordination_advice`
+
+Get actionable coordination suggestions ranked by urgency.
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userId` | string | yes | User identifier |
+| `repo` | string | yes | Repository in `owner/repo` format |
+
+**Output:**
+
+```json
+{
+  "userId": "alice",
+  "repo": "acme/app",
+  "targets": [
+    {
+      "userId": "bob",
+      "branch": "feature-x",
+      "sharedFiles": ["src/index.ts"],
+      "urgency": "high",
+      "suggestedAction": "merge before pushing"
+    }
+  ],
+  "hasUrgentTargets": true
+}
+```
+
+Urgency levels:
+- `high` — merge hell (different branch, same files)
+- `medium` — collision course (same branch, same files)
+- `low` — crossroads (same directories)
+
+### `client_install_info`
+
+Get npx commands for installing or updating the Konductor client. No parameters required — the server returns commands with its own URL baked in.
+
+**Output:**
+
+```
+Konductor server v0.1.0
+
+Full install (first time — sets up MCP config, watcher, steering rules, hooks):
+  npx http://LT-DWHEATLEY-2.local:3010/bundle/installer.tgz --server http://LT-DWHEATLEY-2.local:3010 --api-key <your-api-key>
+
+Workspace-only update (updates watcher and bundle files only):
+  npx http://LT-DWHEATLEY-2.local:3010/bundle/installer.tgz --workspace --server http://LT-DWHEATLEY-2.local:3010
+
+Check if your client is up to date:
+  npx http://LT-DWHEATLEY-2.local:3010/bundle/installer.tgz --check-update --server http://LT-DWHEATLEY-2.local:3010
+```
+
+### `client_update_check`
+
+Check if a client version is up to date with this server.
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `clientVersion` | string | yes | Client version string (semver) |
+
+**Output:**
+
+```json
+{
+  "clientVersion": "0.0.9",
+  "serverVersion": "0.1.0",
+  "status": "outdated",
+  "updateCommand": "npx http://LT-DWHEATLEY-2.local:3010/bundle/installer.tgz --workspace --server http://LT-DWHEATLEY-2.local:3010"
+}
+```
+
 ## Architecture
 
 ```
+npx <server>/bundle/installer.tgz ──→ GET /bundle/installer.tgz ──→ Konductor Server
+                                  ──→ GET /bundle/manifest.json  ──→ konductor_bundle/
+                                  ──→ GET /bundle/files/:path    ──→ konductor_bundle/
+
 Kiro Agent ──┐
              ├── stdio / SSE ──→ Konductor MCP Server
 Other Agent ─┘                      ├── SessionManager
                                     ├── CollisionEvaluator
+                                    ├── QueryEngine
                                     ├── SummaryFormatter
                                     ├── ConfigManager
-                                    └── PersistenceStore → sessions.json
+                                    ├── PersistenceStore → sessions.json
+                                    └── Bundle Endpoints (installer tgz + manifest + file serving)
 ```
 
 ### Components
 
 - **SessionManager** — CRUD operations on work sessions, heartbeat tracking, stale cleanup
 - **CollisionEvaluator** — Pure function that computes collision state from session overlap
+- **QueryEngine** — Composes SessionManager and CollisionEvaluator to answer awareness, risk, and coordination queries
 - **SummaryFormatter** — Human-readable summaries with round-trip parseability
 - **ConfigManager** — YAML config loading with hot-reload via `fs.watch`
 - **PersistenceStore** — Atomic JSON file writes for session durability
+- **Bundle Endpoints** — `GET /bundle/installer.tgz` serves the `konductor-setup` npm package as a tarball (built once via `npm pack` and cached). `GET /bundle/manifest.json` and `GET /bundle/files/:path` serve the client bundle for the installer. No authentication required.
 
 ## Persistence
 
@@ -580,6 +837,11 @@ SSE endpoints:
 - `GET /sse` — establish SSE connection
 - `POST /messages?sessionId=<id>` — send MCP messages
 - `GET /health` — health check
+
+Bundle endpoints (no auth required):
+- `GET /bundle/installer.tgz` — npm-compatible tarball of `konductor-setup` (for `npx`)
+- `GET /bundle/manifest.json` — list of client bundle files
+- `GET /bundle/files/:path` — individual bundle file content
 
 REST API endpoints (for file watchers and scripts):
 - `POST /api/register` — register or update a session (body: `{userId, repo, branch, files}`)

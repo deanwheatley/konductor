@@ -144,6 +144,22 @@ export class SessionManager implements ISessionManager {
   }
 
   /**
+   * Return all active (non-stale) sessions across all repos.
+   * A session is stale if its lastHeartbeat is older than the configured timeout.
+   * Requirements: 3.1
+   */
+  async getAllActiveSessions(): Promise<WorkSession[]> {
+    const cutoff = Date.now() - this.timeoutMs();
+    const active: WorkSession[] = [];
+    for (const session of this.sessions.values()) {
+      if (new Date(session.lastHeartbeat).getTime() > cutoff) {
+        active.push(session);
+      }
+    }
+    return active;
+  }
+
+  /**
    * Remove all sessions whose lastHeartbeat is older than the timeout.
    * Returns the number of sessions removed.
    */

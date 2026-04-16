@@ -16,8 +16,10 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { z } from "zod";
-import { resolve } from "node:path";
-import { readFileSync } from "node:fs";
+import { resolve, extname, join, relative } from "node:path";
+import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import { hostname as osHostname } from "node:os";
+import { execSync } from "node:child_process";
 
 // ---------------------------------------------------------------------------
 // Load .env.local if present (lightweight, no external dependency)
@@ -52,6 +54,7 @@ import { SummaryFormatter } from "./summary-formatter.js";
 import { ConfigManager } from "./config-manager.js";
 import { PersistenceStore } from "./persistence-store.js";
 import { KonductorLogger } from "./logger.js";
+import { QueryEngine } from "./query-engine.js";
 import type { CollisionResult } from "./types.js";
 
 // ---------------------------------------------------------------------------
@@ -97,13 +100,14 @@ export async function createComponents(configPath?: string, sessionsPath?: strin
 
   const collisionEvaluator = new CollisionEvaluator();
   const summaryFormatter = new SummaryFormatter();
+  const queryEngine = new QueryEngine(sessionManager, collisionEvaluator);
 
   // Watch for config changes
   configManager.onConfigChange(() => {
     /* config is already updated internally */
   });
 
-  return { configManager, sessionManager, collisionEvaluator, summaryFormatter, logger };
+  return { configManager, sessionManager, collisionEvaluator, summaryFormatter, queryEngine, logger };
 }
 
 
@@ -116,9 +120,13 @@ export function buildMcpServer(deps: {
   collisionEvaluator: CollisionEvaluator;
   summaryFormatter: SummaryFormatter;
   configManager: ConfigManager;
+  queryEngine?: QueryEngine;
   logger?: KonductorLogger;
+  serverVersion?: string;
+  serverUrl?: string;
 }): McpServer {
-  const { sessionManager, collisionEvaluator, summaryFormatter, configManager, logger } = deps;
+  const { sessionManager, collisionEvaluator, summaryFormatter, configManager, queryEngine, logger, serverVersion, serverUrl } = deps;
+  const pkgVersion = serverVersion ?? "0.0.0";
 
   const mcp = new McpServer(
     { name: "konductor", version: "0.1.0" },
@@ -134,8 +142,9 @@ export function buildMcpServer(deps: {
       repo: z.string().min(1).describe('Repository in "owner/repo" format'),
       branch: z.string().min(1).describe("Git branch name"),
       files: z.array(z.string().min(1)).describe("List of file paths being modified"),
+      clientVersion: z.string().optional().describe("Client bundle version for update checking"),
     },
-    async ({ userId, repo, branch, files }) => {
+    async ({ userId, repo, branch, files, clientVersion }) => {
       const repoErr = validateRepo(repo);
       if (repoErr) return { content: [{ type: "text", text: JSON.stringify({ error: repoErr }) }], isError: true };
 
@@ -158,14 +167,23 @@ export function buildMcpServer(deps: {
         }
       }
 
+      const responsePayload: Record<string, unknown> = {
+        sessionId: session.sessionId,
+        collisionState: result.state,
+        summary,
+      };
+
+      // Append version check if clientVersion provided
+      const versionCheck = compareVersions(clientVersion, pkgVersion);
+      if (versionCheck === "outdated") {
+        responsePayload.updateRequired = true;
+        responsePayload.serverVersion = pkgVersion;
+      }
+
       return {
         content: [{
           type: "text",
-          text: JSON.stringify({
-            sessionId: session.sessionId,
-            collisionState: result.state,
-            summary,
-          }),
+          text: JSON.stringify(responsePayload),
         }],
       };
     },
@@ -179,8 +197,9 @@ export function buildMcpServer(deps: {
       userId: z.string().min(1).describe("User identifier"),
       repo: z.string().min(1).describe('Repository in "owner/repo" format'),
       files: z.array(z.string().min(1)).optional().describe("Optional file list override; uses existing session files if omitted"),
+      clientVersion: z.string().optional().describe("Client bundle version for update checking"),
     },
-    async ({ userId, repo, files }) => {
+    async ({ userId, repo, files, clientVersion }) => {
       const repoErr = validateRepo(repo);
       if (repoErr) return { content: [{ type: "text", text: JSON.stringify({ error: repoErr }) }], isError: true };
 
@@ -224,20 +243,29 @@ export function buildMcpServer(deps: {
         logger.logCollisionState(userId, repo, result.state, overlappingUsers, result.sharedFiles, branches, querySession.files, querySession.branch || undefined);
       }
 
+      const statusPayload: Record<string, unknown> = {
+        collisionState: result.state,
+        overlappingSessions: result.overlappingSessions.map((s) => ({
+          sessionId: s.sessionId,
+          userId: s.userId,
+          branch: s.branch,
+          files: s.files,
+        })),
+        summary,
+        actions: result.actions,
+      };
+
+      // Append version check if clientVersion provided
+      const versionCheck = compareVersions(clientVersion, pkgVersion);
+      if (versionCheck === "outdated") {
+        statusPayload.updateRequired = true;
+        statusPayload.serverVersion = pkgVersion;
+      }
+
       return {
         content: [{
           type: "text",
-          text: JSON.stringify({
-            collisionState: result.state,
-            overlappingSessions: result.overlappingSessions.map((s) => ({
-              sessionId: s.sessionId,
-              userId: s.userId,
-              branch: s.branch,
-              files: s.files,
-            })),
-            summary,
-            actions: result.actions,
-          }),
+          text: JSON.stringify(statusPayload),
         }],
       };
     },
@@ -303,15 +331,295 @@ export function buildMcpServer(deps: {
     },
   );
 
+  // ── Query tools (Enhanced Chat) ───────────────────────────────────
+  // These tools require a QueryEngine instance. If not provided (e.g.
+  // legacy callers), the query tools are simply not registered.
+
+  if (queryEngine) {
+    // ── who_is_active ───────────────────────────────────────────────
+    mcp.tool(
+      "who_is_active",
+      "List all active users in a repository with their branch, files, and session duration.",
+      {
+        repo: z.string().min(1).describe('Repository in "owner/repo" format'),
+      },
+      async ({ repo }) => {
+        const repoErr = validateRepo(repo);
+        if (repoErr) return { content: [{ type: "text", text: JSON.stringify({ error: repoErr }) }], isError: true };
+
+        if (logger) logger.logQueryTool("who_is_active", { repo });
+        const result = await queryEngine.whoIsActive(repo);
+        return { content: [{ type: "text", text: JSON.stringify(result) }] };
+      },
+    );
+
+    // ── who_overlaps ────────────────────────────────────────────────
+    mcp.tool(
+      "who_overlaps",
+      "Find users whose files overlap with a specific user's session.",
+      {
+        userId: z.string().min(1).describe("User identifier"),
+        repo: z.string().min(1).describe('Repository in "owner/repo" format'),
+      },
+      async ({ userId, repo }) => {
+        const repoErr = validateRepo(repo);
+        if (repoErr) return { content: [{ type: "text", text: JSON.stringify({ error: repoErr }) }], isError: true };
+
+        if (logger) logger.logQueryTool("who_overlaps", { userId, repo });
+        const result = await queryEngine.whoOverlaps(userId, repo);
+        return { content: [{ type: "text", text: JSON.stringify(result) }] };
+      },
+    );
+
+    // ── user_activity ───────────────────────────────────────────────
+    mcp.tool(
+      "user_activity",
+      "Show all active sessions for a user across all repositories.",
+      {
+        userId: z.string().min(1).describe("User identifier"),
+      },
+      async ({ userId }) => {
+        if (logger) logger.logQueryTool("user_activity", { userId });
+        const result = await queryEngine.userActivity(userId);
+        return { content: [{ type: "text", text: JSON.stringify(result) }] };
+      },
+    );
+
+    // ── risk_assessment ─────────────────────────────────────────────
+    mcp.tool(
+      "risk_assessment",
+      "Compute collision risk score for a user in a repository.",
+      {
+        userId: z.string().min(1).describe("User identifier"),
+        repo: z.string().min(1).describe('Repository in "owner/repo" format'),
+      },
+      async ({ userId, repo }) => {
+        const repoErr = validateRepo(repo);
+        if (repoErr) return { content: [{ type: "text", text: JSON.stringify({ error: repoErr }) }], isError: true };
+
+        if (logger) logger.logQueryTool("risk_assessment", { userId, repo });
+        const result = await queryEngine.riskAssessment(userId, repo);
+        return { content: [{ type: "text", text: JSON.stringify(result) }] };
+      },
+    );
+
+    // ── repo_hotspots ───────────────────────────────────────────────
+    mcp.tool(
+      "repo_hotspots",
+      "Rank files in a repository by collision risk (number of concurrent editors).",
+      {
+        repo: z.string().min(1).describe('Repository in "owner/repo" format'),
+      },
+      async ({ repo }) => {
+        const repoErr = validateRepo(repo);
+        if (repoErr) return { content: [{ type: "text", text: JSON.stringify({ error: repoErr }) }], isError: true };
+
+        if (logger) logger.logQueryTool("repo_hotspots", { repo });
+        const result = await queryEngine.repoHotspots(repo);
+        return { content: [{ type: "text", text: JSON.stringify(result) }] };
+      },
+    );
+
+    // ── active_branches ─────────────────────────────────────────────
+    mcp.tool(
+      "active_branches",
+      "List all branches with active sessions in a repository and flag cross-branch file overlap.",
+      {
+        repo: z.string().min(1).describe('Repository in "owner/repo" format'),
+      },
+      async ({ repo }) => {
+        const repoErr = validateRepo(repo);
+        if (repoErr) return { content: [{ type: "text", text: JSON.stringify({ error: repoErr }) }], isError: true };
+
+        if (logger) logger.logQueryTool("active_branches", { repo });
+        const result = await queryEngine.activeBranches(repo);
+        return { content: [{ type: "text", text: JSON.stringify(result) }] };
+      },
+    );
+
+    // ── coordination_advice ─────────────────────────────────────────
+    mcp.tool(
+      "coordination_advice",
+      "Suggest who to coordinate with, ranked by urgency.",
+      {
+        userId: z.string().min(1).describe("User identifier"),
+        repo: z.string().min(1).describe('Repository in "owner/repo" format'),
+      },
+      async ({ userId, repo }) => {
+        const repoErr = validateRepo(repo);
+        if (repoErr) return { content: [{ type: "text", text: JSON.stringify({ error: repoErr }) }], isError: true };
+
+        if (logger) logger.logQueryTool("coordination_advice", { userId, repo });
+        const result = await queryEngine.coordinationAdvice(userId, repo);
+        return { content: [{ type: "text", text: JSON.stringify(result) }] };
+      },
+    );
+  }
+
+  // ── Client install/update info ──────────────────────────────────────
+
+  mcp.tool(
+    "client_install_info",
+    "Get npx commands for installing or updating the Konductor client in a workspace.",
+    {},
+    async () => {
+      const url = serverUrl ?? "http://localhost:3010";
+      const tgzUrl = `${url}/bundle/installer-${pkgVersion}.tgz`;
+      const lines = [
+        `Konductor server v${pkgVersion}`,
+        "",
+        "Install or update Konductor:",
+        `  npx ${tgzUrl} --server ${url} --api-key <your-api-key>`,
+      ];
+      if (logger) logger.logQueryTool("client_install_info", {});
+      return { content: [{ type: "text", text: lines.join("\n") }] };
+    },
+  );
+
+  mcp.tool(
+    "client_update_check",
+    "Check if a client version is up to date with this server.",
+    {
+      clientVersion: z.string().min(1).describe("Client version string (semver)"),
+    },
+    async ({ clientVersion }) => {
+      const status = compareVersions(clientVersion, pkgVersion);
+      const url = serverUrl ?? "http://localhost:3010";
+      const result: Record<string, unknown> = {
+        clientVersion,
+        serverVersion: pkgVersion,
+        status,
+      };
+      if (status === "outdated") {
+        result.updateCommand = `npx ${url}/bundle/installer-${pkgVersion}.tgz --workspace --server ${url}`;
+      }
+      if (logger) logger.logQueryTool("client_update_check", { clientVersion });
+      return { content: [{ type: "text", text: JSON.stringify(result) }] };
+    },
+  );
+
   return mcp;
 }
 
 
 // ---------------------------------------------------------------------------
+// Version comparison
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare two semver version strings (major.minor.patch).
+ * Returns "outdated" if client < server, "current" if equal, "newer" if client > server.
+ * Malformed or missing versions are treated as outdated.
+ */
+export function compareVersions(
+  clientVersion: string | undefined | null,
+  serverVersion: string,
+): "outdated" | "current" | "newer" {
+  if (!clientVersion || typeof clientVersion !== "string") return "outdated";
+
+  const parse = (v: string): [number, number, number] | null => {
+    const m = /^(\d+)\.(\d+)\.(\d+)$/.exec(v.trim());
+    if (!m) return null;
+    return [parseInt(m[1], 10), parseInt(m[2], 10), parseInt(m[3], 10)];
+  };
+
+  const c = parse(clientVersion);
+  if (!c) return "outdated";
+
+  const s = parse(serverVersion);
+  if (!s) return "current"; // can't compare against malformed server version
+
+  for (let i = 0; i < 3; i++) {
+    if (c[i] < s[i]) return "outdated";
+    if (c[i] > s[i]) return "newer";
+  }
+  return "current";
+}
+
+// ---------------------------------------------------------------------------
+// Bundle manifest builder
+// ---------------------------------------------------------------------------
+
+interface BundleManifest {
+  version: string;
+  files: string[];
+}
+
+/**
+ * Walk a directory recursively and return all file paths relative to `root`.
+ */
+function walkDir(dir: string, root: string): string[] {
+  const results: string[] = [];
+  let entries: string[];
+  try {
+    entries = readdirSync(dir);
+  } catch {
+    return results;
+  }
+  for (const entry of entries) {
+    const fullPath = join(dir, entry);
+    let stat;
+    try {
+      stat = statSync(fullPath);
+    } catch {
+      continue;
+    }
+    if (stat.isDirectory()) {
+      results.push(...walkDir(fullPath, root));
+    } else if (stat.isFile()) {
+      results.push(relative(root, fullPath));
+    }
+  }
+  return results;
+}
+
+/**
+ * Build the bundle manifest by scanning konductor_bundle/ on disk.
+ * Called once at startup and cached.
+ */
+export function buildBundleManifest(bundleDir: string, version: string): BundleManifest {
+  const files = walkDir(bundleDir, bundleDir);
+  // Normalize to forward slashes for cross-platform consistency
+  const normalizedFiles = files.map((f) => f.split("\\").join("/"));
+  return { version, files: normalizedFiles };
+}
+
+// ---------------------------------------------------------------------------
+// Installer tarball builder
+// ---------------------------------------------------------------------------
+
+let cachedInstallerTgz: Buffer | null = null;
+
+/**
+ * Build an npm-compatible tarball from the konductor-setup package.
+ * Uses `npm pack` and caches the result. Returns null if the setup
+ * package isn't found or packing fails.
+ */
+export function buildInstallerTarball(setupDir: string): Buffer | null {
+  if (cachedInstallerTgz) return cachedInstallerTgz;
+  if (!existsSync(join(setupDir, "package.json"))) return null;
+  try {
+    const tgzName = execSync("npm pack --pack-destination .", { cwd: setupDir, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+    const tgzPath = join(setupDir, tgzName);
+    cachedInstallerTgz = readFileSync(tgzPath);
+    // Clean up the generated file
+    try { execSync(`rm ${JSON.stringify(tgzPath)}`); } catch { /* best effort */ }
+    return cachedInstallerTgz;
+  } catch {
+    return null;
+  }
+}
+
+/** Clear the cached tarball (for testing or after updates). */
+export function clearInstallerCache(): void {
+  cachedInstallerTgz = null;
+}
+
+// ---------------------------------------------------------------------------
 // SSE transport with API key auth
 // ---------------------------------------------------------------------------
 
-function startSseServer(
+export function startSseServer(
   mcp: McpServer,
   port: number,
   apiKey: string | undefined,
@@ -321,9 +629,23 @@ function startSseServer(
     collisionEvaluator: CollisionEvaluator;
     summaryFormatter: SummaryFormatter;
     configManager: ConfigManager;
+    queryEngine?: QueryEngine;
   },
 ) {
   const transports = new Map<string, SSEServerTransport>();
+
+  // Build bundle manifest once at startup
+  const bundleDir = resolve(process.cwd(), "konductor_bundle");
+  const pkgJsonPath = resolve(process.cwd(), "package.json");
+  let pkgVersion = "0.0.0";
+  try {
+    const pkg = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
+    pkgVersion = pkg.version ?? "0.0.0";
+  } catch { /* use default */ }
+  const bundleManifest = buildBundleManifest(bundleDir, pkgVersion);
+
+  // Resolve server URL for client install info
+  const serverUrl = `http://${osHostname()}:${port}`;
 
   const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
     // CORS headers for SSE
@@ -338,8 +660,64 @@ function startSseServer(
     }
 
     const clientIp = req.socket.remoteAddress ?? "unknown";
+    const url = new URL(req.url ?? "/", `http://localhost:${port}`);
 
-    // API key authentication
+    // ── Bundle endpoints (no auth required) ─────────────────────────
+
+    // Bundle manifest
+    if (req.method === "GET" && url.pathname === "/bundle/manifest.json") {
+      if (logger) {
+        logger.logClientInstall(clientIp, pkgVersion);
+      }
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(bundleManifest));
+      return;
+    }
+
+    // Bundle file serving
+    if (req.method === "GET" && (req.url ?? "").startsWith("/bundle/files/")) {
+      const rawPath = (req.url ?? "").slice("/bundle/files/".length);
+      const filePath = decodeURIComponent(rawPath);
+      // Reject path traversal (check both raw and decoded)
+      if (rawPath.includes("..") || filePath.includes("..")) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Invalid path" }));
+        return;
+      }
+      const fullPath = resolve(bundleDir, filePath);
+      try {
+        const content = readFileSync(fullPath);
+        const ext = extname(filePath);
+        const contentType = ext === ".json" ? "application/json" : "text/plain";
+        res.writeHead(200, { "Content-Type": contentType });
+        res.end(content);
+      } catch {
+        res.writeHead(404, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "File not found" }));
+      }
+      return;
+    }
+
+    // Installer tarball (npm-compatible .tgz of konductor-setup)
+    // Matches /bundle/installer.tgz and /bundle/installer-<version>.tgz for cache busting
+    if (req.method === "GET" && /^\/bundle\/installer(-[\d.]+)?\.tgz$/.test(url.pathname)) {
+      const setupDir = resolve(process.cwd(), "..", "konductor-setup");
+      const tgz = buildInstallerTarball(setupDir);
+      if (!tgz) {
+        res.writeHead(404, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Installer package not found" }));
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "application/gzip",
+        "Content-Disposition": "attachment; filename=konductor-setup.tgz",
+        "Content-Length": tgz.length,
+      });
+      res.end(tgz);
+      return;
+    }
+
+    // ── API key authentication ──────────────────────────────────────
     if (apiKey) {
       const authHeader = req.headers.authorization;
       if (!authHeader || authHeader !== `Bearer ${apiKey}`) {
@@ -352,8 +730,6 @@ function startSseServer(
         return;
       }
     }
-
-    const url = new URL(req.url ?? "/", `http://localhost:${port}`);
 
     // ── REST API: register session (for file watchers) ──────────────
     if (req.method === "POST" && url.pathname === "/api/register" && deps) {
@@ -384,8 +760,18 @@ function startSseServer(
           const branches = [...new Set(result.overlappingSessions.map((s) => s.branch))];
           logger.logCollisionState(userId, repo, result.state, overlappingUsers, result.sharedFiles, branches, files, branch);
         }
+        const registerPayload: Record<string, unknown> = { sessionId: session.sessionId, collisionState: result.state, summary };
+
+        // Version check from X-Konductor-Client-Version header
+        const clientVersion = req.headers["x-konductor-client-version"] as string | undefined;
+        const versionCheck = compareVersions(clientVersion, pkgVersion);
+        if (versionCheck === "outdated") {
+          registerPayload.updateRequired = true;
+          registerPayload.serverVersion = pkgVersion;
+        }
+
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ sessionId: session.sessionId, collisionState: result.state, summary }));
+        res.end(JSON.stringify(registerPayload));
       } catch {
         res.writeHead(400, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Invalid JSON body" }));
@@ -427,15 +813,25 @@ function startSseServer(
         if (logger) {
           logger.logCheckStatus(userId, repo, result.state, querySession.files, querySession.branch || undefined);
         }
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({
+        const statusPayload: Record<string, unknown> = {
           collisionState: result.state,
           overlappingSessions: result.overlappingSessions.map((s) => ({
             sessionId: s.sessionId, userId: s.userId, branch: s.branch, files: s.files,
           })),
           sharedFiles: result.sharedFiles,
           actions: result.actions,
-        }));
+        };
+
+        // Version check from X-Konductor-Client-Version header
+        const clientVersion = req.headers["x-konductor-client-version"] as string | undefined;
+        const versionCheck = compareVersions(clientVersion, pkgVersion);
+        if (versionCheck === "outdated") {
+          statusPayload.updateRequired = true;
+          statusPayload.serverVersion = pkgVersion;
+        }
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(statusPayload));
       } catch {
         res.writeHead(400, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Invalid JSON body" }));
@@ -449,18 +845,32 @@ function startSseServer(
 
       if (logger) {
         const hostname = req.headers["x-konductor-user"] as string || undefined;
-        logger.logConnection(hostname || `session:${transport.sessionId.slice(0, 8)}`, clientIp, hostname ? undefined : clientIp);
-        logger.logAuthentication(hostname || `session:${transport.sessionId.slice(0, 8)}`);
+        if (hostname) {
+          logger.logConnection(hostname, clientIp);
+          logger.logAuthentication(hostname);
+        } else {
+          logger.logTransportConnection(transport.sessionId.slice(0, 8), clientIp);
+          logger.logTransportAuthentication(transport.sessionId.slice(0, 8));
+        }
       }
 
       res.on("close", () => {
         transports.delete(transport.sessionId);
         if (logger) {
           const hostname = req.headers["x-konductor-user"] as string || undefined;
-          logger.logDisconnection(hostname || `session:${transport.sessionId.slice(0, 8)}`);
+          if (hostname) {
+            logger.logDisconnection(hostname);
+          } else {
+            logger.logTransportDisconnection(transport.sessionId.slice(0, 8));
+          }
         }
       });
-      await mcp.connect(transport);
+
+      // Each SSE client gets its own McpServer instance (SDK limitation: one transport per instance)
+      const clientMcp = deps
+        ? buildMcpServer({ ...deps, logger, serverVersion: pkgVersion, serverUrl })
+        : mcp;
+      await clientMcp.connect(transport);
       return;
     }
 
@@ -514,17 +924,30 @@ async function main() {
   const useSSE = args.includes("--sse") || !!process.env.KONDUCTOR_PORT;
 
   const components = await createComponents();
-  const mcp = buildMcpServer(components);
-  const { logger } = components;
+
+  // Read package version for version checking
+  let mainPkgVersion = "0.0.0";
+  try {
+    const pkg = JSON.parse(readFileSync(resolve(process.cwd(), "package.json"), "utf-8"));
+    mainPkgVersion = pkg.version ?? "0.0.0";
+  } catch { /* use default */ }
 
   if (useSSE) {
     const port = parseInt(process.env.KONDUCTOR_PORT ?? "3010", 10);
     const apiKey = process.env.KONDUCTOR_API_KEY;
+    const serverUrl = `http://${osHostname()}:${port}`;
+
+    const mcp = buildMcpServer({ ...components, serverVersion: mainPkgVersion, serverUrl });
+    const { logger } = components;
+
     if (logger) {
       logger.logServerStart("SSE", port);
     }
     startSseServer(mcp, port, apiKey, logger, components);
   } else {
+    const mcp = buildMcpServer({ ...components, serverVersion: mainPkgVersion });
+    const { logger } = components;
+
     const transport = new StdioServerTransport();
     if (logger) {
       logger.logServerStart("stdio");
@@ -534,7 +957,10 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error("Fatal error:", err);
-  process.exit(1);
-});
+// Only run main() when executed directly, not when imported by tests
+if (process.env.VITEST === undefined) {
+  main().catch((err) => {
+    console.error("Fatal error:", err);
+    process.exit(1);
+  });
+}

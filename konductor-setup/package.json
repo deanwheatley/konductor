@@ -1,0 +1,24 @@
+{
+  "name": "konductor-setup",
+  "version": "0.2.2",
+  "description": "Installer for Konductor collision awareness client",
+  "type": "module",
+  "bin": {
+    "konductor-setup": "./bin/setup.mjs"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "bundle/"
+  ],
+  "scripts": {
+    "test": "vitest --run"
+  },
+  "devDependencies": {
+    "fast-check": "^4.6.0",
+    "vitest": "^3.2.1"
+  }
+}
