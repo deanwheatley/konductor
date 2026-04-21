@@ -52,3 +52,16 @@ The root `README.md` serves as the project summary and roadmap. Keep it updated:
 - When new configuration options, tools, or components are added, update the relevant README sections
 - When architecture changes, update the architecture diagram
 - Treat the README as the single source of truth for project status
+
+### README Sync Across the Project
+
+Multiple READMEs exist in this project. When making changes, keep all affected READMEs in sync:
+
+| README | Scope | Update when... |
+|--------|-------|----------------|
+| `README.md` (root) | Project overview, quick start, specs status, steering rules | A spec status changes, a new steering rule is added, the quick start flow changes, or the project structure changes |
+| `konductor/README.md` | Server documentation — install, config, usage, API, dashboard | Server features, config options, endpoints, or CLI flags change |
+| `konductor-setup/` | Installer package | Installer behavior or CLI flags change |
+| `konductor/konductor_bundle/README.md` | Legacy install fallback | Bundle contents or legacy install steps change |
+
+When completing a feature spec, check whether the root README's Specs table needs its status updated (e.g. moving a spec from "In Progress" to "Implemented"). Do this in the same task, not as a follow-up.

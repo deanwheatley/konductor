@@ -90,6 +90,9 @@ async function main() {
   console.log(`  Root:    ${workspaceRoot}`);
 
   // Verify server is reachable
+  // Allow self-signed certs for the health check
+  const prevTls = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+  if (serverUrl.startsWith("https")) process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
     const headers = {};
     if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
@@ -105,6 +108,9 @@ async function main() {
     }
   } catch {
     console.log(`  ⚠️  Could not reach server at ${serverUrl} — verify the server is running`);
+  } finally {
+    if (prevTls === undefined) delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+    else process.env.NODE_TLS_REJECT_UNAUTHORIZED = prevTls;
   }
 
   if (!apiKey) {

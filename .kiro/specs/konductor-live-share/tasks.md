@@ -1,0 +1,288 @@
+# Implementation Plan
+
+## Phase 1: Collaboration Requests via Slack + Agent Check-In
+
+- [x] 1. Server: Collaboration Request Store (Req 3, 11)
+  - [x] 1.1 Create `collab-request-store.ts` with in-memory store
+    - Define `CollabRequest` interface: `{ requestId, initiator, recipient, repo, branch, files, collisionState, shareLink?, status, createdAt, updatedAt }`
+    - Status enum: `pending | accepted | declined | expired | link_shared`
+    - `create(initiator, recipient, repo, branch, files, collisionState)` → returns `CollabRequest`
+    - `respond(requestId, action: "accept" | "decline")` → updates status
+    - `attachLink(requestId, shareLink)` → updates status to `link_shared`
+    - `listForUser(userId)` → returns non-expired requests where user is initiator or recipient, newest-first
+    - `listForRepo(repo)` → returns non-expired requests for a repo
+    - `getById(requestId)` → returns single request or null
+    - Dedup: if pending request exists for same initiator→recipient+repo, return existing instead of creating new
+    - Mutual detection: if A→B and B→A both pending for same repo, auto-accept both
+    - Expiry grace period: expired requests included in responses for one additional check-in cycle, then removed
+    - Pending requests NOT auto-cancelled when collision resolves
+    - _Requirements: 3.1, 3.2, 3.5, 3.6, 3.8, 3.9, 3.10, 3.11_
+    - _Use Cases: UC-LS-1, UC-LS-26, UC-LS-27, UC-LS-28_
+  - [x] 1.2 Add TTL expiry logic
+    - Read `KONDUCTOR_COLLAB_REQUEST_TTL` env var (default: 1800 seconds)
+    - `cleanup()` method marks pending requests older than TTL as `expired`
+    - Wire into server's periodic cleanup interval (same as stale session cleanup)
+    - _Requirements: 3.3_
+    - _Use Cases: UC-LS-14_
+  - [x] 1.3 Add `KONDUCTOR_COLLAB_ENABLED` master toggle
+    - Read from env (default: `true`)
+    - When `false`, `create()` throws with message: `Collaboration requests are disabled on this server.`
+    - _Requirements: 11.1, 11.2_
+    - _Use Cases: UC-LS-20_
+  - [x] 1.4 Write unit tests for collab request store
+    - Test create, respond, attachLink, listForUser, listForRepo, TTL expiry
+    - Test dedup behavior (same initiator→recipient+repo returns existing)
+    - Test mutual request auto-accept
+    - Test disabled toggle
+    - Test expiry grace period (expired requests visible for one cycle)
+    - Test pending requests survive collision resolution
+    - _Requirements: 3.1–3.11, 11.1, 11.2_
+
+- [x] 2. Server: MCP Tools for Collaboration Requests (Req 3)
+  - [x] 2.1 Register `create_collab_request` MCP tool
+    - Parameters: `{ initiator, recipient, repo, branch, files, collisionState }`
+    - Validate repo format, non-empty fields
+    - Check `KONDUCTOR_COLLAB_ENABLED`
+    - Call `collabStore.create()`, return `{ requestId, status }`
+    - Emit `collab_request_update` SSE event via BatonEventEmitter
+    - Trigger Slack notification (Task 3)
+    - _Requirements: 3.2, 3.7_
+    - _Use Cases: UC-LS-1_
+  - [x] 2.2 Register `list_collab_requests` MCP tool
+    - Parameters: `{ userId }`
+    - Call `collabStore.listForUser(userId)`, return array
+    - _Requirements: 3.4_
+  - [x] 2.3 Register `respond_collab_request` MCP tool
+    - Parameters: `{ requestId, action: "accept" | "decline" }`
+    - Call `collabStore.respond()`, emit SSE event
+    - Trigger Slack notification for status change
+    - _Requirements: 3.5_
+    - _Use Cases: UC-LS-12, UC-LS-13_
+  - [x] 2.4 Register `share_link` MCP tool
+    - Parameters: `{ requestId, shareLink }`
+    - Validate URL contains `liveshare` or `vsengsaas.visualstudio.com`
+    - Call `collabStore.attachLink()`, emit SSE event
+    - Trigger Slack notification with link
+    - _Requirements: 3.6_
+    - _Use Cases: UC-LS-15_
+  - [x] 2.5 Add `collab_request_update` to BatonEvent type union
+    - Add to `baton-types.ts`: `{ type: "collab_request_update"; repo: string; data: CollabRequest }`
+    - _Requirements: 3.7_
+  - [x] 2.6 Write unit tests for MCP tools
+    - Test each tool's happy path and error cases
+    - Test SSE event emission
+    - Test disabled toggle error response
+    - _Requirements: 3.2–3.7_
+
+- [x] 3. Server: Slack Notification for Collab Requests (Req 4)
+  - [x] 3.1 Add `sendCollabRequest()` method to SlackNotifier
+    - Build Block Kit message: initiator, repo, files, collision state, call-to-action
+    - Send to repo's configured channel (or DM if `KONDUCTOR_COLLAB_SLACK_DM=true`)
+    - Respect verbosity ≥ 1
+    - When Slack not configured: return indicator so agent can warn initiator
+    - _Requirements: 4.1, 4.2, 4.4, 4.5_
+    - _Use Cases: UC-LS-9, UC-LS-18_
+  - [x] 3.2 Add `sendCollabStatusUpdate()` method to SlackNotifier
+    - For accepted/declined: send status update message
+    - For link_shared: send message with clickable join link
+    - _Requirements: 4.3_
+    - _Use Cases: UC-LS-12, UC-LS-13, UC-LS-15_
+  - [x] 3.3 Read `KONDUCTOR_COLLAB_SLACK_DM` env var
+    - Default: `true`
+    - When true: attempt DM to recipient (requires Slack user lookup by username)
+    - When false or DM fails: fall back to channel message
+    - _Requirements: 11.1_
+  - [x] 3.4 Write unit tests for Slack collab notifications
+    - Test message format, verbosity gating, DM vs channel fallback
+    - _Requirements: 4.1–4.5_
+
+- [x] 4. Checkpoint — Phase 1 server-side
+  - Run full test suite. Ensure all new and existing tests pass.
+
+- [x] 5. Server: Piggyback Pending Requests on Check-In (Req 5)
+  - [x] 5.1 Add `pendingCollabRequests` to `register_session` response
+    - After collision evaluation, query `collabStore.listForUser(userId)` for pending requests where user is recipient
+    - Also include requests where user is initiator and status changed (accepted/declined/link_shared)
+    - Append to response payload as `pendingCollabRequests` array
+    - _Requirements: 5.1_
+    - _Use Cases: UC-LS-8_
+  - [x] 5.2 Add `pendingCollabRequests` to `check_status` response
+    - Same logic as register_session
+    - _Requirements: 5.1_
+  - [x] 5.3 Add `pendingCollabRequests` to `/api/register` and `/api/status` REST endpoints
+    - Mirror MCP tool behavior for REST API
+    - _Requirements: 5.1_
+  - [x] 5.4 Write unit tests for check-in piggyback
+    - Test that pending requests appear in register_session response
+    - Test that initiator sees status updates (accepted/declined)
+    - Test that expired requests are NOT included
+    - _Requirements: 5.1, 5.5_
+
+- [x] 6. Steering Rule: Add Live Share Commands (Req 1, 2, 5)
+  - [x] 6.1 Add `"konductor, live share with <user>"` to Query Routing Table
+    - Parse target username (strip `@` prefix if present)
+    - Validate target user via `who_is_active` or `user_activity`
+    - Call `create_collab_request` MCP tool
+    - Handle: user not found, no collision (Solo), multiple collision partners (auto-select highest severity), server unreachable
+    - Update all 4 steering rule locations
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8_
+    - _Use Cases: UC-LS-1, UC-LS-2, UC-LS-3, UC-LS-4, UC-LS-5, UC-LS-19_
+  - [x] 6.2 Add `"konductor, accept/decline collab from <user>"` commands
+    - Parse initiator username
+    - Call `respond_collab_request` MCP tool
+    - Display appropriate confirmation message
+    - Update all 4 steering rule locations
+    - _Requirements: 5.3, 5.4_
+    - _Use Cases: UC-LS-12, UC-LS-13_
+  - [x] 6.3 Add `"konductor, share link <url>"` command
+    - Validate URL format (must contain `liveshare` or `vsengsaas.visualstudio.com`)
+    - Resolve `requestId` automatically: find most recent accepted collab request where current user is recipient
+    - If no accepted request found: display error with guidance
+    - Call `share_link` MCP tool
+    - Update all 4 steering rule locations
+    - _Requirements: 6.1, 6.2_
+    - _Use Cases: UC-LS-15, UC-LS-16_
+  - [x] 6.4 Add proactive Live Share suggestions to collision notifications
+    - At Collision Course: append `💡 Tip: Say "konductor, live share with <user>" to start a pairing session.`
+    - At Merge Hell: append `🤝 Strongly recommend pairing. Say "konductor, live share with <user>" to coordinate in real-time.`
+    - Place after existing coordination tip, not replacing it
+    - Update all 4 steering rule locations
+    - _Requirements: 2.1, 2.2, 2.3, 2.4_
+    - _Use Cases: UC-LS-6, UC-LS-7_
+  - [x] 6.5 Add pending request display to agent check-in handling
+    - When `pendingCollabRequests` present in server response, display each request
+    - Handle: single request, multiple requests (numbered list sorted by recency), status updates for initiator
+    - Handle expiry notifications: display `⏰` message when initiator's request expired
+    - Update all 4 steering rule locations
+    - _Requirements: 5.2, 5.5, 5.6, 5.7_
+    - _Use Cases: UC-LS-8, UC-LS-14, UC-LS-30_
+  - [x] 6.6 Update help output with new commands
+    - Add to Queries section: `"konductor, live share with <user>"` — request a pairing session
+    - Add to Management section: `"konductor, accept/decline collab from <user>"`, `"konductor, share link <url>"`, `"konductor, join <url>"`
+    - Update all 4 steering rule locations
+    - _Requirements: 1.9, 9.5_
+
+- [x] 7. Checkpoint — Phase 1 complete
+  - Run full test suite.
+  - Manual test: create collab request, verify Slack delivery, verify agent check-in delivery.
+  - Verify steering rule commands work end-to-end.
+
+## Phase 2: Share Link Relay + Baton Dashboard
+
+- [x] 8. Server: REST Endpoints for Collab Requests (Req 7)
+  - [x] 8.1 Add `GET /api/repo/:repoName/collab-requests` endpoint
+    - Return non-expired requests for the repo
+    - Used by Baton dashboard to render the Collaboration Requests panel
+    - _Requirements: 7.1_
+  - [x] 8.2 Add `POST /api/collab-requests/:requestId/respond` endpoint
+    - Accept `{ action: "accept" | "decline" }` body
+    - Alternative to MCP tool for dashboard-initiated responses (future)
+    - _Requirements: 7.3_
+  - [x] 8.3 Write integration tests for REST endpoints
+    - Test list, respond, and SSE event emission
+    - _Requirements: 7.1–7.4_
+
+- [x] 9. Baton Dashboard: Collaboration Requests Panel (Req 7)
+  - [x] 9.1 Add "Collaboration Requests" section to `baton-page-builder.ts`
+    - Render non-expired requests: initiator, recipient, files, collision state, status, age
+    - Render share link as clickable "Join Session" button when available
+    - Show "No active collaboration requests." when empty
+    - _Requirements: 7.1, 7.2, 7.3, 7.5_
+    - _Use Cases: UC-LS-10, UC-LS-17_
+  - [x] 9.2 Add SSE handler for `collab_request_update` events
+    - Real-time update of the Collaboration Requests section
+    - _Requirements: 7.4_
+  - [x] 9.3 Write render tests for the panel
+    - Test with 0, 1, and multiple requests
+    - Test each status state rendering
+    - Test share link button rendering
+    - _Requirements: 7.1–7.5_
+
+- [x] 10. Watcher: Surface Pending Collab Requests in Terminal (Req 5)
+  - [x] 10.1 Parse `pendingCollabRequests` from `/api/register` and `/api/status` responses
+    - In `checkAndNotify()`: check for `pendingCollabRequests` in response
+    - Log to watcher terminal with collab request details
+    - Deduplicate: don't re-log requests already shown (track by requestId)
+    - _Requirements: 5.8_
+    - _Use Cases: UC-LS-11_
+  - [x] 10.2 Log status updates for initiator's requests
+    - When a request the user initiated changes status (accepted/declined/expired/link_shared), log the update
+    - _Requirements: 5.5, 5.7_
+    - _Use Cases: UC-LS-12, UC-LS-13, UC-LS-14_
+
+- [x] 11. Checkpoint — Phase 2 complete
+  - Run full test suite.
+  - Manual test: full flow from collab request → accept → share link → join via dashboard.
+  - Verify Baton panel renders correctly with SSE updates.
+
+## Phase 3: IDE Live Share Automation
+
+- [x] 12. Agent: Live Share Extension Detection (Req 8)
+  - [x] 12.1 Add Live Share detection logic to steering rule
+    - Try `code --list-extensions | grep ms-vsliveshare` (VS Code)
+    - Cache result for session duration
+    - If not found: offer to install or give manual instructions
+    - _Requirements: 8.1, 8.2, 8.4, 8.5_
+    - _Use Cases: UC-LS-22, UC-LS-23_
+  - [x] 12.2 Add Live Share installation flow
+    - On user confirmation: run `code --install-extension ms-vsliveshare.vsliveshare`
+    - Update cached status
+    - Handle: `code` binary not found (Kiro or other IDE)
+    - _Requirements: 8.2, 8.3_
+    - _Use Cases: UC-LS-22_
+
+- [x] 13. Agent: Live Share Session Automation (Req 9)
+  - [x] 13.1 Add session start logic to steering rule
+    - After accepting collab request + Live Share detected: attempt `liveshare.start`
+    - If URI captured programmatically: auto-call `share_link`
+    - If URI not captured: instruct user to copy and paste
+    - _Requirements: 9.1, 9.2, 9.3, 9.4_
+    - _Use Cases: UC-LS-21, UC-LS-23_
+  - [x] 13.2 Add `"konductor, join <url>"` command
+    - Validate URL, attempt `liveshare.join` IDE command
+    - Fallback: open URL in default browser
+    - _Requirements: 9.5_
+    - _Use Cases: UC-LS-24_
+  - [x] 13.3 Handle Live Share authentication prompt
+    - Detect timeout on session start (no URI returned within 10s)
+    - Display auth guidance message
+    - _Requirements: 9.6_
+    - _Use Cases: UC-LS-25_
+
+- [ ] 14. Backward Compatibility Verification (Req 10)
+  - [ ] 14.1 Verify Phase 1+2 work without Live Share installed
+    - All collab request flows (create, respond, share link) work via Slack + agent + dashboard
+    - No errors when Live Share detection fails
+    - _Requirements: 10.1, 10.2, 10.3_
+  - [ ] 14.2 Verify cross-IDE link sharing
+    - Live Share join links work in browser when extension not installed
+    - _Requirements: 10.4_
+    - _Use Cases: UC-LS-29_
+
+- [x] 15. Checkpoint — Phase 3 complete
+  - Run full test suite.
+  - Manual test: full automated flow (accept → auto-start → auto-share link).
+  - Manual test: graceful degradation when Live Share not installed.
+
+## Documentation & Finalization
+
+- [ ] 16. Update documentation
+  - [ ] 16.1 Update `konductor/README.md` with Live Share integration section
+    - Document new MCP tools: `create_collab_request`, `list_collab_requests`, `respond_collab_request`, `share_link`
+    - Document new env vars: `KONDUCTOR_COLLAB_ENABLED`, `KONDUCTOR_COLLAB_REQUEST_TTL`, `KONDUCTOR_COLLAB_SLACK_DM`
+    - Document new chat commands
+    - _Requirements: documentation standards_
+  - [ ] 16.2 Update `CHANGELOG.md`
+    - Add entry for Live Share integration feature (all phases)
+  - [ ] 16.3 Update regression test plan
+    - Add test cases for collab request lifecycle, Slack delivery, agent check-in, dashboard panel
+    - Add test cases for Phase 3 IDE automation (manual verification)
+    - _Requirements: feature completeness_
+  - [ ] 16.4 Update client-verification.mjs
+    - Add API-level tests for collab request REST endpoints
+    - _Requirements: feature completeness_
+
+- [ ] 17. Final Checkpoint
+  - Run full test suite. Ensure all property tests, unit tests, and existing tests pass.
+  - Verify all 4 steering rule locations are in sync.
+  - Ask the user if questions arise.

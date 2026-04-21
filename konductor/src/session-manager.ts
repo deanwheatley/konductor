@@ -11,6 +11,7 @@ import type {
   ISessionManager,
   IPersistenceStore,
   WorkSession,
+  FileChange,
 } from "./types.js";
 import type { KonductorLogger } from "./logger.js";
 
@@ -30,6 +31,16 @@ export class SessionManager implements ISessionManager {
     this.store = store;
     this.timeoutMs = timeoutMs;
     this.logger = logger;
+  }
+
+  /**
+   * Register a passive session (from GitHub poller) directly into the session map.
+   * Passive sessions bypass persistence (they are ephemeral and re-created each poll).
+   * If a session with the same sessionId already exists, it is replaced.
+   */
+  async registerPassive(session: WorkSession): Promise<void> {
+    this.sessions.set(session.sessionId, session);
+    // Passive sessions are NOT persisted — they are ephemeral
   }
 
   /** Load existing sessions from the persistence store into memory. */
@@ -52,6 +63,7 @@ export class SessionManager implements ISessionManager {
     repo: string,
     branch: string,
     files: string[],
+    fileChanges?: FileChange[],
   ): Promise<WorkSession> {
     // Check for existing session with same user+repo — update it instead
     for (const existing of this.sessions.values()) {
@@ -59,6 +71,12 @@ export class SessionManager implements ISessionManager {
         existing.branch = branch;
         existing.files = files;
         existing.lastHeartbeat = new Date().toISOString();
+        // Store fileChanges when provided, clear when not
+        if (fileChanges) {
+          existing.fileChanges = fileChanges;
+        } else {
+          delete existing.fileChanges;
+        }
         await this.persist();
         if (this.logger) {
           this.logger.logSessionUpdated(userId, existing.sessionId, files, branch);
@@ -77,6 +95,11 @@ export class SessionManager implements ISessionManager {
       createdAt: now,
       lastHeartbeat: now,
     };
+
+    // Attach fileChanges when provided
+    if (fileChanges) {
+      session.fileChanges = fileChanges;
+    }
 
     this.sessions.set(session.sessionId, session);
     await this.persist();

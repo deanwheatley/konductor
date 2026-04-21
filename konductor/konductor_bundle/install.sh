@@ -158,6 +158,11 @@ KONDUCTOR_POLL_INTERVAL=10
 # KONDUCTOR_REPO=
 # KONDUCTOR_BRANCH=
 
+# Log rotation: max log file size before rotation (default: 10MB).
+# Supports KB, MB, GB suffixes. Rotation keeps at most 3 files:
+# current, .backup, .tobedeleted
+# KONDUCTOR_LOG_MAX_SIZE=10MB
+
 # File filtering: by default, watches ALL files not in .gitignore.
 # Set this to restrict to specific extensions (comma-separated, no dots).
 # Leave empty or commented to watch everything git tracks.
@@ -242,6 +247,7 @@ if [ "$do_global" = true ] && [ "$do_workspace" = true ]; then
   echo "  │    KONDUCTOR_LOG_LEVEL    info or debug                  │"
   echo "  │    KONDUCTOR_POLL_INTERVAL  seconds between polls        │"
   echo "  │    KONDUCTOR_LOG_FILE     optional file logging          │"
+  echo "  │    KONDUCTOR_LOG_MAX_SIZE log rotation size (def: 10MB)  │"
   echo "  │    KONDUCTOR_WATCH_EXTENSIONS  restrict file types       │"
   echo "  │    KONDUCTOR_USER         override detected username     │"
   echo "  │                                                          │"

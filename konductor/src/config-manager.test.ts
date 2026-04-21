@@ -6,7 +6,7 @@ import fc from "fast-check";
 import { stringify as yamlStringify } from "yaml";
 import { ConfigManager, DEFAULT_CONFIG } from "./config-manager.js";
 import { CollisionState } from "./types.js";
-import type { Action } from "./types.js";
+import type { Action, GitHubConfig } from "./types.js";
 
 // ---------------------------------------------------------------------------
 // Generators
@@ -168,6 +168,272 @@ describe("ConfigManager — Unit Tests", () => {
     expect(config.states[CollisionState.MergeHell].message).toBe(
       DEFAULT_CONFIG.states[CollisionState.MergeHell].message,
     );
+    mgr.close();
+  });
+});
+
+
+// ---------------------------------------------------------------------------
+// GitHub Config Parsing Tests
+// ---------------------------------------------------------------------------
+
+describe("ConfigManager — GitHub Config Parsing", () => {
+  it("returns undefined github config when section is absent", async () => {
+    const configPath = join(tempDir, "no-github.yaml");
+    await writeFile(
+      configPath,
+      yamlStringify({ heartbeat_timeout_seconds: 300 }),
+      "utf-8",
+    );
+
+    const mgr = new ConfigManager();
+    const config = await mgr.load(configPath);
+
+    expect(config.github).toBeUndefined();
+    expect(mgr.getGitHubConfig()).toBeUndefined();
+    mgr.close();
+  });
+
+  it("parses a full github config with all fields", async () => {
+    const configPath = join(tempDir, "full-github.yaml");
+    await writeFile(
+      configPath,
+      yamlStringify({
+        heartbeat_timeout_seconds: 300,
+        github: {
+          token_env: "MY_GH_TOKEN",
+          poll_interval_seconds: 120,
+          include_drafts: false,
+          commit_lookback_hours: 48,
+          repositories: [
+            { repo: "org/repo-a", commit_branches: ["main", "develop"] },
+            { repo: "org/repo-b" },
+          ],
+        },
+      }),
+      "utf-8",
+    );
+
+    const mgr = new ConfigManager();
+    await mgr.load(configPath);
+    const gh = mgr.getGitHubConfig();
+
+    expect(gh).toBeDefined();
+    expect(gh!.tokenEnv).toBe("MY_GH_TOKEN");
+    expect(gh!.pollIntervalSeconds).toBe(120);
+    expect(gh!.includeDrafts).toBe(false);
+    expect(gh!.commitLookbackHours).toBe(48);
+    expect(gh!.repositories).toHaveLength(2);
+    expect(gh!.repositories[0].repo).toBe("org/repo-a");
+    expect(gh!.repositories[0].commitBranches).toEqual(["main", "develop"]);
+    expect(gh!.repositories[1].repo).toBe("org/repo-b");
+    expect(gh!.repositories[1].commitBranches).toBeUndefined();
+    mgr.close();
+  });
+
+  it("applies defaults for missing optional github fields", async () => {
+    const configPath = join(tempDir, "partial-github.yaml");
+    await writeFile(
+      configPath,
+      yamlStringify({
+        github: {
+          repositories: [{ repo: "org/repo-a" }],
+        },
+      }),
+      "utf-8",
+    );
+
+    const mgr = new ConfigManager();
+    await mgr.load(configPath);
+    const gh = mgr.getGitHubConfig();
+
+    expect(gh).toBeDefined();
+    expect(gh!.tokenEnv).toBe("GITHUB_TOKEN");
+    expect(gh!.pollIntervalSeconds).toBe(60);
+    expect(gh!.includeDrafts).toBe(true);
+    expect(gh!.commitLookbackHours).toBe(24);
+    expect(gh!.repositories).toHaveLength(1);
+    mgr.close();
+  });
+
+  it("returns undefined when github section has empty repositories", async () => {
+    const configPath = join(tempDir, "empty-repos.yaml");
+    await writeFile(
+      configPath,
+      yamlStringify({
+        github: {
+          token_env: "GH_TOKEN",
+          repositories: [],
+        },
+      }),
+      "utf-8",
+    );
+
+    const mgr = new ConfigManager();
+    await mgr.load(configPath);
+
+    expect(mgr.getGitHubConfig()).toBeUndefined();
+    mgr.close();
+  });
+
+  it("returns undefined when github section has invalid repositories", async () => {
+    const configPath = join(tempDir, "invalid-repos.yaml");
+    await writeFile(
+      configPath,
+      yamlStringify({
+        github: {
+          repositories: [{ not_a_repo: true }, { repo: "" }],
+        },
+      }),
+      "utf-8",
+    );
+
+    const mgr = new ConfigManager();
+    await mgr.load(configPath);
+
+    expect(mgr.getGitHubConfig()).toBeUndefined();
+    mgr.close();
+  });
+
+  it("skips invalid repo entries but keeps valid ones", async () => {
+    const configPath = join(tempDir, "mixed-repos.yaml");
+    await writeFile(
+      configPath,
+      yamlStringify({
+        github: {
+          repositories: [
+            { repo: "org/valid-repo" },
+            { not_a_repo: true },
+            { repo: "" },
+            { repo: "org/another-valid" },
+          ],
+        },
+      }),
+      "utf-8",
+    );
+
+    const mgr = new ConfigManager();
+    await mgr.load(configPath);
+    const gh = mgr.getGitHubConfig();
+
+    expect(gh).toBeDefined();
+    expect(gh!.repositories).toHaveLength(2);
+    expect(gh!.repositories[0].repo).toBe("org/valid-repo");
+    expect(gh!.repositories[1].repo).toBe("org/another-valid");
+    mgr.close();
+  });
+
+  it("returns undefined when github is not an object", async () => {
+    const configPath = join(tempDir, "github-string.yaml");
+    await writeFile(configPath, "github: true\n", "utf-8");
+
+    const mgr = new ConfigManager();
+    await mgr.load(configPath);
+
+    expect(mgr.getGitHubConfig()).toBeUndefined();
+    mgr.close();
+  });
+
+  it("fires onGitHubConfigChange when github config is added on reload", async () => {
+    const configPath = join(tempDir, "hot-reload-gh.yaml");
+    // Start without github
+    await writeFile(
+      configPath,
+      yamlStringify({ heartbeat_timeout_seconds: 300 }),
+      "utf-8",
+    );
+
+    const mgr = new ConfigManager();
+    await mgr.load(configPath);
+    expect(mgr.getGitHubConfig()).toBeUndefined();
+
+    let callbackFired = false;
+    let receivedConfig: GitHubConfig | undefined;
+    mgr.onGitHubConfigChange((cfg) => {
+      callbackFired = true;
+      receivedConfig = cfg;
+    });
+
+    // Now add github section and reload
+    await writeFile(
+      configPath,
+      yamlStringify({
+        heartbeat_timeout_seconds: 300,
+        github: {
+          repositories: [{ repo: "org/repo" }],
+        },
+      }),
+      "utf-8",
+    );
+    await mgr.reload();
+
+    expect(callbackFired).toBe(true);
+    expect(receivedConfig).toBeDefined();
+    expect(receivedConfig!.repositories[0].repo).toBe("org/repo");
+    mgr.close();
+  });
+
+  it("fires onGitHubConfigChange when github config is removed on reload", async () => {
+    const configPath = join(tempDir, "hot-reload-remove.yaml");
+    await writeFile(
+      configPath,
+      yamlStringify({
+        github: { repositories: [{ repo: "org/repo" }] },
+      }),
+      "utf-8",
+    );
+
+    const mgr = new ConfigManager();
+    await mgr.load(configPath);
+    expect(mgr.getGitHubConfig()).toBeDefined();
+
+    let callbackFired = false;
+    mgr.onGitHubConfigChange(() => {
+      callbackFired = true;
+    });
+
+    // Remove github section
+    await writeFile(
+      configPath,
+      yamlStringify({ heartbeat_timeout_seconds: 300 }),
+      "utf-8",
+    );
+    await mgr.reload();
+
+    expect(callbackFired).toBe(true);
+    expect(mgr.getGitHubConfig()).toBeUndefined();
+    mgr.close();
+  });
+
+  it("does NOT fire onGitHubConfigChange when github config is unchanged", async () => {
+    const configPath = join(tempDir, "hot-reload-same.yaml");
+    const yamlContent = yamlStringify({
+      heartbeat_timeout_seconds: 300,
+      github: { repositories: [{ repo: "org/repo" }] },
+    });
+    await writeFile(configPath, yamlContent, "utf-8");
+
+    const mgr = new ConfigManager();
+    await mgr.load(configPath);
+
+    let callbackFired = false;
+    mgr.onGitHubConfigChange(() => {
+      callbackFired = true;
+    });
+
+    // Reload with same content (only timeout changes)
+    await writeFile(
+      configPath,
+      yamlStringify({
+        heartbeat_timeout_seconds: 600,
+        github: { repositories: [{ repo: "org/repo" }] },
+      }),
+      "utf-8",
+    );
+    await mgr.reload();
+
+    expect(callbackFired).toBe(false);
+    expect(mgr.getTimeout()).toBe(600);
     mgr.close();
   });
 });

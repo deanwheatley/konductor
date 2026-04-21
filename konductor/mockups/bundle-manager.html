@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎼 Konductor — Bundle Manager (Mockup)</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0f0f0f;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+.header {
+  background: #1a1a2e;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #2a2a3e;
+}
+.header .logo { font-size: 24px; }
+.header h1 { font-size: 18px; font-weight: 600; color: #fff; }
+.header-spacer { flex: 1; }
+.back-link { color: #8b8bff; text-decoration: none; font-size: 13px; }
+.back-link:hover { text-decoration: underline; }
+.main {
+  padding: 20px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Channel Summary */
+.channel-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.channel-card {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 16px;
+}
+.channel-card h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #888;
+  margin-bottom: 8px;
+}
+.channel-card .version {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+.channel-card .version.none { color: #666; font-size: 14px; }
+.channel-card .meta { font-size: 11px; color: #555; margin-top: 4px; }
+.channel-card.latest { border-color: #4fc3f7; }
+.channel-card.latest h3 { color: #4fc3f7; }
+
+/* Section */
+.section {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.section-header {
+  padding: 12px 16px;
+  background: #222;
+  border-bottom: 1px solid #2a2a2a;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-header h2 {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #aaa;
+}
+.section-header .count {
+  background: #2a2a3e;
+  color: #888;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+}
+.section-header .spacer { flex: 1; }
+.section-body { padding: 16px; }
+
+/* Upload area */
+.upload-area {
+  border: 2px dashed #333;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.upload-area:hover { border-color: #4fc3f7; }
+.upload-area .icon { font-size: 32px; margin-bottom: 8px; }
+.upload-area .label { font-size: 14px; color: #aaa; }
+.upload-area .hint { font-size: 11px; color: #555; margin-top: 4px; }
+.local-store-badge {
+  display: inline-block;
+  background: #f59e0b33;
+  color: #fbbf24;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* Bundle table */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  text-align: left;
+  padding: 10px 12px;
+  background: #1e1e1e;
+  color: #aaa;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid #2a2a2a;
+}
+th:hover { color: #fff; }
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #1f1f1f;
+  vertical-align: middle;
+}
+tr:hover td { background: #1f1f2f; }
+.version-cell {
+  font-family: 'SF Mono', Monaco, monospace;
+  font-weight: 600;
+  color: #4ade80;
+}
+.version-cell .prerelease { color: #f59e0b; }
+.channel-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.pill-dev { background: #3b82f633; color: #60a5fa; }
+.pill-uat { background: #f59e0b33; color: #fbbf24; }
+.pill-prod { background: #16a34a33; color: #4ade80; }
+.pill-latest { background: #4fc3f733; color: #4fc3f7; }
+.size-cell { color: #888; font-size: 12px; }
+.date-cell { color: #888; font-size: 12px; }
+.author-cell { color: #ccc; }
+.notes-cell { color: #888; font-size: 12px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Buttons */
+.btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-primary { background: #4fc3f7; color: #1a1a2e; }
+.btn-primary:hover { background: #81d4fa; }
+.btn-danger { background: #dc262633; color: #f87171; border: 1px solid #dc262666; }
+.btn-danger:hover { background: #dc262655; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.actions-cell { display: flex; gap: 6px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="logo">🎼</span>
+  <h1>Bundle Manager</h1>
+  <div class="header-spacer"></div>
+  <a class="back-link" href="/admin">← Back to Admin Dashboard</a>
+</div>
+
+<div class="main">
+
+  <!-- Channel Assignment Summary -->
+  <div class="channel-summary">
+    <div class="channel-card">
+      <h3>Dev</h3>
+      <div class="version">0.4.1</div>
+      <div class="meta">Assigned 2 hours ago</div>
+    </div>
+    <div class="channel-card">
+      <h3>UAT</h3>
+      <div class="version">0.4.0</div>
+      <div class="meta">Assigned 3 days ago</div>
+    </div>
+    <div class="channel-card">
+      <h3>Prod</h3>
+      <div class="version">0.4.0</div>
+      <div class="meta">Assigned 1 week ago</div>
+    </div>
+    <div class="channel-card latest">
+      <h3>Latest</h3>
+      <div class="version">0.4.1</div>
+      <div class="meta">Most recently uploaded</div>
+    </div>
+  </div>
+
+  <!-- Bundle Registry -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Available Bundles</h2>
+      <span class="count">3 bundles</span>
+      <div class="spacer"></div>
+      <button class="btn btn-primary" onclick="alert('Upload dialog would open here')">Upload Bundle</button>
+    </div>
+    <div class="section-body">
+
+      <div class="local-store-badge">📂 Local Store Mode — bundles loaded from installers/ directory</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Version ▼</th>
+            <th>Channels</th>
+            <th>Size</th>
+            <th>Created</th>
+            <th>Uploaded</th>
+            <th>Author</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="version-cell">0.4.1</td>
+            <td>
+              <div class="channel-pills">
+                <span class="pill pill-dev">Dev</span>
+                <span class="pill pill-latest">Latest</span>
+              </div>
+            </td>
+            <td class="size-cell">31 KB</td>
+            <td class="date-cell">2026-04-20 09:21</td>
+            <td class="date-cell">n/a (local)</td>
+            <td class="author-cell">—</td>
+            <td class="notes-cell" title="Channel-aware update URLs, Slack disable checkbox">Channel-aware update URLs, Slack disable checkbox</td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn btn-danger btn-sm" onclick="alert('Confirm: Delete v0.4.1?\n\nWarning: 2 users on Dev channel will lose access until a new bundle is assigned.')">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="version-cell">0.4.0</td>
+            <td>
+              <div class="channel-pills">
+                <span class="pill pill-uat">UAT</span>
+                <span class="pill pill-prod">Prod</span>
+              </div>
+            </td>
+            <td class="size-cell">31 KB</td>
+            <td class="date-cell">2026-04-18 14:30</td>
+            <td class="date-cell">n/a (local)</td>
+            <td class="author-cell">—</td>
+            <td class="notes-cell" title="Stable release with admin dashboard">Stable release with admin dashboard</td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn btn-danger btn-sm" onclick="alert('Cannot delete: assigned to UAT and Prod channels.\n\nReassign those channels first.')">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="version-cell">0.3.0<span class="prerelease">-beta.1</span></td>
+            <td>
+              <div class="channel-pills">
+                <span style="color:#555; font-size:11px">—</span>
+              </div>
+            </td>
+            <td class="size-cell">31 KB</td>
+            <td class="date-cell">2026-04-15 10:00</td>
+            <td class="date-cell">n/a (local)</td>
+            <td class="author-cell">—</td>
+            <td class="notes-cell" title="Beta: initial Slack integration">Beta: initial Slack integration</td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn btn-danger btn-sm" onclick="alert('Confirm: Delete v0.3.0-beta.1?\n\nThis bundle is not assigned to any channel. Safe to delete.')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

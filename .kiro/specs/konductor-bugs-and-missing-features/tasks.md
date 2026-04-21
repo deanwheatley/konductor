@@ -1,0 +1,118 @@
+# Implementation Plan
+
+- [x] 1. Watcher: Offline change queuing (Req 1, 5)
+  - [x] 1.1 Add OfflineQueue class to konductor-watcher.mjs
+    - Add `offlineQueue` Set and `offlineQueueMax` config reading from `KONDUCTOR_OFFLINE_QUEUE_MAX`
+    - In `registerFiles()`: when server unreachable, add files to queue instead of dropping them
+    - Implement FIFO eviction when queue exceeds max size
+    - Log queue count: "X file changes queued while offline. Will report on reconnection."
+    - Log eviction: "Offline queue full (max: X). Oldest events discarded."
+    - _Requirements: 1.1, 1.4, 1.5, 1.6, 1.7_
+  - [x] 1.2 Add offline replay on reconnection
+    - In `registerFiles()` and `api()`: when server becomes reachable after being offline, replay cumulative queue as single registration
+    - Clear queue after successful replay
+    - Log: "Reconnected. Synced X offline changes."
+    - Include queue count in reconnect terminal message for Req 5
+    - _Requirements: 1.2, 1.3, 5.1, 5.2, 5.3_
+  - [x] 1.3 Write property tests for offline queue
+    - **Property 1: Offline queue preserves all files (union)**
+    - **Validates: Requirements 1.1, 1.2, 1.3**
+  - [x] 1.4 Write property test for FIFO eviction
+    - **Property 2: Offline queue FIFO eviction**
+    - **Validates: Requirements 1.4**
+  - [x] 1.5 Write property test for single replay registration
+    - **Property 3: Offline replay is a single registration**
+    - **Validates: Requirements 1.2, 1.3**
+
+- [x] 2. Watcher: Branch change detection (Req 7)
+  - [x] 2.1 Change BRANCH from const to dynamic refresh
+    - Change `const BRANCH` to `let currentBranch`
+    - Add `refreshBranch()` function that re-reads `git branch --show-current`
+    - Call `refreshBranch()` at the start of every poll interval
+    - Log branch changes: "Branch changed: X → Y"
+    - Update all references from `BRANCH` to `currentBranch`
+    - _Requirements: 7.1, 7.2, 7.3_
+  - [x] 2.2 Write property test for branch detection
+    - **Property 4: Branch detection on every poll cycle**
+    - **Validates: Requirements 7.1, 7.3**
+
+- [x] 3. Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 4. Server: Proactive collision push (Req 3)
+  - [x] 4.1 Add user-to-transport mapping in startSseServer
+    - Track `userId → Set<ServerResponse>` for SSE connections
+    - Populate on `/sse` connection using `X-Konductor-User` header
+    - Clean up on connection close
+    - _Requirements: 3.1_
+  - [x] 4.2 Emit collision_alert SSE event to affected users
+    - In register_session handler (both MCP and REST): after collision evaluation, if state ≠ solo, push `collision_alert` event to each overlapping user's SSE connections
+    - Event payload: `{ type, repo, collisionState, triggeringUser, sharedFiles, summary }`
+    - Best-effort push — never block registration on send failure
+    - _Requirements: 3.1, 3.4_
+  - [x] 4.3 Write property test for proactive push
+    - **Property 5: Proactive collision push reaches affected users**
+    - **Validates: Requirements 3.1, 3.4**
+
+- [x] 5. Server: Slack notification debouncing (Req 4)
+  - [x] 5.1 Add SlackDebouncer class
+    - Create `src/slack-debouncer.ts` with per-repo timer management
+    - `schedule(repo, result, userId, callback)` — sets/resets timer
+    - `setDebounceMs(ms)` — configurable period (min 5s, max 300s)
+    - On timer expiry: invoke callback with latest state
+    - _Requirements: 4.1, 4.2, 4.3_
+  - [x] 5.2 Integrate debouncer into SlackNotifier
+    - Wrap the existing `postMessage` call in `onCollisionEvaluated()` with the debouncer
+    - Read debounce period from admin settings (default 30s)
+    - _Requirements: 4.1, 4.4_
+  - [x] 5.3 Write property test for debounce coalescing
+    - **Property 6: Slack debounce coalesces rapid changes**
+    - **Validates: Requirements 4.1, 4.2, 4.3**
+  - [x] 5.4 Write property test for timer reset
+    - **Property 7: Debounce timer resets on new state change**
+    - **Validates: Requirements 4.2**
+
+- [x] 6. Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 7. Steering rule: Add new chat commands (Req 2, 6, 9, 10)
+  - [x] 7.1 Add "show baton" / "open baton" to routing table
+    - Add entries for "show baton", "open baton", "where is the repo website?", "show dashboard", "open dashboard"
+    - Add "open slack" entry
+    - Include platform-detection logic for open command (macOS: `open`, Linux: `xdg-open`, Windows: `start`)
+    - Update all 4 steering rule locations: `steering/`, `.agent/rules/`, `konductor_bundle/kiro/steering/`, `konductor_bundle/agent/rules/`
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 6.1, 6.2, 6.3_
+  - [x] 7.2 Add resolution suggestions section
+    - Add "Resolution Suggestions" section after Automatic Collision Check
+    - Include context-aware suggestion lists for: same-branch collision, cross-branch merge hell, approved PR imminent
+    - Include "do option N" handling with confirmation requirement
+    - Include safety constraint: never execute destructive git commands without explicit confirmation
+    - Update all 4 steering rule locations
+    - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7_
+  - [x] 7.3 Add "is it safe?" query to routing table
+    - Add entries for "is it safe to unstash?", "is it safe to resume?", "can I continue?", "is it safe?"
+    - Route to `check_status` or `who_overlaps` for previously stashed files
+    - Include response templates for safe/unsafe scenarios
+    - Update all 4 steering rule locations
+    - _Requirements: 10.1, 10.2, 10.3, 10.4_
+
+- [x] 8. README: Document both install methods (Req 8)
+  - [x] 8.1 Add "Method 2: Manual MCP Config" to README
+    - Add subsection under "Installing Konductor (Client)" in `konductor/README.md`
+    - Document creating `.kiro/settings/mcp.json` manually
+    - Explain the auto-install flow that triggers on first agent interaction
+    - Explain what happens after each method
+    - _Requirements: 8.1, 8.2, 8.3, 8.4_
+
+- [x] 9. Update regression test plan and client verification
+  - [x] 9.1 Update REGRESSION-TEST-PLAN.md with new test cases
+    - Add tests for offline queue (T-094+), branch detection, proactive push, Slack debounce
+    - Update existing tests that reference missing features to remove "MISSING" tags
+    - _Requirements: 1.1-1.7, 3.1-3.4, 4.1-4.4, 7.1-7.3_
+  - [x] 9.2 Update client-verification.mjs with deregister and offline tests
+    - Add deregister endpoint test (already done in regression)
+    - Add offline queue replay test (mock server down/up cycle)
+    - _Requirements: 1.2, 1.3_
+
+- [x] 10. Final Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.

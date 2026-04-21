@@ -63,15 +63,22 @@ export function detectUsername() {
  * Matches the structure in bundle/kiro/settings/mcp.json.
  */
 function buildKonductorMcpEntry(serverUrl, apiKey, username) {
-  // Kiro requires MCP SSE URLs to be https or localhost.
-  // Extract the port from the server URL and use localhost for the SSE connection.
-  // The watcher uses the full server URL for REST API calls separately.
-  let port = "3010";
+  // Kiro requires MCP SSE URLs to be https or localhost (http).
+  // For HTTPS servers: use http://localhost on port+1 (HTTP fallback port)
+  //   because Kiro's Electron runtime doesn't trust mkcert CAs.
+  // For HTTP servers: use localhost directly.
+  let sseUrl;
   try {
     const parsed = new URL(serverUrl);
-    if (parsed.port) port = parsed.port;
-  } catch { /* use default */ }
-  const sseUrl = `http://localhost:${port}/sse`;
+    if (parsed.protocol === "https:") {
+      const httpPort = parseInt(parsed.port || "3010", 10) + 1;
+      sseUrl = `http://localhost:${httpPort}/sse`;
+    } else {
+      sseUrl = `http://localhost:${parsed.port || "3010"}/sse`;
+    }
+  } catch {
+    sseUrl = "http://localhost:3010/sse";
+  }
   return {
     url: sseUrl,
     headers: {
@@ -225,12 +232,16 @@ const DEFAULT_WATCHER_ENV = `# Konductor Watcher Configuration
 # Only watcher-specific settings go here.
 
 KONDUCTOR_LOG_LEVEL=info
-KONDUCTOR_LOG_TO_TERMINAL=true
 KONDUCTOR_POLL_INTERVAL=10
-# KONDUCTOR_LOG_FILE=.konductor-watcher.log
+KONDUCTOR_LOG_FILE=.konductor-watcher.log
 # KONDUCTOR_USER=
 # KONDUCTOR_REPO=
 # KONDUCTOR_BRANCH=
+
+# Log rotation: max log file size before rotation (default: 10MB).
+# Supports KB, MB, GB suffixes. Rotation keeps at most 3 files:
+# current, .backup, .tobedeleted
+# KONDUCTOR_LOG_MAX_SIZE=10MB
 
 # File filtering: by default, watches ALL files not in .gitignore.
 # Set this to restrict to specific extensions (comma-separated, no dots).
@@ -291,6 +302,8 @@ export async function installWorkspace(bundleDir, workspaceRoot, version, server
   const agentDest = resolve(workspaceRoot, ".agent", "rules", "konductor-collision-awareness.md");
   if (deployFile(bundleDir, "agent/rules/konductor-collision-awareness.md", agentDest)) {
     console.log("  ✅ Antigravity workspace rule installed");
+    console.log("     ℹ️  Antigravity limitation: the file watcher and MCP server won't auto-start on project open.");
+    console.log("        Send a message in chat to trigger the agent rule, or run: node konductor-watcher.mjs &");
   }
 
   // Deploy watcher + launcher + watchdog
@@ -310,12 +323,45 @@ export async function installWorkspace(bundleDir, workspaceRoot, version, server
   console.log("  ✅ File watcher installed");
 
   // Create .konductor-watcher.env if missing (preserve if exists)
+  // Always update KONDUCTOR_USER to the detected username
   const envPath = resolve(workspaceRoot, ".konductor-watcher.env");
+  const detectedUser = detectUsername();
+  const effectiveUrl = serverUrl || "http://localhost:3010";
+  // For HTTPS servers, the watcher uses the HTTP fallback port (port+1)
+  // because Node's fetch rejects self-signed/mkcert certs
+  let watcherUrl = effectiveUrl;
+  try {
+    const parsed = new URL(effectiveUrl);
+    if (parsed.protocol === "https:") {
+      const httpPort = parseInt(parsed.port || "3010", 10) + 1;
+      watcherUrl = `http://${parsed.hostname}:${httpPort}`;
+    }
+  } catch { /* use as-is */ }
   if (!existsSync(envPath)) {
-    writeFileSync(envPath, DEFAULT_WATCHER_ENV, "utf-8");
-    console.log("  ✅ Watcher config created (.konductor-watcher.env)");
+    let envContent = DEFAULT_WATCHER_ENV.replace(
+      "# KONDUCTOR_USER=",
+      `KONDUCTOR_USER=${detectedUser}`,
+    );
+    // Add server URL so the watcher uses it for REST API calls
+    envContent = `KONDUCTOR_URL=${watcherUrl}\n${envContent}`;
+    writeFileSync(envPath, envContent, "utf-8");
+    console.log(`  ✅ Watcher config created (.konductor-watcher.env) — user: ${detectedUser}`);
   } else {
-    console.log("  ⏭  Watcher config preserved (.konductor-watcher.env)");
+    // Preserve the file but update the username and server URL
+    let envContent = readFileSync(envPath, "utf-8");
+    if (envContent.match(/^KONDUCTOR_USER\s*=.*$/m)) {
+      envContent = envContent.replace(/^KONDUCTOR_USER\s*=.*$/m, `KONDUCTOR_USER=${detectedUser}`);
+    } else if (envContent.match(/^#\s*KONDUCTOR_USER\s*=/m)) {
+      envContent = envContent.replace(/^#\s*KONDUCTOR_USER\s*=.*$/m, `KONDUCTOR_USER=${detectedUser}`);
+    }
+    // Update or add KONDUCTOR_URL
+    if (envContent.match(/^KONDUCTOR_URL\s*=.*$/m)) {
+      envContent = envContent.replace(/^KONDUCTOR_URL\s*=.*$/m, `KONDUCTOR_URL=${watcherUrl}`);
+    } else {
+      envContent = `KONDUCTOR_URL=${watcherUrl}\n${envContent}`;
+    }
+    writeFileSync(envPath, envContent, "utf-8");
+    console.log(`  ✅ Watcher config updated — user: ${detectedUser}, server: ${effectiveUrl}`);
   }
 
   // Update workspace MCP config (.kiro/settings/mcp.json)
@@ -333,12 +379,18 @@ export async function installWorkspace(bundleDir, workspaceRoot, version, server
     if (existing !== "YOUR_API_KEY") wsKey = existing;
   }
 
-  let wsPort = "3010";
+  let sseUrl;
   try {
     const parsed = new URL(effectiveServerUrl);
-    if (parsed.port) wsPort = parsed.port;
-  } catch { /* use default */ }
-  const sseUrl = `http://localhost:${wsPort}/sse`;
+    if (parsed.protocol === "https:") {
+      const httpPort = parseInt(parsed.port || "3010", 10) + 1;
+      sseUrl = `http://localhost:${httpPort}/sse`;
+    } else {
+      sseUrl = `http://localhost:${parsed.port || "3010"}/sse`;
+    }
+  } catch {
+    sseUrl = "http://localhost:3010/sse";
+  }
   const username = detectUsername();
   wsCfg.mcpServers.konductor = {
     url: sseUrl,
@@ -451,7 +503,7 @@ export async function checkUpdate(serverUrl, workspaceRoot) {
     const http = await import(base.startsWith("https") ? "node:https" : "node:http");
     const res = await new Promise((resolve, reject) => {
       const client = http.default || http;
-      const req = client.get(`${base}/bundle/manifest.json`, { timeout: 5000 }, (res) => {
+      const req = client.get(`${base}/bundle/manifest.json`, { timeout: 5000, rejectUnauthorized: false }, (res) => {
         const chunks = [];
         res.on("data", (c) => chunks.push(c));
         res.on("end", () => resolve({ statusCode: res.statusCode, body: Buffer.concat(chunks) }));

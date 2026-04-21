@@ -3,9 +3,11 @@
  * Konductor's enhanced chat tools (who_is_active, who_overlaps, etc.).
  *
  * Requirements: 1.1, 1.2, 2.1, 2.2, 3.1, 3.2, 4.1, 4.2, 5.1, 5.3, 6.1, 6.2, 7.1, 7.3
+ * GitHub Integration Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6
  */
 
 import { CollisionState } from "./types.js";
+import type { SessionSource, OverlapSeverity } from "./types.js";
 
 // ---------------------------------------------------------------------------
 // who_is_active
@@ -16,6 +18,18 @@ export interface ActiveUserInfo {
   branch: string;
   files: string[];
   sessionDurationMinutes: number;
+  /** Session source: "active", "github_pr", or "github_commit". Requirement 6.5 */
+  source: SessionSource;
+  /** PR number when source is github_pr */
+  prNumber?: number;
+  /** PR URL when source is github_pr */
+  prUrl?: string;
+  /** Whether the PR is a draft */
+  prDraft?: boolean;
+  /** Whether the PR is approved */
+  prApproved?: boolean;
+  /** Commit date range when source is github_commit */
+  commitDateRange?: { earliest: string; latest: string };
 }
 
 export interface ActiveUsersResult {
@@ -33,6 +47,24 @@ export interface OverlapInfo {
   branch: string;
   sharedFiles: string[];
   collisionState: CollisionState;
+  /** Session source type. Requirement 6.1 */
+  source: SessionSource;
+  /** PR number when source is github_pr */
+  prNumber?: number;
+  /** PR URL when source is github_pr */
+  prUrl?: string;
+  /** PR target branch when source is github_pr */
+  prTargetBranch?: string;
+  /** Whether the PR is a draft */
+  prDraft?: boolean;
+  /** Whether the PR is approved */
+  prApproved?: boolean;
+  /** Commit date range when source is github_commit */
+  commitDateRange?: { earliest: string; latest: string };
+  /** Whether line ranges overlap on shared files. Requirement 4.1 */
+  lineOverlap?: boolean | null;
+  /** Aggregate merge severity when line data is available. Requirement 7.5 */
+  overlapSeverity?: OverlapSeverity;
 }
 
 export interface OverlapResult {
@@ -52,6 +84,14 @@ export interface UserSessionInfo {
   files: string[];
   sessionStartedAt: string;
   lastHeartbeat: string;
+  /** Session source type */
+  source: SessionSource;
+  /** PR number when source is github_pr */
+  prNumber?: number;
+  /** PR URL when source is github_pr */
+  prUrl?: string;
+  /** Commit date range when source is github_commit */
+  commitDateRange?: { earliest: string; latest: string };
 }
 
 export interface UserActivityResult {
@@ -73,6 +113,12 @@ export interface RiskResult {
   sharedFileCount: number;
   hasCrossBranchOverlap: boolean;
   riskSummary: string;
+  /** Whether overlaps include PR sessions with approved status. Requirement 6.4 */
+  hasApprovedPrOverlap: boolean;
+  /** Number of distinct source types among overlapping sessions. Requirement 6.4 */
+  sourceDiversity: number;
+  /** Aggregate merge severity when line overlap data is available. Requirement 5.5 */
+  overlapSeverity?: OverlapSeverity;
 }
 
 // ---------------------------------------------------------------------------
@@ -81,8 +127,10 @@ export interface RiskResult {
 
 export interface HotspotInfo {
   file: string;
-  editors: Array<{ userId: string; branch: string }>;
+  editors: Array<{ userId: string; branch: string; source: SessionSource }>;
   collisionState: CollisionState;
+  /** Line ranges per editor when available. Requirement 4.5 */
+  lineRanges?: Array<{ userId: string; ranges: Array<{ startLine: number; endLine: number }> }>;
 }
 
 export interface HotspotsResult {
@@ -100,6 +148,8 @@ export interface BranchInfo {
   users: string[];
   files: string[];
   hasOverlapWithOtherBranches: boolean;
+  /** Source types present on this branch. Requirement 6.6 */
+  sources: SessionSource[];
 }
 
 export interface BranchesResult {
@@ -117,6 +167,12 @@ export interface CoordinationTarget {
   sharedFiles: string[];
   urgency: "high" | "medium" | "low";
   suggestedAction: string;
+  /** Source type of the overlapping session. Requirement 6.3 */
+  source: SessionSource;
+  /** PR number when source is github_pr */
+  prNumber?: number;
+  /** PR URL when source is github_pr */
+  prUrl?: string;
 }
 
 export interface CoordinationResult {

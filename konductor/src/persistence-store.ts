@@ -40,8 +40,9 @@ export class PersistenceStore implements IPersistenceStore {
 
   /**
    * Persist sessions to disk using an atomic write strategy:
-   * 1. Write JSON to a temporary file in the same directory
-   * 2. Rename the temp file over the target (atomic on most filesystems)
+   * 1. Filter out passive sessions (github_pr, github_commit) — they are ephemeral
+   * 2. Write JSON to a temporary file in the same directory
+   * 3. Rename the temp file over the target (atomic on most filesystems)
    */
   async save(sessions: WorkSession[]): Promise<void> {
     const dir = dirname(this.filePath);
@@ -49,8 +50,12 @@ export class PersistenceStore implements IPersistenceStore {
       await mkdir(dir, { recursive: true });
     }
 
+    const activeSessions = sessions.filter(
+      (s) => !s.source || s.source === "active",
+    );
+
     const tempPath = join(dir, `.sessions-${randomUUID()}.tmp`);
-    const json = JSON.stringify(sessions, null, 2);
+    const json = JSON.stringify(activeSessions, null, 2);
 
     await writeFile(tempPath, json, "utf-8");
     await rename(tempPath, this.filePath);

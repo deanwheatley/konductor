@@ -68,6 +68,7 @@ if ($Workspace) {
 KONDUCTOR_LOG_LEVEL=info
 KONDUCTOR_LOG_TO_TERMINAL=true
 KONDUCTOR_POLL_INTERVAL=10
+# KONDUCTOR_LOG_MAX_SIZE=10MB
 "@ | Set-Content -Path $ef -NoNewline; Write-Host "  [ok] Watcher config created" }
 
     # Add Konductor runtime artifacts to .gitignore
@@ -127,6 +128,7 @@ if ($Global -and $Workspace) {
     Write-Host "    KONDUCTOR_LOG_LEVEL         info or debug"
     Write-Host "    KONDUCTOR_POLL_INTERVAL      seconds between polls"
     Write-Host "    KONDUCTOR_LOG_FILE           optional file logging"
+    Write-Host "    KONDUCTOR_LOG_MAX_SIZE       log rotation size (def: 10MB)"
     Write-Host "    KONDUCTOR_WATCH_EXTENSIONS   restrict file types"
     Write-Host "    KONDUCTOR_USER               override detected username"
     Write-Host ""

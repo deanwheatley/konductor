@@ -12,21 +12,27 @@ This section takes absolute priority. It applies whether or not the Konductor se
 
 ### On session start (first message in a conversation)
 
-Before doing anything else, attempt to call `register_session` or `check_status` with a dummy check. Based on the result:
+Before doing anything else:
 
-- If the call succeeds: `🟢 Konductor: Connected. Collision awareness is active.`
-- If the call fails (connection refused, timeout, tool not found, error): `⚠️ Konductor: Server not reachable. Collision awareness is OFFLINE. Your changes are NOT being tracked.`
+1. Check if the file watcher is running. Run: `pgrep -f konductor-watcher.mjs`
+   - If NOT running and `konductor-watcher.mjs` exists in the workspace root, start it detached: `node konductor-watcher.mjs &`. Note that the watcher was restarted.
+   - If NOT running and the file doesn't exist, note that the watcher is not installed.
+
+2. Attempt to call `register_session` or `check_status` with a dummy check. Note whether the MCP server is reachable.
+
+3. Print a consolidated status message based on the results:
+
+- If the watcher is running (or was just restarted) AND the MCP server is reachable: `🟢 Konductor: Fully operational and watching your back!` If the response contains a `repoPageUrl` field, also print: `📊 Dashboard: <repoPageUrl>`
+- If the watcher is running but the MCP server is NOT reachable: `⚠️ Konductor: Server not reachable. Collision awareness is OFFLINE. Your changes are NOT being tracked.` (also print `🟢 Konductor: File watcher is running.` so the user knows the watcher is fine)
+- If the MCP server is reachable but the watcher is NOT running and couldn't be started: `⚠️ Konductor: File watcher not installed. Run "setup konductor".` (also print `🟢 Konductor: Server connected.`)
 - If Konductor tools are not available at all (not configured, MCP server not listed): `⚠️ Konductor: Not configured. Run "setup konductor" to enable collision awareness.`
+- If both are down: print both warnings individually.
 
 ### On every file create or modify
 
-This applies both to files the agent creates/modifies AND files the user edits manually in the editor.
+If the server is reachable, register normally (see Automatic Registration below).
 
-To detect user-edited files, check the environment context for open editor files and the active editor file. If any of these files have changed since the last message (e.g., the active file changed or new files appeared in the open editors list), treat them as user-modified files and apply the same rules below.
-
-If the server is reachable, register normally (see Automatic Registration below). For user-edited files, also call `register_session` with the detected files to ensure they are tracked.
-
-If the server is NOT reachable or tools are unavailable, print on EVERY file created or modified — whether by the agent or the user:
+If the server is NOT reachable or tools are unavailable, print on EVERY file you create or modify:
 `⚠️ Konductor: Still disconnected. Changes to <filename> are untracked.`
 
 Do NOT batch these. Each file gets its own warning line.
@@ -38,6 +44,15 @@ Track the connection state internally. When it changes, notify immediately:
 - Was connected, now disconnected: `⚠️ Konductor: Connection lost. Collision awareness is now OFFLINE.`
 - Was disconnected, now connected: `🟢 Konductor: Reconnected. Collision awareness is back online.`
 
+### Re-verification — NEVER trust cached state
+
+The agent MUST NOT cache the connection status and assume it remains valid across messages. Connections can drop at any time.
+
+- WHEN a Konductor MCP tool call fails (timeout, connection refused, error response), the agent MUST immediately update the connection state to disconnected and print the disconnection warning. Do NOT retry silently and report success.
+- WHEN the user asks "konductor, status" or "konductor, are you running?", the agent MUST perform a live check (call `check_status` or `list_sessions` AND run `pgrep -f konductor-watcher.mjs`). NEVER answer from memory.
+- WHEN the agent is about to modify files and the last successful MCP call was more than 60 seconds ago, the agent SHOULD re-verify by calling `check_status` before registering.
+- WHEN reporting connection status in any context, the agent MUST base the report on the result of an actual tool call or health check performed in the current turn, not on a previous turn's result.
+
 ### Rules for this section
 
 - NEVER silently skip. NEVER assume the user knows the server is down.
@@ -48,10 +63,10 @@ Track the connection state internally. When it changes, notify immediately:
 
 When the user says "setup konductor" (or similar like "install konductor", "configure konductor"), run the npx installer to set up everything they need:
 
-1. Build the command: `npx konductor-setup`
-   - If the Konductor server URL is known from context (e.g., from `~/.kiro/settings/mcp.json` or the user mentioned it), append `--server <url>`
-   - If the user's API key is known from context (e.g., from `~/.kiro/settings/mcp.json` or the user provided it), append `--api-key <key>`
-   - Example: `npx konductor-setup --server https://konductor.example.com:3010 --api-key my-secret-key`
+1. First, call the `client_install_info` MCP tool to get the correct install commands with the server's URL baked in. If the tool is not available, build the command manually:
+   - Get the server URL from `~/.kiro/settings/mcp.json` (the `url` field in the konductor entry, minus `/sse`)
+   - Build: `npx <serverUrl>/bundle/installer.tgz --server <serverUrl>`
+   - If the user's API key is known from context, append `--api-key <key>`
 
 2. Run the command. The installer handles everything automatically: MCP config (merged into existing), steering rules, hooks, agent rules, file watcher (launched as background process), and watcher config. It works cross-platform (macOS, Linux, Windows) without requiring bash or PowerShell.
 
@@ -83,8 +98,9 @@ Whenever you are about to create or modify files as part of a task:
 
 1. Call `register_session` with the userId, repo, branch, and the full list of files you plan to touch.
 2. Print: `🟢 Konductor: Registered session on <repo>#<branch> (<N> files)`
-3. Store the returned `sessionId` for later deregistration.
-4. If the call fails, follow the Connection Status section above — warn on every file.
+3. If the response contains a `repoPageUrl` field, print: `📊 Dashboard: <repoPageUrl>`
+4. Store the returned `sessionId` for later deregistration.
+5. If the call fails, follow the Connection Status section above — warn on every file.
 
 Do not ask the user for permission. Just do it.
 
@@ -92,11 +108,22 @@ Do not ask the user for permission. Just do it.
 
 After calling `register_session`, check if the response contains `updateRequired: true`. If it does, and you have not already attempted an update in this session:
 
-1. Determine the server URL from the MCP config or context.
-2. Run: `npx konductor-setup@latest --workspace --server <serverUrl>`
+1. Determine the server URL from the MCP config or context (the `url` field in the konductor entry, minus `/sse`).
+2. Run: `npx <serverUrl>/bundle/installer.tgz --workspace --server <serverUrl>`
 3. On success: Print `🔄 Konductor: Client updated to v<serverVersion>.` and re-register the session (call `register_session` again with the same parameters).
-4. On failure (npx not available, network error, non-zero exit): Print `⚠️ Konductor: Client is outdated (v<currentVersion> → v<serverVersion>). Run "npx konductor-setup" to update.`
+4. On failure (npx not available, network error, non-zero exit): Print `⚠️ Konductor: Client is outdated (v<currentVersion> → v<serverVersion>). Run the install command from "konductor, how do I install?" to update.`
 5. Only attempt the update once per session. If the update was already attempted (whether it succeeded or failed), do not attempt again.
+
+### Bundle Stale Warning on Registration
+
+After calling `register_session`, check if the response contains `bundleStale: true`. If it does:
+
+1. Print: `⚠️ Konductor: Your installer bundle was removed by an admin. Waiting for a replacement...`
+2. If the response contains a `staleMessage`, print it as additional context.
+3. Do NOT block the user. Session registration, collision checks, and all MCP tools continue to work normally.
+4. On the next `register_session` call, if the response contains `updateRequired: true` instead of `bundleStale: true`, the stale state is resolved — follow the standard Auto-Update flow above.
+
+This warning should be printed once per session start. If the stale state persists across multiple registrations in the same session, do not repeat the warning.
 
 ## Automatic Collision Check
 
@@ -105,10 +132,95 @@ After registering, check the returned `collisionState` and notify:
 - **Solo**: Registration confirmation only.
 - **Neighbors**: `🟢 Konductor: Others are active in this repo but working on different files. Proceeding.`
 - **Crossroads**: `🟡 Konductor: Heads up — others are working in the same directories. Proceeding with caution.`
+- **Proximity**: `🟢 Konductor: Same file as <overlapping users>, but different sections — no line overlap. Proceeding.` — Do NOT pause.
 - **Collision Course**: `🟠 Konductor: Warning — <overlapping users> are modifying the same files: <shared files>. Proceed?` — Wait for confirmation.
+  - When line overlap details are available (`lineOverlapDetails` with `lineOverlap: true`): append line context, e.g. `<user> is editing <file> lines 10-25, overlapping with your lines 15-30.`
+  - When line data is unavailable: use the existing file-level message (no change).
 - **Merge Hell**: `🔴 Konductor: Critical overlap — <overlapping users> have divergent changes on <shared files> across branches <branches>. Strongly recommend coordinating.` — Wait for confirmation.
+  - When `overlapSeverity` is `severe`: append `High merge conflict risk. Coordinate immediately.`
+  - When `overlapSeverity` is `minimal`: append `Minor overlap — likely a quick merge resolution.`
+  - When `overlapSeverity` is `moderate` or unavailable: use the existing message (no additional text).
 
-Only pause at Collision Course or Merge Hell.
+Only pause at Collision Course or Merge Hell. Proximity does NOT pause the agent.
+
+### High-Severity Terminal Echo
+
+When the collision state is **Collision Course** or **Merge Hell**, the agent MUST additionally echo a short warning to the user's active IDE terminal so it is visible even if the chat panel is not in focus. Run a shell command:
+
+- **Collision Course**: `echo "🟠 KONDUCTOR: COLLISION COURSE — <overlapping users> modifying same files: <shared files>" >&2`
+- **Merge Hell**: `echo "🔴 KONDUCTOR: MERGE HELL — <overlapping users> have divergent changes on <shared files> across branches <branches>" >&2`
+
+This is in addition to the chat message, not a replacement. The file watcher also logs these to its own terminal independently.
+
+### Source-Attributed Collision Messages
+
+When the collision result includes `overlappingDetails`, format each overlapping session with source context. Each source type has its own message format:
+
+- **Active session (source: `active`)**: `🟠 Warning — <user> is actively editing <files> on <branch>.`
+- **PR (source: `github_pr`)**: `🟠 Warning — <user>'s PR #<number> (<url>) modifies <files>, targeting <target_branch>.`
+- **Approved PR (source: `github_pr`, approved)**: `🔴 Critical — <user>'s PR #<number> is approved and targets <target_branch>. Merge is imminent.`
+- **Draft PR (source: `github_pr`, draft)**: `🟡 Heads up — <user> has a draft PR #<number> touching <files>. Low risk but worth tracking.`
+- **Commits (source: `github_commit`)**: `🟠 Warning — <user> pushed commits to <branch> (<date_range>) modifying <files>.`
+
+When multiple source types collide simultaneously, each source gets its own context line. Example:
+
+```
+🟠 Konductor: Collision detected on org/app
+  🟠 bob is actively editing src/index.ts on feature-y (live session)
+  🟠 carol's PR #42 (github.com/org/app/pull/42) modifies src/index.ts, targeting main
+```
+
+When Merge Hell involves mixed sources, explain the cross-branch nature with source context.
+
+### Resolution Suggestions
+
+When displaying a Collision Course or Merge Hell warning, the agent SHALL append a numbered list of suggested resolution actions appropriate to the situation.
+
+#### Same Branch Collision (collision_course)
+
+When the collision is on the same branch with file or line overlap, suggest:
+
+```
+🛠️ Suggested actions:
+  1. `git pull --rebase` — Rebase your changes on top of the other user's
+  2. Coordinate with <user> — Agree on who edits which sections
+  3. `git stash` — Shelve your changes and wait for the other user to finish
+  4. Continue working — Accept the risk of merge conflicts
+```
+
+#### Cross-Branch Collision (merge_hell)
+
+When the collision is on different branches, suggest:
+
+```
+🛠️ Suggested actions:
+  1. Stop and coordinate — Talk to <user> before making more changes
+  2. `git pull --rebase origin/<their-branch>` — Rebase onto their branch
+  3. `git stash` — Shelve and wait for their branch to merge first
+  4. Create a shared branch — Both work on a common feature branch
+  5. Continue working — Accept the risk of complex merge conflicts
+```
+
+#### Approved PR Imminent
+
+When an approved PR is about to merge and conflicts with the user's files, suggest:
+
+```
+🛠️ Suggested actions:
+  1. `git add . && git commit` — Commit your changes immediately before the merge
+  2. Ask <user> to hold the merge — Request a delay via Slack/chat
+  3. `git stash` — Shelve and rebase after the PR merges
+```
+
+#### Handling "do option N"
+
+When the user says "do option N" or "option N" after seeing resolution suggestions:
+
+1. Map the number to the corresponding action from the most recently displayed suggestion list.
+2. If the action involves a git command (`git pull --rebase`, `git stash`, `git add . && git commit`), display the exact command and ask for explicit confirmation: `⚠️ This will run: \`<command>\`. Confirm? (yes/no)`
+3. Only execute the command after the user explicitly confirms with "yes".
+4. NEVER execute destructive git commands (rebase, stash, reset, force push) without explicit user confirmation.
+5. If the action is non-destructive (e.g., "coordinate with <user>", "continue working"), acknowledge and proceed without a confirmation prompt.
 
 ## Automatic Session Updates
 
@@ -171,6 +283,29 @@ When the user asks a question prefixed with "konductor,", match it to the approp
 | "what's the hottest file?", "where are the conflicts?", "what's the riskiest file in this repo?" | `repo_hotspots` with the current repo |
 | "what branches are active?" | `active_branches` with the current repo |
 | "who should I talk to?", "who do I coordinate with?", "who should I coordinate with?" | `coordination_advice` with the current userId and repo |
+| "show PRs", "show open PRs", "what PRs are open?", "any open pull requests?" | Open the Baton dashboard to the repo page (use `repoPageUrl` from registration) or call `who_is_active` filtered to `github_pr` sources. Display PR number, author, branch, target, status (draft/approved/open), and file count. |
+| "show history", "show repo history", "what happened recently?", "recent activity" | Open the Baton dashboard to the repo page or fetch `/api/github/history/:repo` from the server. Display recent commits, PRs, and merges with timestamp, action, user, branch, and summary. |
+| "show slack config", "slack status", "slack settings" | Call `get_slack_config` MCP tool with the current repo. Display the Slack channel, verbosity level, and whether Slack is enabled. |
+| "show baton", "where is the repo website?", "show dashboard" | Display the `repoPageUrl` from the most recent `register_session` response. If no `repoPageUrl` is available (never registered or server unreachable), display: `⚠️ Konductor: Dashboard URL not available. Try registering first.` |
+| "open baton", "open dashboard" | Open the Baton repo page URL in the user's default browser using the platform-appropriate command (see Browser Open below). If no `repoPageUrl` is available, display: `⚠️ Konductor: Dashboard URL not available. Try registering first.` |
+| "open slack" | Open the configured Slack channel URL (`https://slack.com/app_redirect?channel=<channel>`) in the user's default browser using the platform-appropriate command (see Browser Open below). If no Slack channel is configured, display: `⚠️ Konductor: No Slack channel configured for this repo.` |
+| "is it safe to unstash?", "is it safe to resume?", "can I continue?", "is it safe?" | Call `check_status` or `who_overlaps` for the files that were previously stashed. If no overlap: `🟢 Safe to resume. <user> is no longer editing <files>.` If overlap persists: `⚠️ <user> is still editing <files>. Wait or coordinate.` |
+| "live share with <user>", "pair with <user>", "live share" | Initiate a Live Share collaboration request. See **Live Share Collaboration** section below. |
+| "accept collab from <user>", "accept collaboration from <user>" | Accept a pending collaboration request. See **Live Share Collaboration — Responding** section below. |
+| "decline collab from <user>", "decline collaboration from <user>" | Decline a pending collaboration request. See **Live Share Collaboration — Responding** section below. |
+| "share link <url>", "share liveshare link <url>" | Share a Live Share join link with the collaboration partner. See **Live Share Collaboration — Share Link** section below. |
+| "check live share", "is live share installed?" | Re-run Live Share extension detection and update the cached status. See **Live Share Extension Detection** section. |
+| "join <url>" | Join a Live Share session by URL. See **Live Share Session Automation — Joining** section below. |
+
+### Browser Open — Platform Detection
+
+When the agent needs to open a URL in the user's default browser, detect the operating system and use the appropriate command:
+
+- **macOS**: `open <url>`
+- **Linux**: `xdg-open <url>`
+- **Windows**: `start <url>`
+
+The agent SHOULD detect the platform by checking the environment (e.g., `uname` output or known shell context). If detection fails, fall back to `open <url>` (macOS default).
 
 ### Formatting Rules
 
@@ -201,10 +336,11 @@ When the user sends a management command prefixed with "konductor,", execute the
 
 | User says | Action |
 |---|---|
-| "turn on", "start" | Launch the file watcher: `node konductor-watcher.mjs &`. Verify MCP connection. Call `register_session`. Print: `🟢 Konductor: Started.` |
-| "turn off", "stop" | Kill the watcher: `pkill -f konductor-watcher.mjs`. Call `deregister_session`. Print: `⏹️ Konductor: Stopped.` |
-| "restart" | Kill the watcher: `pkill -f konductor-watcher.mjs`. Relaunch: `node konductor-watcher.mjs &`. Verify MCP connection. Print: `🔄 Konductor: Restarted.` |
-| "reinstall", "setup" | Run the installer: `npx konductor-setup`. If the server URL is known from context, append `--server <url>`. If the API key is known, append `--api-key <key>`. Print: `✅ Konductor: Reinstalled.` |
+| "turn on", "start", "connect" | Launch the file watcher: `node konductor-watcher.mjs &`. Verify MCP connection. Call `register_session`. Print: `🟢 Konductor: Started.` |
+| "turn off", "stop", "disconnect" | Kill the watcher: `pkill -f konductor-watcher.mjs`. Call `deregister_session`. Print: `⏹️ Konductor: Stopped.` |
+| "restart", "reconnect" | Kill the watcher: `pkill -f konductor-watcher.mjs`. Relaunch: `node konductor-watcher.mjs &`. Verify MCP connection. Print: `🔄 Konductor: Restarted.` |
+| "update" | Get the server URL from MCP config. Run: `npx <serverUrl>/bundle/installer.tgz --workspace --server <serverUrl>`. Print: `🔄 Konductor: Updating...` before, `✅ Konductor: Updated to v<version>.` after. If it fails: `⚠️ Konductor: Update failed.` with the manual command. |
+| "reinstall", "setup" | Run the installer: first call `client_install_info` to get the correct command, or build it manually: `npx <serverUrl>/bundle/installer.tgz --server <serverUrl>`. If the API key is known, append `--api-key <key>`. Print: `✅ Konductor: Reinstalled.` |
 
 ### Configuration Commands
 
@@ -218,6 +354,10 @@ When the user sends a management command prefixed with "konductor,", execute the
 | "watch only X extensions" | Set file filter | Edit `.konductor-watcher.env` — set `KONDUCTOR_WATCH_EXTENSIONS=X`. Restart the watcher. |
 | "watch all files" | Clear file filter | Edit `.konductor-watcher.env` — comment out `KONDUCTOR_WATCH_EXTENSIONS`. Restart the watcher. |
 | "change my username to X" | Update identity | Edit `.konductor-watcher.env` — set `KONDUCTOR_USER=X`. Restart the watcher. |
+| "change slack channel to X" | Update Slack channel | Call `set_slack_config` MCP tool with `{ repo, channel: X }`. Confirm the change. No watcher restart needed. |
+| "change slack verbosity to X" | Update Slack verbosity | Call `set_slack_config` MCP tool with `{ repo, verbosity: X }`. Confirm the change. No watcher restart needed. |
+| "disable slack", "turn off slack" | Disable Slack notifications | Call `set_slack_config` MCP tool with `{ repo, verbosity: 0 }`. Confirm: `⏹️ Konductor: Slack notifications disabled for <repo>.` |
+| "enable slack", "turn on slack" | Enable Slack notifications | Call `set_slack_config` MCP tool with `{ repo, verbosity: 2 }`. Confirm: `🟢 Konductor: Slack notifications enabled for <repo> (verbosity: 2).` |
 
 When a configuration change requires a watcher restart, restart the watcher automatically after applying the change. Print: `🔄 Konductor: Config updated. Watcher restarted.`
 
@@ -245,18 +385,53 @@ When the user asks "konductor, help", respond with:
   • "konductor, what's the hottest file?" — find repo hotspots
   • "konductor, what branches are active?" — list active branches
   • "konductor, who should I talk to?" — get coordination advice
+  • "konductor, show PRs" — see open pull requests for this repo
+  • "konductor, show history" — see recent commits, PRs, and merges
+  • "konductor, slack status" — show Slack config for this repo
+  • "konductor, show baton" — display the Baton dashboard URL
+  • "konductor, open baton" — open the Baton dashboard in your browser
+  • "konductor, open slack" — open the Slack channel in your browser
+  • "konductor, is it safe?" — check if it's safe to resume after shelving
+  • "konductor, live share with <user>" — request a pairing session
+  • "konductor, check live share" — check if Live Share extension is installed
 
 ⚙️ Management:
   • "konductor, status" — check if Konductor is running
-  • "konductor, restart" — restart the file watcher
-  • "konductor, turn on/off" — start or stop Konductor
-  • "konductor, reinstall" — re-run the installer
+  • "konductor, restart" / "reconnect" — restart the file watcher
+  • "konductor, connect" / "disconnect" — start or stop Konductor
+  • "konductor, update" — update client to latest server version
+  • "konductor, reinstall" — re-run the full installer
   • "konductor, show my config" — display current configuration
   • "konductor, config options" — list all config options
   • "konductor, change <option> to <value>" — update a config value
+  • "konductor, change slack channel to X" — set Slack channel for this repo
+  • "konductor, change slack verbosity to X" — set notification verbosity (0-5)
+  • "konductor, disable slack" / "enable slack" — toggle Slack notifications
+  • "konductor, accept/decline collab from <user>" — respond to a collaboration request
+  • "konductor, share link <url>" — share a Live Share join link
+  • "konductor, join <url>" — join a Live Share session
   • "konductor, who am I?" — show your identity
   • "konductor, help" — show this message
 ```
+
+---
+
+## Slack Config Change SSE Event
+
+When the agent receives a `slack_config_change` SSE event for the current repo, display the following notification in chat:
+
+```
+📢 Konductor: Slack alerts for <repo> now go to #<channel> (verbosity: <level>).
+🔗 Slack channel: <slackChannelLink>
+```
+
+Where:
+- `<repo>` is the repository name from the event
+- `<channel>` is the new Slack channel name from the event payload
+- `<level>` is the new verbosity level from the event payload
+- `<slackChannelLink>` is the Slack channel link from the event payload (format: `https://slack.com/app_redirect?channel=<channel>`)
+
+This notification is displayed regardless of who made the change (another user, the admin, or the current user via the Baton dashboard).
 
 ---
 
@@ -270,6 +445,13 @@ When the collision state returned from `register_session` is **collision_course*
 
 `💡 Tip: Ask "konductor, who should I coordinate with?" for detailed coordination advice.`
 
+Additionally, append a Live Share suggestion:
+
+- **Collision Course**: `💡 Tip: Say "konductor, live share with <overlapping user>" to start a pairing session.`
+- **Merge Hell**: `🤝 Strongly recommend pairing. Say "konductor, live share with <overlapping user>" to coordinate in real-time.`
+
+When multiple users are in collision, the suggestion SHALL name the highest-severity overlapping user.
+
 ### At Cross-Branch Overlap
 
 When multiple users are on different branches with shared files (detected during registration or collision check), append this suggestion:
@@ -277,3 +459,248 @@ When multiple users are on different branches with shared files (detected during
 `💡 Tip: Ask "konductor, am I safe to push?" before merging to check for conflicts.`
 
 These suggestions are one-liners appended to the existing collision notifications. They do not replace the standard notifications — they augment them.
+
+---
+
+## Pending Collaboration Request Display
+
+After every `register_session` or `check_status` call, check if the response contains a `pendingCollabRequests` array. If present and non-empty, display the requests to the user.
+
+### Recipient — Incoming Requests
+
+When the user is the recipient of pending requests:
+
+- **Single request**: `🤝 Konductor: <initiator> wants to pair with you on <files> (collision: <state>). Say "konductor, accept collab from <initiator>" or "konductor, decline collab from <initiator>".`
+- **Multiple requests**: Display a numbered list sorted by recency (newest first), with collision severity indicated for each:
+  ```
+  🤝 Konductor: You have pending collaboration requests:
+    1. <initiator1> — <files> (collision: <state>) — <age> ago
+    2. <initiator2> — <files> (collision: <state>) — <age> ago
+  Say "konductor, accept collab from <user>" or "konductor, decline collab from <user>".
+  ```
+
+### Initiator — Status Updates
+
+When the user is the initiator and a request's status has changed:
+
+- **Accepted**: `🟢 Konductor: <recipient> accepted your collaboration request.`
+- **Declined**: `👋 Konductor: <recipient> declined your collaboration request.`
+- **Link shared**: `🔗 Konductor: <recipient> shared a Live Share link: <url>. Open it to join the session.`
+- **Expired**: `⏰ Konductor: Your collaboration request to <recipient> expired (no response after <TTL> min). Say "konductor, live share with <recipient>" to try again.`
+
+### Deduplication
+
+Track displayed request IDs for the session. Do not re-display a request that has already been shown unless its status has changed.
+
+---
+
+## Live Share Collaboration
+
+### Initiating — "konductor, live share with <user>"
+
+When the user says `"konductor, live share with <user>"` (case-insensitive, with or without `@` prefix on the username):
+
+1. **Parse the target username**: Strip any leading `@` from the username.
+
+2. **Validate the target user**: Call `who_is_active` with the current repo. Check if the target user has an active session or recent activity.
+   - If the target user is NOT found: respond `⚠️ Konductor: <user> doesn't appear to be active in this repo. They may be offline.` and stop.
+
+3. **Create the collaboration request**: Call `create_collab_request` MCP tool with `{ initiator: <currentUserId>, recipient: <targetUser>, repo: <currentRepo>, branch: <currentBranch>, files: <currentFiles>, collisionState: <currentCollisionState> }`.
+   - On success: print `🤝 Konductor: Collaboration request sent to <user>. They'll be notified via Slack and their next Konductor check-in.`
+   - On failure (server unreachable, timeout): print `⚠️ Konductor: Server not reachable. Can't send collaboration request right now. Try again when the server is back online, or reach out to <user> directly.`
+
+### Without a Target User — "konductor, live share"
+
+When the user says `"konductor, live share"` without specifying a user:
+
+1. **Check collision state**: Use the most recent collision state from `register_session`.
+   - If **Solo** (no active collisions): respond `⚠️ Konductor: No active collisions detected. Specify a user: "konductor, live share with <user>"` and stop.
+   - If **one overlapping user**: auto-select that user as the target and proceed with the collaboration request flow above.
+   - If **multiple overlapping users**: auto-select the highest-severity overlapping user. Display all collision partners with their severity, proceed with the highest-risk partner, and inform the user: `Say "konductor, live share with <other user>" to pair with someone else.`
+
+### Responding — "konductor, accept/decline collab from <user>"
+
+When the user says `"konductor, accept collab from <user>"`:
+
+1. Parse the initiator username (strip `@` prefix if present).
+2. Find the pending collab request from that initiator by calling `list_collab_requests` with the current userId.
+3. Call `respond_collab_request` MCP tool with `{ requestId: <id>, action: "accept" }`.
+4. Run Live Share extension detection (if not already cached this session).
+5. **If Live Share is installed**: attempt to auto-start a session. See **Live Share Session Automation — Auto-Start After Accept** below.
+6. **If Live Share is NOT installed or CLI unavailable**: print `🟢 Konductor: Accepted. Start a Live Share session and say "konductor, share link <url>" to send it to <initiator>.`
+
+When the user says `"konductor, decline collab from <user>"`:
+
+1. Parse the initiator username (strip `@` prefix if present).
+2. Find the pending collab request from that initiator by calling `list_collab_requests` with the current userId.
+3. Call `respond_collab_request` MCP tool with `{ requestId: <id>, action: "decline" }`.
+4. Print: `👋 Konductor: Declined. <initiator> will be notified.`
+
+### Share Link — "konductor, share link <url>"
+
+When the user says `"konductor, share link <url>"`:
+
+1. **Validate the URL**: Check that the URL contains `liveshare` or `vsengsaas.visualstudio.com`. If not: `⚠️ Konductor: That doesn't look like a Live Share link. The URL should contain "liveshare" or "vsengsaas.visualstudio.com".`
+
+2. **Resolve the requestId**: Call `list_collab_requests` with the current userId. Find the most recent accepted collab request where the current user is the recipient.
+   - If no accepted request found: `⚠️ Konductor: No accepted collaboration request found. Accept a request first, then share the link.`
+
+3. **Share the link**: Call `share_link` MCP tool with `{ requestId: <id>, shareLink: <url> }`.
+4. Print: `🔗 Konductor: Live Share link sent to <initiator>. They'll see it on their next check-in and via Slack.`
+
+---
+
+## Live Share Extension Detection
+
+The agent detects whether VS Code Live Share is installed and caches the result for the session. This detection runs automatically when the user initiates a live share command or accepts a collaboration request.
+
+### Detection Logic
+
+When the agent needs to check Live Share availability (first live share command or accept in a session):
+
+1. **Check cached status**: If Live Share status was already determined this session, use the cached result. Do NOT re-check on every command.
+
+2. **Try VS Code CLI**: Run `code --list-extensions 2>/dev/null | grep -i ms-vsliveshare`
+   - If the command succeeds and output contains `ms-vsliveshare`: Live Share is installed. Cache `liveshare_installed = true`.
+   - If the command succeeds but output is empty: Live Share is NOT installed. Cache `liveshare_installed = false`.
+   - If the `code` command is not found (exit code 127 or "command not found"): the IDE is not VS Code (likely Kiro or another editor). Cache `liveshare_cli_unavailable = true`.
+
+3. **Result handling**:
+   - If **installed**: proceed silently with the live share flow. No message needed.
+   - If **not installed**: offer to install (see Live Share Installation Flow below).
+   - If **CLI unavailable** (`code` binary not found): fall back to manual instructions:
+     ```
+     📦 Konductor: Can't detect Live Share automatically (VS Code CLI not available).
+     If you have Live Share installed, start a session manually:
+     1. Open Command Palette → "Live Share: Start Collaboration Session"
+     2. Copy the join link
+     3. Say "konductor, share link <url>" to send it to the other user
+     ```
+
+### When Detection Runs
+
+- On the FIRST `"konductor, live share with <user>"` command in a session
+- On the FIRST `"konductor, accept collab from <user>"` command in a session
+- NOT on every command — use the cached result after the first check
+- The cache is session-scoped. A new conversation/session resets the cache.
+
+### Cache Invalidation
+
+- After a successful installation (see Installation Flow), update the cache to `liveshare_installed = true`.
+- If the user says `"konductor, check live share"`, re-run detection and update the cache.
+
+---
+
+## Live Share Installation Flow
+
+When Live Share is detected as NOT installed (and the `code` CLI is available):
+
+1. **Offer to install**: Display:
+   ```
+   📦 Konductor: Live Share is not installed. Install it? (say "yes" to proceed)
+   You can also share a link manually without it.
+   ```
+
+2. **On user confirmation** ("yes", "sure", "install it", etc.):
+   - Run: `code --install-extension ms-vsliveshare.vsliveshare`
+   - If successful: display `✅ Konductor: Live Share installed. You may need to reload your IDE window.`
+   - Update cached status to `liveshare_installed = true`.
+   - If the install command fails: display `⚠️ Konductor: Installation failed. Install "Live Share" manually from the Extensions marketplace.`
+
+3. **On user decline** ("no", "skip", "not now", etc.):
+   - Proceed with the manual link sharing flow. Display:
+     ```
+     👍 Konductor: No problem. You can share links manually:
+     1. Start a Live Share session from the Command Palette
+     2. Copy the join link
+     3. Say "konductor, share link <url>"
+     ```
+
+4. **When `code` CLI is not available** (Kiro or other IDE):
+   - Do NOT offer automated installation.
+   - Display:
+     ```
+     📦 Konductor: Please install the "Live Share" extension from the marketplace, then try again.
+     In the meantime, you can share links manually if Live Share is already installed.
+     ```
+
+---
+
+## Live Share Session Automation
+
+When Live Share is detected as installed, the agent automates session creation and link sharing to minimize manual steps.
+
+### Auto-Start After Accept
+
+After the user accepts a collaboration request AND Live Share is detected as installed:
+
+1. **Attempt to start a Live Share session**: Run the IDE command `liveshare.start`.
+
+   - **Try the VS Code extension API first**: If the agent has access to `vscode.extensions.getExtension('ms-vsliveshare.vsliveshare').exports.share()`, call it. This returns the join URI programmatically.
+   - **Fall back to CLI**: Run `code --execute-command liveshare.start`. Note: this does NOT return the join URI to stdout.
+
+2. **If the join URI is captured programmatically** (API returned a URI):
+   - Automatically call `share_link` MCP tool with `{ requestId: <id>, shareLink: <uri> }`.
+   - Print: `🔗 Konductor: Live Share session started. Link sent to <initiator>.`
+
+3. **If the join URI is NOT captured** (CLI-only, no API access, or API returned nothing):
+   - Print:
+     ```
+     📋 Konductor: Live Share session started. Copy the join link from the Live Share panel and say "konductor, share link <url>".
+     ```
+
+4. **If the session start fails** (command not recognized, extension error):
+   - Print: `⚠️ Konductor: Couldn't start Live Share automatically. Start it manually from the Command Palette → "Live Share: Start Collaboration Session", then say "konductor, share link <url>".`
+
+5. **If Live Share requires authentication** (see Authentication Timeout below):
+   - Detect that no URI was returned within 10 seconds of starting the session.
+   - Print:
+     ```
+     🔑 Konductor: Live Share needs you to sign in with your Microsoft or GitHub account. Complete the sign-in in the browser window that opened, then try again.
+     ```
+   - Do NOT retry automatically. Wait for the user to re-initiate or share a link manually.
+
+### Auto-Start on Initiation
+
+When the user says `"konductor, live share with <user>"` AND Live Share is installed AND the collaboration request is created successfully:
+
+- The session is NOT auto-started on initiation. The initiator creates the request; the recipient starts the session after accepting.
+- This avoids starting a session that may never be joined (if the recipient declines or doesn't respond).
+
+### Joining — "konductor, join <url>"
+
+When the user says `"konductor, join <url>"`:
+
+1. **Validate the URL**: Check that the URL contains `liveshare` or `vsengsaas.visualstudio.com`.
+   - If not valid: `⚠️ Konductor: That doesn't look like a Live Share link. The URL should contain "liveshare" or "vsengsaas.visualstudio.com".`
+
+2. **Attempt to join via IDE command**:
+   - **Try the VS Code extension API first**: If the agent has access to `vscode.extensions.getExtension('ms-vsliveshare.vsliveshare').exports.join(uri)`, call it.
+   - **Fall back to CLI**: Run `code --execute-command "liveshare.join" --args "<url>"`.
+
+3. **If the join command succeeds**: Print `🟢 Konductor: Joining Live Share session...`
+
+4. **If the join command fails or the IDE doesn't support it**: Fall back to opening the URL in the default browser.
+   - Detect the platform and use the appropriate command:
+     - **macOS**: `open <url>`
+     - **Linux**: `xdg-open <url>`
+     - **Windows**: `start <url>`
+   - Print: `🔗 Konductor: Opening Live Share link in your browser. If you have the extension installed, it should open in your IDE.`
+
+5. **If Live Share requires authentication on join**: The sign-in flow is handled by the extension/browser automatically. No special handling needed — the user completes auth in the browser.
+
+### Authentication Timeout Handling
+
+When starting a Live Share session (via `liveshare.start` or the extension API):
+
+1. **Set a 10-second timeout** for the session start operation.
+2. **If no URI is returned within 10 seconds**, assume Live Share is prompting for authentication (first-time use or expired token).
+3. Display:
+   ```
+   🔑 Konductor: Live Share needs you to sign in with your Microsoft or GitHub account. Complete the sign-in, then try again.
+   ```
+4. Do NOT block or retry. The user should:
+   - Complete the sign-in in the browser window
+   - Then say `"konductor, share link <url>"` after manually starting a session, OR
+   - Say `"konductor, accept collab from <user>"` again to retry the auto-start
+

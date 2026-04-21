@@ -13,7 +13,7 @@ import { appendFileSync, statSync, renameSync, unlinkSync } from "node:fs";
 // Types
 // ---------------------------------------------------------------------------
 
-export type LogCategory = "CONN" | "SESSION" | "STATUS" | "CONFIG" | "SERVER" | "QUERY";
+export type LogCategory = "CONN" | "SESSION" | "STATUS" | "CONFIG" | "SERVER" | "QUERY" | "GITHUB";
 
 export interface LogEntry {
   timestamp: string;   // "2026-04-10 14:32:01"
@@ -35,7 +35,7 @@ export interface LoggerOptions {
 // ---------------------------------------------------------------------------
 
 const VALID_CATEGORIES: ReadonlySet<string> = new Set<LogCategory>([
-  "CONN", "SESSION", "STATUS", "CONFIG", "SERVER", "QUERY",
+  "CONN", "SESSION", "STATUS", "CONFIG", "SERVER", "QUERY", "GITHUB",
 ]);
 
 const LOG_LINE_REGEX = /^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\] \[([A-Z]+)\] \[([^\]]+)\] (.+)$/;
@@ -152,6 +152,11 @@ export class KonductorLogger {
   private log(category: LogCategory, actor: string, message: string): void {
     if (!this.enabled) return;
     this.write({ timestamp: this.now(), category, actor, message });
+  }
+
+  /** Public helper for system-level log messages (CONFIG, SERVER, etc.) */
+  logSystem(category: LogCategory, message: string): void {
+    this.log(category, "SYSTEM", message);
   }
 
   // ── Connection events ───────────────────────────────────────────────
@@ -292,5 +297,29 @@ export class KonductorLogger {
   logQueryTool(toolName: string, params: Record<string, unknown>): void {
     const paramStr = Object.entries(params).map(([k, v]) => `${k}=${v}`).join(", ");
     this.log("QUERY", "SYSTEM", `${toolName}(${paramStr})`);
+  }
+
+  // ── GitHub events ───────────────────────────────────────────────────
+
+  logGitHubPoll(repo: string, openPrs: number, recentCommits: number): void {
+    this.log("GITHUB", "SYSTEM", `Polled ${repo}: ${openPrs} open PRs, ${recentCommits} recent commits`);
+  }
+
+  logPrSessionCreated(userId: string, prNumber: number, branch: string, targetBranch: string, fileCount: number): void {
+    this.log("GITHUB", "SYSTEM",
+      `Created PR session for ${userId}: PR #${prNumber} (${branch} → ${targetBranch}, ${fileCount} files)`);
+  }
+
+  logPrSessionRemoved(prNumber: number, reason: string): void {
+    this.log("GITHUB", "SYSTEM", `Removed PR session: PR #${prNumber} ${reason}`);
+  }
+
+  logCommitSessionCreated(userId: string, commitCount: number, branch: string, dateRange: string): void {
+    this.log("GITHUB", "SYSTEM",
+      `Created commit session for ${userId}: ${commitCount} commits on ${branch} (${dateRange})`);
+  }
+
+  logCommitSessionRemoved(userId: string, branch: string, reason: string): void {
+    this.log("GITHUB", "SYSTEM", `Removed commit session for ${userId} on ${branch}: ${reason}`);
   }
 }

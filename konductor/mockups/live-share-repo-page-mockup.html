@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎵 Konductor Baton — webapp (Mockup)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f0f0f;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .header {
+    background: #1a1a2e;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #2a2a3e;
+  }
+  .header .logo { font-size: 24px; }
+  .header h1 { font-size: 18px; font-weight: 600; color: #fff; }
+  .header .repo-link {
+    color: #8b8bff;
+    text-decoration: none;
+    font-size: 14px;
+    margin-left: auto;
+  }
+  .connection-bar {
+    background: #16a34a;
+    color: #fff;
+    text-align: center;
+    padding: 4px;
+    font-size: 12px;
+  }
+  .main {
+    flex: 1;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .panel {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 12px 16px;
+    background: #222;
+    border-bottom: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-header h2 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #aaa;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-body { padding: 16px; }
+  .health-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .health-warning { background: #eab308; color: #1a1a1a; }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 12px;
+  }
+  .summary-item label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 4px;
+  }
+  .summary-item .value { font-size: 14px; }
+  .summary-item a { color: #8b8bff; text-decoration: none; }
+  .user-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #fff;
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+  }
+  .user-pill a { color: #fff; text-decoration: none; }
+  .user-pill .ago { font-size: 10px; opacity: 0.8; }
+  .user-link { color: #8b8bff; text-decoration: none; }
+  .branch-list { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; }
+  .branch-tag {
+    background: #2a2a3e;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+  }
+  .branch-tag a { color: #8b8bff; text-decoration: none; }
+  .count-badge {
+    background: #2a2a3e;
+    color: #888;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: normal;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .state-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    background: #2a2a3e;
+    color: #ccc;
+  }
+  .empty-state { text-align: center; padding: 24px; color: #666; font-size: 13px; }
+
+  /* ─── NEW: Recommended Actions ─── */
+  .recommended-actions {
+    margin-top: 16px;
+    background: #1a1a2e;
+    border: 1px solid #3a3a5e;
+    border-radius: 8px;
+    padding: 12px 16px;
+    border-left: 3px solid #eab308;
+  }
+  .recommended-actions-header {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fbbf24;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .action-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 13px;
+    color: #ccc;
+  }
+  .action-item .action-icon { font-size: 14px; flex-shrink: 0; }
+  .action-item code {
+    background: #2a2a3e;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #8b8bff;
+  }
+
+  /* ─── NEW: Enhanced Collab Cards ─── */
+  .collab-card {
+    background: #222;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+  }
+  .collab-card:last-child { margin-bottom: 0; }
+  .collab-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .collab-users { font-size: 13px; font-weight: 600; }
+  .collab-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .collab-status-pending { background: #eab30833; color: #fbbf24; }
+  .collab-status-accepted { background: #16a34a33; color: #4ade80; }
+  .collab-card-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #aaa;
+  }
+  .collab-files {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .collab-meta { display: flex; align-items: center; gap: 6px; }
+  .collab-join-btn {
+    background: #4338ca;
+    border: none;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    margin-left: auto;
+  }
+  .collab-join-btn:hover { background: #5b52e0; }
+
+  /* ─── NEW: Live Session Badge ─── */
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #16a34a33;
+    color: #4ade80;
+    animation: pulse-live 2s ease-in-out infinite;
+  }
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+  }
+  @keyframes pulse-live {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+  .waiting-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #eab30822;
+    color: #fbbf24;
+  }
+
+  /* ─── NEW: Pairing icon on user pills ─── */
+  .pairing-icon {
+    font-size: 11px;
+    margin-left: 2px;
+  }
+
+  /* ─── Mockup label ─── */
+  .mockup-label {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: #dc2626;
+    color: #fff;
+    padding: 4px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    z-index: 999;
+    border-bottom-left-radius: 8px;
+  }
+  .new-indicator {
+    display: inline-block;
+    background: #dc2626;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="mockup-label">MOCKUP — Not Live</div>
+
+<div class="header">
+  <span class="logo">🎵</span>
+  <h1>Konductor Baton — webapp</h1>
+  <a class="repo-link" href="#">↗ GitHub</a>
+</div>
+<div class="connection-bar">● Connected — live updates active</div>
+
+<div class="main">
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- REPOSITORY SUMMARY (existing, with NEW recommended actions)   -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Repository Summary</h2>
+      <span class="health-status health-warning">🟡 Warning</span>
+    </div>
+    <div class="panel-body">
+      <div class="summary-grid">
+        <div class="summary-item">
+          <label>Repository</label>
+          <div class="value"><a href="#">acme/webapp</a></div>
+        </div>
+        <div class="summary-item">
+          <label>Active Sessions</label>
+          <div class="value">3 sessions · 3 users</div>
+        </div>
+        <div class="summary-item" style="grid-column:1/-1">
+          <label>Active Users</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <!-- alice and bob are pairing — they get the 🤝 icon -->
+            <span class="user-pill" style="background:#16a34a">
+              <a href="#">alice</a><span class="ago">2m ago</span>
+              <span class="pairing-icon" title="In Live Share session with bob">🤝</span>
+              <span class="new-indicator">NEW</span>
+            </span>
+            <span class="user-pill" style="background:#16a34a">
+              <a href="#">bob</a><span class="ago">1m ago</span>
+              <span class="pairing-icon" title="In Live Share session with alice">🤝</span>
+              <span class="new-indicator">NEW</span>
+            </span>
+            <!-- carol is not pairing — standard pill -->
+            <span class="user-pill" style="background:#22c55e">
+              <a href="#">carol</a><span class="ago">5m ago</span>
+            </span>
+          </div>
+        </div>
+        <div class="summary-item" style="grid-column:1/-1">
+          <label>Active Branches</label>
+          <ul class="branch-list">
+            <li class="branch-tag"><a href="#">main</a></li>
+            <li class="branch-tag"><a href="#">feature/auth</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- NEW: Recommended Actions (only visible during collision) -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <div class="recommended-actions">
+        <div class="recommended-actions-header">
+          🛠️ Recommended Actions <span class="new-indicator">NEW</span>
+        </div>
+        <div class="action-item">
+          <span class="action-icon">🤝</span>
+          <span>Start a Live Share session with the overlapping user — say <code>konductor, live share with carol</code> in your IDE</span>
+        </div>
+        <div class="action-item">
+          <span class="action-icon">💬</span>
+          <span>Get coordination advice — say <code>konductor, who should I coordinate with?</code></span>
+        </div>
+        <div class="action-item">
+          <span class="action-icon">📊</span>
+          <span>Check risk level — say <code>konductor, am I safe to push?</code></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- COLLABORATION REQUESTS (existing panel, ENHANCED with badges) -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>🤝 Collaboration Requests <span class="count-badge">3 requests</span></h2>
+    </div>
+    <div class="panel-body">
+
+      <!-- Request 1: link_shared → "🟢 Live" badge + Join button -->
+      <div class="collab-card" style="border-left: 3px solid #16a34a;">
+        <div class="collab-card-header">
+          <span class="collab-users">
+            <a class="user-link" href="#">alice</a> → <a class="user-link" href="#">bob</a>
+          </span>
+          <span>
+            <span class="live-badge"><span class="live-dot"></span> Live</span>
+            <span class="new-indicator">NEW</span>
+          </span>
+        </div>
+        <div class="collab-card-body">
+          <span class="collab-files">📂 src/index.ts, src/auth.ts</span>
+          <span class="collab-meta">
+            <span class="state-badge">Collision Course</span> · 12m ago
+          </span>
+          <a class="collab-join-btn" href="#">Join Session</a>
+        </div>
+      </div>
+
+      <!-- Request 2: accepted → "⏳ Waiting for Link" badge -->
+      <div class="collab-card">
+        <div class="collab-card-header">
+          <span class="collab-users">
+            <a class="user-link" href="#">carol</a> → <a class="user-link" href="#">dave</a>
+          </span>
+          <span>
+            <span class="waiting-badge">⏳ Waiting for Link</span>
+            <span class="new-indicator">NEW</span>
+          </span>
+        </div>
+        <div class="collab-card-body">
+          <span class="collab-files">📂 src/config.ts</span>
+          <span class="collab-meta">
+            <span class="state-badge">Merge Hell</span> · 3m ago
+          </span>
+        </div>
+      </div>
+
+      <!-- Request 3: pending → standard badge (existing behavior) -->
+      <div class="collab-card">
+        <div class="collab-card-header">
+          <span class="collab-users">
+            <a class="user-link" href="#">eve</a> → <a class="user-link" href="#">frank</a>
+          </span>
+          <span class="collab-status collab-status-pending">Pending</span>
+        </div>
+        <div class="collab-card-body">
+          <span class="collab-files">📂 src/utils.ts</span>
+          <span class="collab-meta">
+            <span class="state-badge">Collision Course</span> · 8m ago
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Other existing panels (collapsed for brevity) -->
+  <div class="panel" style="opacity: 0.5;">
+    <div class="panel-header"><h2>Notifications & Alerts <span class="count-badge">2 active</span></h2></div>
+    <div class="panel-body"><div class="empty-state">... existing notifications table ...</div></div>
+  </div>
+  <div class="panel" style="opacity: 0.5;">
+    <div class="panel-header"><h2>Query Log <span class="count-badge">5 entries</span></h2></div>
+    <div class="panel-body"><div class="empty-state">... existing query log table ...</div></div>
+  </div>
+
+</div>
+
+</body>
+</html>

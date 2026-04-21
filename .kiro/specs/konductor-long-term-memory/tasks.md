@@ -1,0 +1,180 @@
+# Implementation Plan
+
+- [x] 1. Define types and interfaces for session history
+  - [x] 1.1 Create `session-history-types.ts` with `HistoricalSession`, `UserRecord`, `RepoAccess`, `StaleOverlap`, `HistoryConfig`, and `ISessionHistoryStore` interface
+    - Define all types from the design document
+    - Export the `ISessionHistoryStore` interface with all method signatures
+    - Add `HistoryConfig` type for the YAML config section
+    - _Requirements: 1.2, 8.3, 8.5_
+
+- [x] 2. Implement MemoryHistoryStore
+  - [x] 2.1 Create `memory-history-store.ts` implementing `ISessionHistoryStore`
+    - Use `Map<string, HistoricalSession>` for sessions and `Map<string, UserRecord>` for users
+    - Implement all interface methods: record, markExpired, markCommitted, updateFiles, getStaleOverlaps, getRecentActivity, getFileHistory, getCollisionTimeline, purgeOlderThan, exportJson, importJson, upsertUser, getUser, getAllUsers, close
+    - Filter out passive sessions (source github_pr or github_commit) in the record method
+    - First user created in empty system gets admin: true (bootstrap admin)
+    - _Requirements: 1.1, 2.1, 2.2, 2.3, 2.4, 2.5, 3.1, 4.1, 5.2, 6.1, 6.2, 6.3, 7.1, 7.2, 7.3, 8.1, 8.2, 8.4_
+  - [x] 2.2 Write property test for storage record/retrieve round-trip
+    - **Property 1: Storage record/retrieve round-trip**
+    - **Validates: Requirements 1.1, 2.1**
+    - Generate random HistoricalSession with status active, record it, retrieve via getRecentActivity, assert equivalence
+  - [x] 2.3 Write property test for session lifecycle status transitions
+    - **Property 2: Session lifecycle status transitions**
+    - **Validates: Requirements 2.2, 2.3, 5.2**
+    - Generate random session, record as active, mark expired, verify status and expiredAt; mark committed, verify status and committedAt; verify original fields unchanged
+  - [x] 2.4 Write property test for file list updates
+    - **Property 3: File list updates are recorded**
+    - **Validates: Requirements 2.4**
+    - Generate random session and new file list, update, verify files match
+  - [x] 2.5 Write property test for passive session exclusion
+    - **Property 4: Passive sessions excluded from history**
+    - **Validates: Requirements 2.5**
+    - Generate sessions with source github_pr or github_commit, attempt to record, verify not stored
+  - [x] 2.6 Write property test for purge correctness
+    - **Property 5: Purge removes only sessions older than retention**
+    - **Validates: Requirements 3.1**
+    - Generate sessions with various expiredAt timestamps, purge with a cutoff, verify only old expired sessions removed
+  - [x] 2.7 Write property test for stale overlap detection
+    - **Property 6: Stale overlap detection correctness**
+    - **Validates: Requirements 4.1, 4.2, 4.3**
+    - Generate active session files and historical sessions, call getStaleOverlaps, verify result contains exactly expired uncommitted sessions with file overlap
+  - [x] 2.8 Write property test for committed session exclusion from stale overlaps
+    - **Property 7: Committed sessions excluded from stale overlaps**
+    - **Validates: Requirements 4.4, 5.3**
+    - Generate committed historical sessions with file overlap, verify getStaleOverlaps returns empty
+  - [x] 2.9 Write property test for recent activity time range
+    - **Property 8: Recent activity returns sessions in time range**
+    - **Validates: Requirements 6.1**
+    - Generate sessions with various timestamps, query with time range, verify correct subset returned
+  - [x] 2.10 Write property test for file history
+    - **Property 9: File history returns correct sessions**
+    - **Validates: Requirements 6.2**
+    - Generate sessions with various files, query for a specific file, verify correct subset returned
+  - [x] 2.11 Write property test for JSON export/import round-trip
+    - **Property 10: JSON export/import round-trip**
+    - **Validates: Requirements 7.1, 7.2, 7.3**
+    - Generate random sessions, record them, export to JSON, import into fresh store, verify equivalence
+  - [x] 2.12 Write property test for user record upsert
+    - **Property 11: User record upsert consistency**
+    - **Validates: Requirements 8.1, 8.2**
+    - Generate sequence of upsert calls for same userId with different repos, verify firstSeen, lastSeen, and reposAccessed
+  - [x] 2.13 Write unit tests for MemoryHistoryStore edge cases
+    - Test empty store operations (getStaleOverlaps, purge, export on empty)
+    - Test markExpired/markCommitted for nonexistent sessionId
+    - Test importJson with invalid JSON and mixed valid/invalid records
+    - Test bootstrap admin (first user gets admin: true)
+    - _Requirements: 1.1, 5.5, 8.1_
+
+- [ ] 3. Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 4. Extend ConfigManager for history configuration
+  - [ ] 4.1 Add history config parsing to `config-manager.ts`
+    - Add `HistoryConfig` to `KonductorConfig` type in `types.ts`
+    - Parse `history` section from YAML with defaults (session_retention_days: 30, purge_interval_hours: 6)
+    - Add `getHistoryConfig()` method to ConfigManager
+    - Add `onHistoryConfigChange()` callback for hot-reload
+    - _Requirements: 9.1, 9.2, 9.3_
+  - [ ] 4.2 Write property test for history config parsing
+    - **Property 12: History config parsing**
+    - **Validates: Requirements 9.1**
+    - Generate valid history YAML sections with positive integers, parse, verify values match; test absent section produces defaults
+
+- [ ] 5. Implement HistoryPurger
+  - [ ] 5.1 Create `history-purger.ts` with periodic purge logic
+    - Accept `ISessionHistoryStore` and `ConfigManager` as dependencies
+    - Run purge immediately on startup
+    - Schedule periodic purge at configured interval using setInterval
+    - Log purge results via KonductorLogger
+    - Respect hot-reloaded config changes
+    - Provide stop() method for graceful shutdown
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+
+- [ ] 6. Integrate history store with SessionManager
+  - [ ] 6.1 Hook SessionManager lifecycle events into ISessionHistoryStore
+    - Add optional `historyStore` parameter to SessionManager constructor
+    - On `register`: call `historyStore.record()` and `historyStore.upsertUser()`
+    - On `deregister`: call `historyStore.markExpired()`
+    - On `cleanupStale`: call `historyStore.markExpired()` for each removed session
+    - On `update`: call `historyStore.updateFiles()`
+    - Skip recording for passive sessions (source github_pr or github_commit)
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 8.1, 8.2_
+
+- [ ] 7. Extend CollisionEvaluator for historical overlaps
+  - [ ] 7.1 Add stale overlap detection to CollisionEvaluator
+    - Add optional `historyStore` parameter to `evaluate()` method
+    - Query `getStaleOverlaps()` when historyStore is provided
+    - Add `staleOverlaps` field to `CollisionResult` in types.ts
+    - Extend `SummaryFormatter` to include stale overlap messages with userId and time-since-expiry
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
+  - [ ] 7.2 Write property test for stale overlap summary formatting
+    - **Property 13: Stale overlap summary formatting**
+    - **Validates: Requirements 4.5**
+    - Generate collision results with staleOverlaps, format, verify summary contains userId and time-since-expiry for each overlap
+
+- [ ] 8. Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 9. Implement new MCP tools
+  - [ ] 9.1 Add `mark_committed` MCP tool and REST endpoint
+    - Register `mark_committed` tool in `buildMcpServer`
+    - Accept `sessionId` or `userId + repo` parameters
+    - Call `historyStore.markCommitted()`
+    - Add `POST /api/mark-committed` REST endpoint for client watcher
+    - Return `{ success, count, message }`
+    - _Requirements: 5.1, 5.2, 5.5_
+  - [ ] 9.2 Add `recent_activity` MCP tool
+    - Register `recent_activity` tool in `buildMcpServer`
+    - Accept `repo`, optional `since` and `until` (default: last 24 hours)
+    - Call `historyStore.getRecentActivity()`
+    - Log query via Baton QueryLogStore
+    - _Requirements: 6.1_
+  - [ ] 9.3 Add `file_history` MCP tool
+    - Register `file_history` tool in `buildMcpServer`
+    - Accept `repo`, `filePath`, optional `since` and `until`
+    - Call `historyStore.getFileHistory()`
+    - Log query via Baton QueryLogStore
+    - _Requirements: 6.2_
+  - [ ] 9.4 Add `collision_timeline` MCP tool
+    - Register `collision_timeline` tool in `buildMcpServer`
+    - Accept `userId`, `repo`, optional `since` and `until`
+    - Call `historyStore.getCollisionTimeline()`
+    - Log query via Baton QueryLogStore
+    - _Requirements: 6.3_
+
+- [ ] 10. Wire up storage initialization in index.ts
+  - [ ] 10.1 Add storage initialization and dependency injection in `createComponents`
+    - Instantiate `MemoryHistoryStore`
+    - Pass history store to SessionManager constructor
+    - Pass history store to CollisionEvaluator (via evaluate calls)
+    - Start HistoryPurger with history store and ConfigManager
+    - Pass history store to `buildMcpServer` deps for new MCP tools
+    - Add graceful shutdown for HistoryPurger
+    - _Requirements: 1.1, 1.3_
+
+- [ ] 11. Add Baton dashboard history endpoint and integration
+  - [ ] 11.1 Add `GET /api/repo/:repoName/history` REST endpoint
+    - Accept optional `since` and `until` query parameters
+    - Call `historyStore.getRecentActivity()` for the repo
+    - Return JSON array of historical sessions
+    - Include stale overlap context in Baton notifications when historical overlap detected during registration
+    - _Requirements: 10.1, 10.2, 10.3_
+
+- [ ] 12. Update steering rule and documentation
+  - [ ] 12.1 Update steering rule for new query tools
+    - Add routing for "konductor, what changed recently?" → `recent_activity`
+    - Add routing for "konductor, who worked on this file?" → `file_history`
+    - Add routing for "konductor, show me the collision timeline" → `collision_timeline`
+    - _Requirements: 6.1, 6.2, 6.3_
+  - [ ] 12.2 Update README.md with long-term memory documentation
+    - Add section on in-memory storage mode
+    - Add example `konductor.yaml` with `history` section
+    - Document new MCP tools: `mark_committed`, `recent_activity`, `file_history`, `collision_timeline`
+    - Note that durable database backend is planned for future phase
+    - _Requirements: 11.1, 11.2, 11.3_
+  - [ ] 12.3 Update CHANGELOG.md
+    - Add entry for long-term session memory feature
+    - _Requirements: 11.1_
+
+- [ ] 13. Final Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.

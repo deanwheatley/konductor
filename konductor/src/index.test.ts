@@ -15,7 +15,7 @@ import { writeFile, rm, mkdir } from "node:fs/promises";
 import { readdirSync, statSync, readFileSync } from "node:fs";
 import fc from "fast-check";
 
-import { buildMcpServer, buildBundleManifest, startSseServer, compareVersions } from "./index.js";
+import { buildMcpServer, buildBundleManifest, startSseServer, compareVersions, buildGitHubHistory, buildOpenPRs } from "./index.js";
 import { SessionManager } from "./session-manager.js";
 import { CollisionEvaluator } from "./collision-evaluator.js";
 
@@ -1243,5 +1243,678 @@ describe("Property 9: Version comparison triggers update correctly", () => {
       }),
       { numRuns: 200 },
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildGitHubHistory — Unit Tests (Requirement 7.2)
+// ---------------------------------------------------------------------------
+
+describe("buildGitHubHistory", () => {
+  it("returns empty array when no passive sessions exist", () => {
+    const sessions = [
+      {
+        sessionId: "s1",
+        userId: "alice",
+        repo: "org/repo",
+        branch: "main",
+        files: ["src/index.ts"],
+        createdAt: "2025-04-15T10:00:00.000Z",
+        lastHeartbeat: "2025-04-15T10:00:00.000Z",
+      },
+    ];
+    const history = buildGitHubHistory(sessions);
+    expect(history).toEqual([]);
+  });
+
+  it("creates PR Opened entry from a github_pr session", () => {
+    const sessions = [
+      {
+        sessionId: "s1",
+        userId: "bob",
+        repo: "org/repo",
+        branch: "feature-x",
+        files: ["src/a.ts", "src/b.ts"],
+        createdAt: "2025-04-15T10:00:00.000Z",
+        lastHeartbeat: "2025-04-15T10:00:00.000Z",
+        source: "github_pr" as const,
+        prNumber: 42,
+        prTargetBranch: "main",
+        prDraft: false,
+        prApproved: false,
+      },
+    ];
+    const history = buildGitHubHistory(sessions);
+    expect(history).toHaveLength(1);
+    expect(history[0].action).toBe("PR Opened");
+    expect(history[0].user).toBe("bob");
+    expect(history[0].branch).toBe("feature-x");
+    expect(history[0].summary).toContain("PR #42");
+    expect(history[0].summary).toContain("main");
+    expect(history[0].summary).toContain("2 files");
+  });
+
+  it("creates PR Approved entry when prApproved is true", () => {
+    const sessions = [
+      {
+        sessionId: "s1",
+        userId: "carol",
+        repo: "org/repo",
+        branch: "hotfix",
+        files: ["fix.ts"],
+        createdAt: "2025-04-15T10:00:00.000Z",
+        lastHeartbeat: "2025-04-15T10:00:00.000Z",
+        source: "github_pr" as const,
+        prNumber: 99,
+        prTargetBranch: "main",
+        prDraft: false,
+        prApproved: true,
+      },
+    ];
+    const history = buildGitHubHistory(sessions);
+    expect(history).toHaveLength(1);
+    expect(history[0].action).toBe("PR Approved");
+  });
+
+  it("creates Commit entry from a github_commit session", () => {
+    const sessions = [
+      {
+        sessionId: "s2",
+        userId: "dave",
+        repo: "org/repo",
+        branch: "main",
+        files: ["src/c.ts", "src/d.ts", "src/e.ts"],
+        createdAt: "2025-04-16T08:00:00.000Z",
+        lastHeartbeat: "2025-04-16T08:00:00.000Z",
+        source: "github_commit" as const,
+        commitDateRange: { earliest: "2025-04-15T00:00:00.000Z", latest: "2025-04-16T00:00:00.000Z" },
+      },
+    ];
+    const history = buildGitHubHistory(sessions);
+    expect(history).toHaveLength(1);
+    expect(history[0].action).toBe("Commit");
+    expect(history[0].user).toBe("dave");
+    expect(history[0].summary).toContain("3 files");
+  });
+
+  it("sorts entries newest-first", () => {
+    const sessions = [
+      {
+        sessionId: "s1",
+        userId: "alice",
+        repo: "org/repo",
+        branch: "feat-a",
+        files: ["a.ts"],
+        createdAt: "2025-04-14T10:00:00.000Z",
+        lastHeartbeat: "2025-04-14T10:00:00.000Z",
+        source: "github_pr" as const,
+        prNumber: 1,
+        prTargetBranch: "main",
+        prDraft: false,
+        prApproved: false,
+      },
+      {
+        sessionId: "s2",
+        userId: "bob",
+        repo: "org/repo",
+        branch: "main",
+        files: ["b.ts"],
+        createdAt: "2025-04-16T10:00:00.000Z",
+        lastHeartbeat: "2025-04-16T10:00:00.000Z",
+        source: "github_commit" as const,
+        commitDateRange: { earliest: "2025-04-15T00:00:00.000Z", latest: "2025-04-16T10:00:00.000Z" },
+      },
+    ];
+    const history = buildGitHubHistory(sessions);
+    expect(history).toHaveLength(2);
+    expect(history[0].user).toBe("bob"); // newer
+    expect(history[1].user).toBe("alice"); // older
+  });
+
+  it("includes draft label in PR summary", () => {
+    const sessions = [
+      {
+        sessionId: "s1",
+        userId: "eve",
+        repo: "org/repo",
+        branch: "wip",
+        files: ["x.ts"],
+        createdAt: "2025-04-15T10:00:00.000Z",
+        lastHeartbeat: "2025-04-15T10:00:00.000Z",
+        source: "github_pr" as const,
+        prNumber: 7,
+        prTargetBranch: "main",
+        prDraft: true,
+        prApproved: false,
+      },
+    ];
+    const history = buildGitHubHistory(sessions);
+    expect(history[0].summary).toContain("(draft)");
+  });
+});
+
+
+// ---------------------------------------------------------------------------
+// buildOpenPRs — Unit Tests (Requirement 7.1)
+// ---------------------------------------------------------------------------
+
+describe("buildOpenPRs", () => {
+  it("returns empty array when no PR sessions exist", () => {
+    const sessions = [
+      {
+        sessionId: "s1",
+        userId: "alice",
+        repo: "org/repo",
+        branch: "main",
+        files: ["a.ts"],
+        createdAt: "2025-04-15T10:00:00.000Z",
+        lastHeartbeat: "2025-04-15T10:00:00.000Z",
+      },
+    ];
+    const prs = buildOpenPRs(sessions);
+    expect(prs).toEqual([]);
+  });
+
+  it("extracts open PR data from PR sessions", () => {
+    const sessions = [
+      {
+        sessionId: "s1",
+        userId: "bob",
+        repo: "org/repo",
+        branch: "feature-x",
+        files: ["a.ts", "b.ts"],
+        createdAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+        lastHeartbeat: new Date().toISOString(),
+        source: "github_pr" as const,
+        prNumber: 42,
+        prUrl: "https://github.com/org/repo/pull/42",
+        prTargetBranch: "main",
+        prDraft: false,
+        prApproved: false,
+      },
+    ];
+    const prs = buildOpenPRs(sessions);
+    expect(prs).toHaveLength(1);
+    expect(prs[0].prNumber).toBe(42);
+    expect(prs[0].user).toBe("bob");
+    expect(prs[0].branch).toBe("feature-x");
+    expect(prs[0].targetBranch).toBe("main");
+    expect(prs[0].status).toBe("open");
+    expect(prs[0].filesCount).toBe(2);
+    expect(prs[0].hoursOpen).toBeGreaterThan(0);
+  });
+
+  it("marks draft PRs with draft status", () => {
+    const sessions = [
+      {
+        sessionId: "s1",
+        userId: "carol",
+        repo: "org/repo",
+        branch: "wip",
+        files: ["x.ts"],
+        createdAt: new Date().toISOString(),
+        lastHeartbeat: new Date().toISOString(),
+        source: "github_pr" as const,
+        prNumber: 7,
+        prDraft: true,
+        prApproved: false,
+      },
+    ];
+    const prs = buildOpenPRs(sessions);
+    expect(prs[0].status).toBe("draft");
+  });
+
+  it("marks approved PRs with approved status", () => {
+    const sessions = [
+      {
+        sessionId: "s1",
+        userId: "dave",
+        repo: "org/repo",
+        branch: "ready",
+        files: ["y.ts"],
+        createdAt: new Date().toISOString(),
+        lastHeartbeat: new Date().toISOString(),
+        source: "github_pr" as const,
+        prNumber: 99,
+        prDraft: false,
+        prApproved: true,
+      },
+    ];
+    const prs = buildOpenPRs(sessions);
+    expect(prs[0].status).toBe("approved");
+  });
+
+  it("ignores commit sessions", () => {
+    const sessions = [
+      {
+        sessionId: "s1",
+        userId: "eve",
+        repo: "org/repo",
+        branch: "main",
+        files: ["z.ts"],
+        createdAt: new Date().toISOString(),
+        lastHeartbeat: new Date().toISOString(),
+        source: "github_commit" as const,
+        commitDateRange: { earliest: "2025-04-15T00:00:00Z", latest: "2025-04-16T00:00:00Z" },
+      },
+    ];
+    const prs = buildOpenPRs(sessions);
+    expect(prs).toEqual([]);
+  });
+});
+
+
+// ---------------------------------------------------------------------------
+// Baton Auth Integration Tests (Task 7.1)
+// Requirements: 1.1, 1.7, 2.2, 2.3, 3.3, 4.1, 4.2, 5.3
+// ---------------------------------------------------------------------------
+
+import {
+  BatonAuthModule,
+  encodeSession as rawEncodeSession,
+  parseCookies as rawParseCookies,
+  serializeCookie as rawSerializeCookie,
+} from "./baton-auth.js";
+import type { BatonSession } from "./baton-auth.js";
+import { NotificationStore } from "./baton-notification-store.js";
+import { QueryLogStore } from "./baton-query-log.js";
+import { BatonEventEmitter } from "./baton-event-emitter.js";
+
+describe("Baton Auth — Integration Tests", () => {
+  const SESSION_SECRET = "integration-test-secret-key-1234";
+
+  /** Create a valid, non-expired BatonSession. */
+  function makeSession(overrides: Partial<BatonSession> = {}): BatonSession {
+    return {
+      githubUsername: "testuser",
+      githubAvatarUrl: "https://avatars.githubusercontent.com/u/1?v=4",
+      accessToken: "gho_test_token_abc123",
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 8 * 60 * 60 * 1000, // 8 hours
+      ...overrides,
+    };
+  }
+
+  /** Create an expired BatonSession. */
+  function makeExpiredSession(): BatonSession {
+    return makeSession({ expiresAt: Date.now() - 1000 });
+  }
+
+  /** Encode a session into a cookie value using the test secret. */
+  function encodeTestSession(session: BatonSession): string {
+    return rawEncodeSession(session, SESSION_SECRET);
+  }
+
+  /**
+   * Spin up a real HTTP server with BatonAuthModule wired in.
+   * The auth module's checkRepoAccess is overridden to avoid real GitHub calls.
+   */
+  async function createAuthServer(opts: {
+    authEnabled: boolean;
+    accessResult?: "allowed" | "denied" | "error";
+  }) {
+    const tempDir = join(tmpdir(), `konductor-auth-integ-${randomUUID()}`);
+    await mkdir(tempDir, { recursive: true });
+    const port = 30000 + Math.floor(Math.random() * 10000);
+
+    const configPath = join(tempDir, "konductor.yaml");
+    const sessionsPath = join(tempDir, "sessions.json");
+
+    const configManager = new ConfigManager();
+    await configManager.load(configPath);
+    const persistenceStore = new PersistenceStore(sessionsPath);
+    const sessionManager = new SessionManager(persistenceStore, () => configManager.getTimeout() * 1000);
+    await sessionManager.init();
+    const collisionEvaluator = new CollisionEvaluator();
+    const summaryFormatter = new SummaryFormatter();
+    const notificationStore = new NotificationStore();
+    const queryLogStore = new QueryLogStore();
+    const batonEventEmitter = new BatonEventEmitter();
+
+    // Register a session so /repo/app resolves to "org/app"
+    await sessionManager.register("alice", "org/app", "main", ["src/index.ts"]);
+
+    let batonAuth: BatonAuthModule | undefined;
+    if (opts.authEnabled) {
+      batonAuth = new BatonAuthModule({
+        clientId: "test-client-id",
+        clientSecret: "test-client-secret",
+        serverUrl: `http://localhost:${port}`,
+        sessionSecret: SESSION_SECRET,
+        sessionMaxAgeHours: 8,
+        accessCacheMinutes: 5,
+      });
+      // Override checkRepoAccess to avoid real GitHub API calls
+      batonAuth.checkRepoAccess = async () => opts.accessResult ?? "allowed";
+    }
+
+    const mcp = buildMcpServer({ sessionManager, collisionEvaluator, summaryFormatter, configManager });
+
+    const server = startSseServer(mcp, port, "test-api-key", undefined, {
+      sessionManager,
+      collisionEvaluator,
+      summaryFormatter,
+      configManager,
+      notificationStore,
+      queryLogStore,
+      batonEventEmitter,
+      batonAuth,
+    });
+
+    await new Promise<void>((resolve) => server.on("listening", resolve));
+
+    return {
+      port,
+      server,
+      tempDir,
+      batonAuth,
+      cleanup: async () => {
+        await new Promise<void>((resolve) => server.close(() => resolve()));
+        await rm(tempDir, { recursive: true, force: true });
+      },
+    };
+  }
+
+  // ── Property 1: Auth bypass when unconfigured (Req 5.3) ──────────
+
+  describe("Property 1: Auth disabled — routes serve without auth", () => {
+    let ctx: Awaited<ReturnType<typeof createAuthServer>>;
+
+    beforeEach(async () => {
+      ctx = await createAuthServer({ authEnabled: false });
+    });
+    afterEach(async () => { await ctx.cleanup(); });
+
+    it("GET /repo/:repoName serves page without auth check", async () => {
+      const res = await fetch(`http://localhost:${ctx.port}/repo/app`, { redirect: "manual" });
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain("Konductor Baton");
+    });
+
+    it("GET /api/repo/:repoName serves JSON without auth check", async () => {
+      const res = await fetch(`http://localhost:${ctx.port}/api/repo/app`);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data).toHaveProperty("repo");
+    });
+  });
+
+  // ── Auth enabled, no session → redirect / 401 (Req 1.1, 4.1) ────
+
+  describe("Auth enabled, no session", () => {
+    let ctx: Awaited<ReturnType<typeof createAuthServer>>;
+
+    beforeEach(async () => {
+      ctx = await createAuthServer({ authEnabled: true });
+    });
+    afterEach(async () => { await ctx.cleanup(); });
+
+    it("GET /repo/:repoName redirects to /auth/login (Req 1.1)", async () => {
+      const res = await fetch(`http://localhost:${ctx.port}/repo/app`, { redirect: "manual" });
+      expect(res.status).toBe(302);
+      const location = res.headers.get("location") ?? "";
+      expect(location).toContain("/auth/login");
+      expect(location).toContain("redirect=");
+    });
+
+    // Property 6: API endpoints return JSON errors, not redirects (Req 4.1)
+    it("GET /api/repo/:repoName returns 401 JSON (Property 6, Req 4.1)", async () => {
+      const res = await fetch(`http://localhost:${ctx.port}/api/repo/app`);
+      expect(res.status).toBe(401);
+      const data = await res.json() as { error: string };
+      expect(data.error).toContain("Authentication required");
+      // Verify it's JSON, not an HTML redirect
+      expect(res.headers.get("content-type")).toContain("application/json");
+    });
+
+    it("GET /api/repo/:repoName/notifications returns 401 JSON", async () => {
+      const res = await fetch(`http://localhost:${ctx.port}/api/repo/app/notifications`);
+      expect(res.status).toBe(401);
+      const data = await res.json() as { error: string };
+      expect(data.error).toContain("Authentication required");
+    });
+
+    it("GET /api/repo/:repoName/events returns 401 JSON (Req 4.3)", async () => {
+      const res = await fetch(`http://localhost:${ctx.port}/api/repo/app/events`);
+      expect(res.status).toBe(401);
+      const data = await res.json() as { error: string };
+      expect(data.error).toContain("Authentication required");
+    });
+  });
+
+  // ── Auth enabled, valid session, repo access → page served (Req 2.2) ──
+
+  describe("Auth enabled, valid session with repo access", () => {
+    let ctx: Awaited<ReturnType<typeof createAuthServer>>;
+
+    beforeEach(async () => {
+      ctx = await createAuthServer({ authEnabled: true, accessResult: "allowed" });
+    });
+    afterEach(async () => { await ctx.cleanup(); });
+
+    it("GET /repo/:repoName serves page with user in header (Req 2.2)", async () => {
+      const session = makeSession();
+      const cookie = `baton_session=${encodeURIComponent(encodeTestSession(session))}`;
+      const res = await fetch(`http://localhost:${ctx.port}/repo/app`, {
+        redirect: "manual",
+        headers: { Cookie: cookie },
+      });
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain("Konductor Baton");
+      expect(html).toContain("testuser");
+    });
+
+    it("GET /api/repo/:repoName serves JSON (Req 2.2)", async () => {
+      const session = makeSession();
+      const cookie = `baton_session=${encodeURIComponent(encodeTestSession(session))}`;
+      const res = await fetch(`http://localhost:${ctx.port}/api/repo/app`, {
+        headers: { Cookie: cookie },
+      });
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data).toHaveProperty("repo");
+    });
+  });
+
+  // ── Auth enabled, valid session, no repo access → 403 (Req 2.3, 4.2) ──
+
+  describe("Auth enabled, valid session, repo access denied", () => {
+    let ctx: Awaited<ReturnType<typeof createAuthServer>>;
+
+    beforeEach(async () => {
+      ctx = await createAuthServer({ authEnabled: true, accessResult: "denied" });
+    });
+    afterEach(async () => { await ctx.cleanup(); });
+
+    it("GET /repo/:repoName returns 403 page (Req 2.3)", async () => {
+      const session = makeSession();
+      const cookie = `baton_session=${encodeURIComponent(encodeTestSession(session))}`;
+      const res = await fetch(`http://localhost:${ctx.port}/repo/app`, {
+        redirect: "manual",
+        headers: { Cookie: cookie },
+      });
+      expect(res.status).toBe(403);
+      const html = await res.text();
+      expect(html).toContain("Access Denied");
+      expect(html).toContain("testuser");
+    });
+
+    it("GET /api/repo/:repoName returns 403 JSON (Property 6, Req 4.2)", async () => {
+      const session = makeSession();
+      const cookie = `baton_session=${encodeURIComponent(encodeTestSession(session))}`;
+      const res = await fetch(`http://localhost:${ctx.port}/api/repo/app`, {
+        headers: { Cookie: cookie },
+      });
+      expect(res.status).toBe(403);
+      const data = await res.json() as { error: string };
+      expect(data.error).toContain("access denied");
+      expect(res.headers.get("content-type")).toContain("application/json");
+    });
+  });
+
+  // ── Auth enabled, expired session → redirects to login (Req 3.3) ──
+
+  describe("Auth enabled, expired session", () => {
+    let ctx: Awaited<ReturnType<typeof createAuthServer>>;
+
+    beforeEach(async () => {
+      ctx = await createAuthServer({ authEnabled: true });
+    });
+    afterEach(async () => { await ctx.cleanup(); });
+
+    it("GET /repo/:repoName redirects to login (Req 3.3)", async () => {
+      const expired = makeExpiredSession();
+      const cookie = `baton_session=${encodeURIComponent(encodeTestSession(expired))}`;
+      const res = await fetch(`http://localhost:${ctx.port}/repo/app`, {
+        redirect: "manual",
+        headers: { Cookie: cookie },
+      });
+      expect(res.status).toBe(302);
+      const location = res.headers.get("location") ?? "";
+      expect(location).toContain("/auth/login");
+    });
+
+    it("GET /api/repo/:repoName returns 401 JSON for expired session", async () => {
+      const expired = makeExpiredSession();
+      const cookie = `baton_session=${encodeURIComponent(encodeTestSession(expired))}`;
+      const res = await fetch(`http://localhost:${ctx.port}/api/repo/app`, {
+        headers: { Cookie: cookie },
+      });
+      expect(res.status).toBe(401);
+    });
+  });
+
+  // ── /auth/callback with mismatched state → 403 (Property 3, Req 1.7) ──
+
+  describe("OAuth callback — CSRF state validation (Property 3)", () => {
+    let ctx: Awaited<ReturnType<typeof createAuthServer>>;
+
+    beforeEach(async () => {
+      ctx = await createAuthServer({ authEnabled: true });
+    });
+    afterEach(async () => { await ctx.cleanup(); });
+
+    it("/auth/callback with mismatched state returns 403 (Req 1.7)", async () => {
+      // Set a state cookie with one value, but send a different state in the URL
+      const statePayload = JSON.stringify({ state: "expected-state-abc", redirect: "/repo/app" });
+      const stateCookie = `baton_auth_state=${encodeURIComponent(statePayload)}`;
+
+      const res = await fetch(
+        `http://localhost:${ctx.port}/auth/callback?code=fake-code&state=wrong-state-xyz`,
+        { redirect: "manual", headers: { Cookie: stateCookie } },
+      );
+      expect(res.status).toBe(403);
+      const html = await res.text();
+      expect(html).toContain("Authentication Failed");
+    });
+
+    it("/auth/callback with missing code returns 400", async () => {
+      const res = await fetch(
+        `http://localhost:${ctx.port}/auth/callback?state=some-state`,
+        { redirect: "manual" },
+      );
+      expect(res.status).toBe(400);
+    });
+  });
+
+  // ── /auth/logout clears session and redirects (Req 3.4) ──────────
+
+  describe("Logout flow", () => {
+    let ctx: Awaited<ReturnType<typeof createAuthServer>>;
+
+    beforeEach(async () => {
+      ctx = await createAuthServer({ authEnabled: true });
+    });
+    afterEach(async () => { await ctx.cleanup(); });
+
+    it("GET /auth/logout redirects to /auth/logged-out and clears cookie", async () => {
+      const session = makeSession();
+      const cookie = `baton_session=${encodeURIComponent(encodeTestSession(session))}`;
+      const res = await fetch(`http://localhost:${ctx.port}/auth/logout`, {
+        redirect: "manual",
+        headers: { Cookie: cookie },
+      });
+      expect(res.status).toBe(302);
+      expect(res.headers.get("location")).toBe("/auth/logged-out");
+      // Check that the Set-Cookie clears the session (Max-Age=0)
+      const setCookie = res.headers.get("set-cookie") ?? "";
+      expect(setCookie).toContain("baton_session=");
+      expect(setCookie).toContain("Max-Age=0");
+    });
+
+    it("GET /auth/logged-out serves the logged-out page", async () => {
+      const res = await fetch(`http://localhost:${ctx.port}/auth/logged-out`);
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain("logged out");
+    });
+  });
+
+  // ── Property 7: Redirect path preserved through OAuth flow (Req 1.1, 1.6) ──
+
+  describe("Property 7: Redirect path preserved through OAuth flow", () => {
+    let ctx: Awaited<ReturnType<typeof createAuthServer>>;
+
+    beforeEach(async () => {
+      ctx = await createAuthServer({ authEnabled: true });
+    });
+    afterEach(async () => { await ctx.cleanup(); });
+
+    it("GET /auth/login stores redirect path in state cookie", async () => {
+      const res = await fetch(
+        `http://localhost:${ctx.port}/auth/login?redirect=/repo/my-repo`,
+        { redirect: "manual" },
+      );
+      expect(res.status).toBe(302);
+      const location = res.headers.get("location") ?? "";
+      expect(location).toContain("github.com/login/oauth/authorize");
+      expect(location).toContain("client_id=test-client-id");
+
+      // The state cookie should contain the redirect path
+      const setCookie = res.headers.get("set-cookie") ?? "";
+      expect(setCookie).toContain("baton_auth_state=");
+      // Decode the cookie value to verify redirect is stored
+      const match = setCookie.match(/baton_auth_state=([^;]+)/);
+      expect(match).toBeTruthy();
+      const decoded = JSON.parse(decodeURIComponent(match![1]));
+      expect(decoded.redirect).toBe("/repo/my-repo");
+      expect(decoded.state).toBeTruthy();
+    });
+  });
+
+  // ── GitHub API error → 503 (Req 2.4) ─────────────────────────────
+
+  describe("Auth enabled, GitHub API error → 503", () => {
+    let ctx: Awaited<ReturnType<typeof createAuthServer>>;
+
+    beforeEach(async () => {
+      ctx = await createAuthServer({ authEnabled: true, accessResult: "error" });
+    });
+    afterEach(async () => { await ctx.cleanup(); });
+
+    it("GET /repo/:repoName returns 503 page", async () => {
+      const session = makeSession();
+      const cookie = `baton_session=${encodeURIComponent(encodeTestSession(session))}`;
+      const res = await fetch(`http://localhost:${ctx.port}/repo/app`, {
+        redirect: "manual",
+        headers: { Cookie: cookie },
+      });
+      expect(res.status).toBe(503);
+      const html = await res.text();
+      expect(html).toContain("GitHub Unavailable");
+    });
+
+    it("GET /api/repo/:repoName returns 503 JSON", async () => {
+      const session = makeSession();
+      const cookie = `baton_session=${encodeURIComponent(encodeTestSession(session))}`;
+      const res = await fetch(`http://localhost:${ctx.port}/api/repo/app`, {
+        headers: { Cookie: cookie },
+      });
+      expect(res.status).toBe(503);
+      const data = await res.json() as { error: string };
+      expect(data.error).toContain("GitHub API unavailable");
+    });
   });
 });

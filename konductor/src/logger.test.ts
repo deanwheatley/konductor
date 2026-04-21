@@ -2,10 +2,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import fc from "fast-check";
 import { KonductorLogger } from "./logger.js";
 import type { LogEntry, LogCategory } from "./logger.js";
-import { appendFileSync } from "node:fs";
+import { appendFileSync, statSync, unlinkSync, renameSync } from "node:fs";
 
 vi.mock("node:fs", () => ({
   appendFileSync: vi.fn(),
+  statSync: vi.fn(),
+  unlinkSync: vi.fn(),
+  renameSync: vi.fn(),
 }));
 
 // ---------------------------------------------------------------------------
@@ -13,7 +16,7 @@ vi.mock("node:fs", () => ({
 // ---------------------------------------------------------------------------
 
 const categoryArb: fc.Arbitrary<LogCategory> = fc.constantFrom(
-  "CONN", "SESSION", "STATUS", "CONFIG", "SERVER", "QUERY",
+  "CONN", "SESSION", "STATUS", "CONFIG", "SERVER", "QUERY", "GITHUB",
 );
 
 const timestampArb: fc.Arbitrary<string> = fc
@@ -63,7 +66,7 @@ describe("KonductorLogger — Property Tests", () => {
    * **Validates: Requirements 2.1, 2.2, 2.3, 2.4**
    */
   it("Property 1: Log format consistency", () => {
-    const FORMAT_REGEX = /^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\] \[(CONN|SESSION|STATUS|CONFIG|SERVER|QUERY)\] \[(User: [^\]]+|SYSTEM|Transport: [^\]]+)\] .+$/;
+    const FORMAT_REGEX = /^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\] \[(CONN|SESSION|STATUS|CONFIG|SERVER|QUERY|GITHUB)\] \[(User: [^\]]+|SYSTEM|Transport: [^\]]+)\] .+$/;
 
     fc.assert(
       fc.property(logEntryArb, (entry) => {
@@ -541,5 +544,176 @@ describe("KonductorLogger — File Logging", () => {
     expect(terminalOutput).toContain("Authenticated");
     expect(fileContent).toContain("[CONN]");
     expect(fileContent).toContain("Authenticated");
+  });
+});
+
+
+// ---------------------------------------------------------------------------
+// Log Rotation Tests (Req 1.1–1.6)
+// ---------------------------------------------------------------------------
+
+describe("KonductorLogger — Log Rotation", () => {
+  const mockedAppendFileSync = vi.mocked(appendFileSync);
+  const mockedStatSync = vi.mocked(statSync);
+  const mockedUnlinkSync = vi.mocked(unlinkSync);
+  const mockedRenameSync = vi.mocked(renameSync);
+
+  beforeEach(() => {
+    mockedAppendFileSync.mockClear();
+    mockedStatSync.mockClear();
+    mockedUnlinkSync.mockClear();
+    mockedRenameSync.mockClear();
+  });
+
+  it("does not rotate when file is under max size", () => {
+    mockedStatSync.mockReturnValue({ size: 1000 } as any);
+    const logger = new KonductorLogger({
+      enabled: true,
+      toTerminal: false,
+      toFile: true,
+      filePath: "test.log",
+      maxFileSize: 10 * 1024 * 1024,
+    });
+
+    logger.logServerStart("stdio");
+
+    expect(mockedRenameSync).not.toHaveBeenCalled();
+    expect(mockedUnlinkSync).not.toHaveBeenCalled();
+    expect(mockedAppendFileSync).toHaveBeenCalledOnce();
+  });
+
+  it("rotates when file reaches max size", () => {
+    mockedStatSync.mockReturnValue({ size: 11 * 1024 * 1024 } as any);
+    const logger = new KonductorLogger({
+      enabled: true,
+      toTerminal: false,
+      toFile: true,
+      filePath: "test.log",
+      maxFileSize: 10 * 1024 * 1024,
+    });
+
+    logger.logServerStart("stdio");
+
+    // Should attempt: unlinkSync(.tobedeleted), renameSync(.backup → .tobedeleted), renameSync(current → .backup)
+    expect(mockedUnlinkSync).toHaveBeenCalledWith("test.log.tobedeleted");
+    expect(mockedRenameSync).toHaveBeenCalledWith("test.log.backup", "test.log.tobedeleted");
+    expect(mockedRenameSync).toHaveBeenCalledWith("test.log", "test.log.backup");
+    expect(mockedAppendFileSync).toHaveBeenCalledOnce();
+  });
+
+  it("rotates at exact max size boundary", () => {
+    const maxSize = 5 * 1024 * 1024;
+    mockedStatSync.mockReturnValue({ size: maxSize } as any);
+    const logger = new KonductorLogger({
+      enabled: true,
+      toTerminal: false,
+      toFile: true,
+      filePath: "exact.log",
+      maxFileSize: maxSize,
+    });
+
+    logger.logServerStart("stdio");
+
+    expect(mockedRenameSync).toHaveBeenCalledWith("exact.log", "exact.log.backup");
+  });
+
+  it("handles missing file gracefully (no rotation needed)", () => {
+    mockedStatSync.mockImplementation(() => { throw new Error("ENOENT"); });
+    const logger = new KonductorLogger({
+      enabled: true,
+      toTerminal: false,
+      toFile: true,
+      filePath: "missing.log",
+      maxFileSize: 10 * 1024 * 1024,
+    });
+
+    // Should not throw
+    logger.logServerStart("stdio");
+
+    expect(mockedRenameSync).not.toHaveBeenCalled();
+    expect(mockedAppendFileSync).toHaveBeenCalledOnce();
+  });
+
+  it("handles missing .tobedeleted and .backup gracefully during rotation", () => {
+    mockedStatSync.mockReturnValue({ size: 20 * 1024 * 1024 } as any);
+    mockedUnlinkSync.mockImplementation(() => { throw new Error("ENOENT"); });
+    mockedRenameSync.mockImplementation((src: any) => {
+      if (src.endsWith(".backup")) throw new Error("ENOENT");
+    });
+
+    const logger = new KonductorLogger({
+      enabled: true,
+      toTerminal: false,
+      toFile: true,
+      filePath: "fresh.log",
+      maxFileSize: 10 * 1024 * 1024,
+    });
+
+    // Should not throw — gracefully handles missing intermediate files
+    logger.logServerStart("stdio");
+
+    expect(mockedAppendFileSync).toHaveBeenCalledOnce();
+  });
+
+  it("defaults to 10MB when maxFileSize is not provided", () => {
+    const logger = new KonductorLogger({
+      enabled: true,
+      toTerminal: false,
+      toFile: true,
+      filePath: "default.log",
+    });
+
+    // File is 9MB — should NOT rotate
+    mockedStatSync.mockReturnValue({ size: 9 * 1024 * 1024 } as any);
+    logger.logServerStart("stdio");
+    expect(mockedRenameSync).not.toHaveBeenCalled();
+
+    mockedAppendFileSync.mockClear();
+    mockedRenameSync.mockClear();
+
+    // File is 11MB — should rotate
+    mockedStatSync.mockReturnValue({ size: 11 * 1024 * 1024 } as any);
+    logger.logServerStart("stdio");
+    expect(mockedRenameSync).toHaveBeenCalledWith("default.log", "default.log.backup");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// parseFileSize Tests (Design Property 5)
+// ---------------------------------------------------------------------------
+
+describe("KonductorLogger — parseFileSize via constructor", () => {
+  it("parses MB correctly", () => {
+    const logger = new KonductorLogger({
+      enabled: true,
+      toTerminal: false,
+      toFile: true,
+      filePath: "test.log",
+      maxFileSize: 10 * 1024 * 1024, // 10MB
+    });
+
+    const mockedStat = vi.mocked(statSync);
+    mockedStat.mockReturnValue({ size: 10 * 1024 * 1024 } as any);
+
+    logger.logServerStart("stdio");
+
+    // At exactly 10MB, rotation should trigger
+    expect(vi.mocked(renameSync)).toHaveBeenCalled();
+  });
+
+  it("custom small max size triggers rotation on small files", () => {
+    const logger = new KonductorLogger({
+      enabled: true,
+      toTerminal: false,
+      toFile: true,
+      filePath: "small.log",
+      maxFileSize: 1024, // 1KB
+    });
+
+    vi.mocked(statSync).mockReturnValue({ size: 2048 } as any);
+
+    logger.logServerStart("stdio");
+
+    expect(vi.mocked(renameSync)).toHaveBeenCalledWith("small.log", "small.log.backup");
   });
 });

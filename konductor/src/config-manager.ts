@@ -17,6 +17,8 @@ import {
   type KonductorConfig,
   type StateConfig,
   type Action,
+  type GitHubConfig,
+  type GitHubRepoConfig,
 } from "./types.js";
 import type { KonductorLogger } from "./logger.js";
 
@@ -32,6 +34,9 @@ export const DEFAULT_CONFIG: KonductorConfig = {
     },
     [CollisionState.Crossroads]: {
       message: "Heads up — others are working in the same directories.",
+    },
+    [CollisionState.Proximity]: {
+      message: "Same file as others, but different sections — no line overlap.",
     },
     [CollisionState.CollisionCourse]: {
       message: "Warning — someone is modifying the same files as you.",
@@ -66,9 +71,69 @@ const STATE_KEY_MAP: Record<string, CollisionState> = {
   solo: CollisionState.Solo,
   neighbors: CollisionState.Neighbors,
   crossroads: CollisionState.Crossroads,
+  proximity: CollisionState.Proximity,
   collision_course: CollisionState.CollisionCourse,
   merge_hell: CollisionState.MergeHell,
 };
+
+/**
+ * Parse a raw YAML `github` section into a GitHubConfig.
+ * Returns undefined if the section is missing or structurally invalid.
+ */
+function parseGitHubConfig(raw: unknown): GitHubConfig | undefined {
+  if (typeof raw !== "object" || raw === null) return undefined;
+  const obj = raw as Record<string, unknown>;
+
+  // repositories is required and must be a non-empty array
+  if (!Array.isArray(obj.repositories) || obj.repositories.length === 0) {
+    return undefined;
+  }
+
+  const repositories: GitHubRepoConfig[] = [];
+  for (const entry of obj.repositories) {
+    if (typeof entry !== "object" || entry === null) continue;
+    const r = entry as Record<string, unknown>;
+    if (typeof r.repo !== "string" || r.repo.length === 0) continue;
+    const repoConfig: GitHubRepoConfig = { repo: r.repo };
+    if (Array.isArray(r.commit_branches)) {
+      const branches = r.commit_branches.filter(
+        (b: unknown): b is string => typeof b === "string" && b.length > 0,
+      );
+      if (branches.length > 0) {
+        repoConfig.commitBranches = branches;
+      }
+    }
+    repositories.push(repoConfig);
+  }
+
+  if (repositories.length === 0) return undefined;
+
+  const tokenEnv =
+    typeof obj.token_env === "string" && obj.token_env.length > 0
+      ? obj.token_env
+      : "GITHUB_TOKEN";
+
+  const pollIntervalSeconds =
+    typeof obj.poll_interval_seconds === "number" && obj.poll_interval_seconds > 0
+      ? obj.poll_interval_seconds
+      : 60;
+
+  const includeDrafts =
+    typeof obj.include_drafts === "boolean" ? obj.include_drafts : true;
+
+  const commitLookbackHours =
+    typeof obj.commit_lookback_hours === "number" && obj.commit_lookback_hours > 0
+      ? obj.commit_lookback_hours
+      : 24;
+
+  return {
+    tokenEnv,
+    pollIntervalSeconds,
+    includeDrafts,
+    commitLookbackHours,
+    repositories,
+  };
+}
 
 /**
  * Merge a raw parsed YAML object with the built-in defaults.
@@ -102,7 +167,37 @@ function mergeWithDefaults(raw: unknown): KonductorConfig {
     }
   }
 
-  return { heartbeatTimeoutSeconds: timeout, states };
+  return { heartbeatTimeoutSeconds: timeout, states, github: parseGitHubConfig(obj.github) };
+}
+
+/**
+ * Shallow-compare two GitHubConfig values for equality.
+ * Used to detect whether the github section changed on reload.
+ */
+function githubConfigEqual(
+  a: GitHubConfig | undefined,
+  b: GitHubConfig | undefined,
+): boolean {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  if (
+    a.tokenEnv !== b.tokenEnv ||
+    a.pollIntervalSeconds !== b.pollIntervalSeconds ||
+    a.includeDrafts !== b.includeDrafts ||
+    a.commitLookbackHours !== b.commitLookbackHours ||
+    a.repositories.length !== b.repositories.length
+  ) {
+    return false;
+  }
+  for (let i = 0; i < a.repositories.length; i++) {
+    const ra = a.repositories[i];
+    const rb = b.repositories[i];
+    if (ra.repo !== rb.repo) return false;
+    const ba = ra.commitBranches ?? [];
+    const bb = rb.commitBranches ?? [];
+    if (ba.length !== bb.length || ba.some((v, j) => v !== bb[j])) return false;
+  }
+  return true;
 }
 
 export class ConfigManager implements IConfigManager {
@@ -110,6 +205,7 @@ export class ConfigManager implements IConfigManager {
   private configPath: string = "";
   private watcher: FSWatcher | null = null;
   private changeCallbacks: Array<(config: KonductorConfig) => void> = [];
+  private githubChangeCallbacks: Array<(config: GitHubConfig | undefined) => void> = [];
   private readonly logger?: KonductorLogger;
 
   constructor(logger?: KonductorLogger) {
@@ -165,6 +261,7 @@ export class ConfigManager implements IConfigManager {
     }
 
     const previousTimeout = this.config.heartbeatTimeoutSeconds;
+    const previousGitHub = this.config.github;
 
     try {
       const raw = await readFile(this.configPath, "utf-8");
@@ -176,11 +273,21 @@ export class ConfigManager implements IConfigManager {
         if (this.config.heartbeatTimeoutSeconds !== previousTimeout) {
           changes.push(`timeout ${previousTimeout}s → ${this.config.heartbeatTimeoutSeconds}s`);
         }
+        const ghChanged = !githubConfigEqual(previousGitHub, this.config.github);
+        if (ghChanged) {
+          changes.push("github config changed");
+        }
         this.logger.logConfigReloaded(changes.length > 0 ? changes.join(", ") : "no value changes detected");
       }
 
       for (const cb of this.changeCallbacks) {
         cb(this.config);
+      }
+
+      if (!githubConfigEqual(previousGitHub, this.config.github)) {
+        for (const cb of this.githubChangeCallbacks) {
+          cb(this.config.github);
+        }
       }
     } catch {
       // Invalid YAML — keep previous config
@@ -195,6 +302,11 @@ export class ConfigManager implements IConfigManager {
   /** Return the configured heartbeat timeout in seconds. */
   getTimeout(): number {
     return this.config.heartbeatTimeoutSeconds;
+  }
+
+  /** Return the GitHub integration config, or undefined if not configured. */
+  getGitHubConfig(): GitHubConfig | undefined {
+    return this.config.github;
   }
 
   /**
@@ -240,6 +352,14 @@ export class ConfigManager implements IConfigManager {
         // fs.watch may not be available in all environments
       }
     }
+  }
+
+  /**
+   * Register a callback that fires only when the GitHub config section changes.
+   * Useful for pollers that need to restart when repos/intervals change.
+   */
+  onGitHubConfigChange(callback: (config: GitHubConfig | undefined) => void): void {
+    this.githubChangeCallbacks.push(callback);
   }
 
   /** Stop watching the config file. Call this on shutdown. */

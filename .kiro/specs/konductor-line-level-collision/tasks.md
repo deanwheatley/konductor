@@ -1,0 +1,185 @@
+# Implementation Plan
+
+- [x] 1. Define line-level types and extend existing types
+  - [x] 1.1 Add `LineRange`, `FileChange`, `OverlapSeverity`, and `LineOverlapDetail` types to `types.ts`
+    - Add `LineRange` interface with `startLine` and `endLine` (1-indexed, inclusive)
+    - Add `FileChange` interface with `path` and optional `lineRanges`
+    - Add `OverlapSeverity` type: `"minimal" | "moderate" | "severe"`
+    - Add `LineOverlapDetail` interface with `file`, `lineOverlap`, `userRanges`, `otherRanges`, `overlappingLines`, `overlapSeverity`
+    - _Requirements: 1.2, 1.5, 2.1, 5.1_
+  - [x] 1.2 Add `Proximity` state to `CollisionState` enum and `SEVERITY` map
+    - Insert `Proximity = "proximity"` between Crossroads and CollisionCourse
+    - Set severity to `2.5` in the `SEVERITY` record
+    - Update `SEVERITY_ORDER` array in `collision-evaluator.ts` to include Proximity
+    - _Requirements: 3.2_
+  - [x] 1.3 Extend `WorkSession` with optional `fileChanges?: FileChange[]`
+    - _Requirements: 2.1, 2.2_
+  - [x] 1.4 Extend `OverlappingSessionDetail` with optional `lineOverlapDetails` and `overlapSeverity`
+    - _Requirements: 4.1, 4.2, 5.1_
+  - [x] 1.5 Extend `CollisionResult` with optional `overlapSeverity`
+    - _Requirements: 5.1, 5.5_
+
+- [x] 2. Implement line range utility functions
+  - [x] 2.1 Create `line-range-utils.ts` with core helper functions
+    - `rangesOverlap(a: LineRange, b: LineRange): boolean` — checks if two ranges have non-empty intersection
+    - `anyRangeOverlap(rangesA: LineRange[], rangesB: LineRange[]): boolean` — checks if any pair overlaps
+    - `countOverlappingLines(rangesA: LineRange[], rangesB: LineRange[]): number` — counts distinct overlapping line numbers
+    - `computeOverlapSeverity(overlappingLines, userTotalLines, otherTotalLines): OverlapSeverity` — applies threshold rules
+    - `totalLinesInRanges(ranges: LineRange[]): number` — sums line counts across ranges
+    - _Requirements: 3.1, 5.1, 5.2_
+  - [x] 2.2 Create `line-range-formatter.ts` with display and serialization functions
+    - `formatLineRange(range: LineRange): string` — "line 10" or "lines 10-25"
+    - `formatLineRanges(ranges: LineRange[]): string` — "lines 10-25, 40-50"
+    - `serializeFileChanges(changes: FileChange[]): string` — JSON serialization
+    - `deserializeFileChanges(json: string): FileChange[]` — JSON deserialization with validation
+    - _Requirements: 6.1, 6.2, 6.3, 6.4_
+  - [x] 2.3 Write property tests for line range utilities (`line-range-utils.property.test.ts`)
+    - **Property 1: Line range overlap detection is symmetric** — Validates: Requirement 3.1
+    - **Property 4: Overlapping line count is correct** — Validates: Requirement 5.1
+    - **Property 5: Overlap severity thresholds are correctly applied** — Validates: Requirement 5.2
+    - **Property 6: FileChange serialization round-trip** — Validates: Requirements 6.1, 6.2
+    - **Property 7: Single-line range formatting** — Validates: Requirement 6.4
+    - _Requirements: 3.1, 5.1, 5.2, 6.1, 6.2, 6.4_
+
+- [x] 3. Checkpoint
+  - Ensure all property tests and unit tests pass for the utility layer before proceeding.
+
+- [x] 4. Extend the collision evaluator for line-level detection
+  - [x] 4.1 Add line-level overlap logic to `CollisionEvaluator.evaluate()`
+    - When both sessions have `fileChanges` with `lineRanges` for a shared file, check `anyRangeOverlap`
+    - If ranges overlap → Collision Course / Merge Hell (unchanged behavior)
+    - If ranges do NOT overlap → Proximity state (new)
+    - If one or both lack line ranges for the file → fallback to Collision Course / Merge Hell (Req 3.3)
+    - Build `LineOverlapDetail` for each shared file and attach to `OverlappingSessionDetail`
+    - Compute per-session and aggregate `overlapSeverity`
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 5.1, 5.2, 5.3_
+  - [x] 4.2 Update `adjustSeverity()` to handle Proximity in `SEVERITY_ORDER`
+    - Ensure severity adjustments for PR draft/approved work correctly with the new Proximity level
+    - _Requirements: 3.2_
+  - [x] 4.3 Write property tests for line-level collision evaluation (`collision-evaluator-lines.property.test.ts`)
+    - **Property 2: Non-overlapping ranges produce Proximity** — Validates: Requirement 3.2
+    - **Property 3: Missing line data falls back to Collision Course** — Validates: Requirement 3.3
+    - **Property 8: Backward compatibility — string files produce identical results** — Validates: Requirements 7.1, 7.2, 7.3, 7.4
+    - **Property 10: Proximity state does not pause the agent** — Validates: Requirement 3.4
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 7.1, 7.2, 7.3, 7.4_
+  - [x] 4.4 Write unit tests for specific collision scenarios (`collision-evaluator-lines.test.ts`)
+    - Same file, overlapping lines → Collision Course with line overlap detail
+    - Same file, non-overlapping lines → Proximity with section context
+    - Same file, one user has line data, other doesn't → Collision Course fallback
+    - Same file, neither has line data → Collision Course (current behavior)
+    - Cross-branch with line overlap → Merge Hell with severity
+    - Cross-branch without line overlap → Proximity (not Merge Hell)
+    - Multiple shared files, mixed overlap → highest severity wins
+    - _Requirements: 3.1, 3.2, 3.3, 5.1, 5.2_
+
+- [x] 5. Checkpoint
+  - Ensure all evaluator tests pass before proceeding to API and formatter changes.
+
+- [x] 6. Extend the server API and MCP tools
+  - [x] 6.1 Update `register_session` MCP tool to accept extended file format
+    - Change `files` parameter schema to accept `string[]` OR `FileChange[]` OR mixed arrays
+    - Normalize mixed arrays: strings become `{ path: string }` objects
+    - Extract `files: string[]` from normalized `FileChange[]` for backward-compatible storage
+    - Pass `fileChanges` to `sessionManager.register()`
+    - _Requirements: 2.3, 2.4, 2.5, 7.1_
+  - [x] 6.2 Update `SessionManager.register()` to accept and store `fileChanges`
+    - Add optional `fileChanges` parameter
+    - Store `fileChanges` on the `WorkSession` object
+    - Ensure `files` array stays in sync with `fileChanges[].path`
+    - _Requirements: 2.1, 2.2_
+  - [x] 6.3 Update `/api/register` REST endpoint to accept extended format
+    - Same normalization logic as the MCP tool
+    - _Requirements: 2.3, 2.4_
+  - [x] 6.4 Include line overlap details in `register_session` and `check_status` responses
+    - Add `overlapSeverity` to response payload when available
+    - Add `lineOverlapDetails` to overlapping session details when available
+    - Only include when line data is present (Req 7.5)
+    - _Requirements: 4.1, 4.2, 4.3, 7.5_
+  - [x] 6.5 Write property test for mixed file format normalization
+    - **Property 9: Mixed file format normalization** — Validates: Requirement 2.4
+    - _Requirements: 2.4_
+
+- [x] 7. Checkpoint
+  - Ensure API tests pass and backward compatibility is maintained.
+
+- [x] 8. Update notification formatting
+  - [x] 8.1 Update `SummaryFormatter.formatDetailLine()` for line-level context
+    - When `lineOverlapDetails` present with `lineOverlap: true`: include "same lines" context with ranges
+    - When `lineOverlapDetails` present with `lineOverlap: false`: include "different sections" context
+    - When no line data: use existing message (no change)
+    - Add Proximity state to `STATE_LABELS` map
+    - _Requirements: 4.1, 4.2, 4.3_
+  - [x] 8.2 Update `SlackNotifier.buildEscalationMessage()` for line range info
+    - Include line range annotations on shared files when available
+    - Format: `• \`src/index.ts\` lines 10-25 ↔ lines 15-30 (overlap: 11 lines — moderate)`
+    - _Requirements: 4.4_
+  - [x] 8.3 Update Proximity handling in `shouldNotify()` in `slack-settings.ts`
+    - Proximity should NOT trigger Slack at default verbosity (level 2)
+    - Only notify at verbosity ≥ 4 (same as Crossroads)
+    - _Requirements: 3.5_
+  - [x] 8.4 Add merge severity recommendation to notifications
+    - When `overlapSeverity` is `severe`: append "High merge conflict risk. Coordinate immediately."
+    - When `overlapSeverity` is `minimal`: append "Minor overlap — likely a quick merge resolution."
+    - _Requirements: 5.3, 5.4_
+  - [x] 8.5 Write unit tests for line-annotated notification messages
+    - Test formatDetailLine with lineOverlap true/false/null
+    - Test Slack message with line range annotations
+    - Test severity recommendation text
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 5.3, 5.4_
+
+- [x] 9. Extend query engine for line-level context
+  - [x] 9.1 Update `risk_assessment` to include `overlapSeverity`
+    - Add `overlapSeverity` field to `RiskResult` type
+    - Populate from collision evaluation when line data is available
+    - **Property 11: Merge severity is included in risk_assessment** — Validates: Requirement 5.5
+    - _Requirements: 5.5_
+  - [x] 9.2 Update `who_overlaps` to include line overlap context
+    - Add optional `lineOverlap` and `overlapSeverity` fields to `OverlapInfo` type
+    - Populate when line data is available
+    - _Requirements: 4.1, 7.5_
+  - [x] 9.3 Update `repo_hotspots` to include line-level detail
+    - When editors have line ranges, include range info in hotspot entries
+    - _Requirements: 4.5_
+
+- [x] 10. Checkpoint
+  - Ensure all notification and query engine tests pass.
+
+- [x] 11. Update the file watcher for line range reporting
+  - [x] 11.1 Add `getLineRanges(filepath)` function to `konductor-watcher.mjs`
+    - Run `git diff --unified=0 -- "<filepath>"` to get hunk headers
+    - Parse `@@ -a,b +c,d @@` headers to extract `{ startLine, endLine }` ranges
+    - Return `undefined` when git diff fails or produces no hunks (new/binary/untracked files)
+    - Handle multiple non-contiguous hunks as separate ranges
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
+  - [x] 11.2 Update `registerFiles()` to send `FileChange[]` instead of `string[]`
+    - Map each changed file through `getLineRanges()` to build `FileChange` objects
+    - Send as `files: FileChange[]` in the API request body
+    - _Requirements: 1.1, 1.2_
+  - [x] 11.3 Update watcher notification display for line context
+    - When collision response includes line overlap details, show line ranges in the terminal output
+    - _Requirements: 4.1, 4.2_
+
+- [x] 12. Update steering rules and documentation
+  - [x] 12.1 Update steering rule for Proximity state handling
+    - Add Proximity to the collision state notification table in the steering rule
+    - Message: `🟢 Konductor: Same file as <users>, but different sections — no line overlap. Proceeding.`
+    - Proximity does not pause the agent
+    - _Requirements: 3.2, 3.4_
+  - [x] 12.2 Update steering rule for line-level collision messages
+    - Update Collision Course message to include line context when available
+    - Update Merge Hell message to include severity assessment
+    - _Requirements: 4.1, 5.3, 5.4_
+  - [x] 12.3 Update `konductor/README.md` with line-level collision documentation
+    - Document the new Proximity state
+    - Document line range reporting from the watcher
+    - Document merge severity assessment
+    - Document backward compatibility guarantees
+    - _Requirements: 3.2, 7.1_
+  - [x] 12.4 Update `CHANGELOG.md`
+    - Add entry for line-level collision detection feature
+    - _Requirements: documentation standards_
+
+- [x] 13. Final Checkpoint
+  - Run full test suite. Ensure all property tests, unit tests, and existing tests pass.
+  - Verify backward compatibility: old-format `files: string[]` requests produce identical results to before.
+  - Ask the user if questions arise.

@@ -69,6 +69,7 @@ KONDUCTOR_LOG_LEVEL=info          # "info" or "debug" (debug shows skipped files
 KONDUCTOR_LOG_TO_TERMINAL=true
 KONDUCTOR_POLL_INTERVAL=10        # seconds between collision polls
 # KONDUCTOR_LOG_FILE=.konductor-watcher.log
+# KONDUCTOR_LOG_MAX_SIZE=10MB     # max log file size before rotation (KB/MB/GB)
 # KONDUCTOR_WATCH_EXTENSIONS=     # empty = watch all, or comma-separated list
 ```
 

@@ -1,0 +1,184 @@
+# Implementation Plan
+
+- [x] 1. Admin auth middleware and KONDUCTOR_ADMINS parsing
+  - [x] 1.1 Implement `parseKonductorAdmins()` function to parse the `KONDUCTOR_ADMINS` env var into a trimmed, case-insensitive list
+    - Create `konductor/src/admin-auth.ts` with the parsing function
+    - Handle comma-separated values, whitespace trimming, empty entries
+    - _Requirements: 1.6_
+  - [x] 1.2 Write property test for KONDUCTOR_ADMINS parsing
+    - **Property 2: KONDUCTOR_ADMINS parsing**
+    - **Validates: Requirements 1.6**
+  - [x] 1.3 Implement `resolveAdminStatus()` function for the two-tier admin check
+    - Check KONDUCTOR_ADMINS env var first (userId and email match, case-insensitive)
+    - Fall back to user record `admin` flag in ISessionHistoryStore
+    - Return `AdminAuthResult` with `isAdmin`, `adminSource` ("env" | "database" | null)
+    - _Requirements: 1.1, 1.2, 1.3, 1.4_
+  - [x] 1.4 Write property test for admin resolution precedence
+    - **Property 1: Admin resolution precedence**
+    - **Validates: Requirements 1.1, 1.2, 1.3, 1.4**
+  - [x] 1.5 Implement cookie-based session auth for browser access
+    - Add `AdminSession` type, `encodeAdminSession()`, `decodeAdminSession()` using signed cookies
+    - Use `KONDUCTOR_SESSION_SECRET` env var (or generate random at startup with warning)
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+  - [x] 1.6 Write unit tests for admin auth middleware
+    - Test cookie encoding/decoding, session expiry, dual auth (cookie vs header)
+    - Test bootstrap admin (first user gets admin: true when KONDUCTOR_ADMINS not set)
+    - _Requirements: 1.5, 2.1, 2.2, 2.3, 2.4, 2.5_
+
+- [x] 2. Settings store and serialization
+  - [x] 2.1 Extend `ISessionHistoryStore` interface with settings operations
+    - Add `getSetting()`, `setSetting()`, `getAllSettings()` methods
+    - Implement in `MemoryHistoryStore` using a JavaScript Map
+    - _Requirements: 11.1, 11.3_
+  - [x] 2.2 Implement `AdminSettingsStore` wrapper with JSON serialization and source tracking
+    - Create `konductor/src/admin-settings-store.ts`
+    - Serialize values to JSON strings for storage, deserialize on retrieval
+    - Track setting source: "env" | "database" | "default"
+    - Merge database settings with env vars (env takes precedence)
+    - _Requirements: 3.2, 3.4, 11.2, 11.4, 12.1, 12.2, 12.3_
+  - [x] 2.3 Write property test for settings serialization round-trip
+    - **Property 3: Settings serialization round-trip**
+    - **Validates: Requirements 11.2, 12.3**
+  - [x] 2.4 Write property test for settings source precedence
+    - **Property 4: Settings source precedence**
+    - **Validates: Requirements 3.4, 11.4**
+
+- [x] 3. Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 4. Installer channel store and promotion/rollback
+  - [x] 4.1 Implement `InstallerChannelStore` with in-memory backend
+    - Create `konductor/src/installer-channel-store.ts`
+    - Store channel metadata (version, hash, path, previous version)
+    - Implement `promote()`: copy tarball, retain previous for rollback
+    - Implement `rollback()`: swap current with previous
+    - Implement `getTarball()`, `setTarball()`, `getMetadata()`, `getAllMetadata()`
+    - _Requirements: 4.5, 4.8, 9.1, 9.2, 9.3, 9.6_
+  - [x] 4.2 Write property test for channel promotion round-trip
+    - **Property 5: Channel promotion round-trip**
+    - **Validates: Requirements 4.5, 9.4**
+  - [x] 4.3 Write property test for channel rollback restores previous version
+    - **Property 6: Channel rollback restores previous version**
+    - **Validates: Requirements 4.8, 9.7**
+  - [x] 4.4 Implement effective channel resolution logic
+    - Create `resolveEffectiveChannel()` function: per-user override first, then global default
+    - Wire into existing `/bundle/installer.tgz` endpoint for backward compatibility
+    - Add channel-specific endpoints: `/bundle/installer-dev.tgz`, `/bundle/installer-uat.tgz`, `/bundle/installer-prod.tgz`
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7_
+  - [x] 4.5 Write property test for effective channel resolution
+    - **Property 7: Effective channel resolution**
+    - **Validates: Requirements 6.1**
+
+- [x] 5. Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 6. Install command generation and JIRA extraction
+  - [x] 6.1 Implement install command generator
+    - Create `buildInstallCommands()` function in `konductor/src/admin-install-commands.ts`
+    - Support cloud mode (KONDUCTOR_EXTERNAL_URL set → single command) and local mode (two commands: localhost + network IP)
+    - Generate commands per channel: `npx <url>/bundle/installer-<channel>.tgz --server <url> --api-key YOUR_API_KEY`
+    - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.6, 5.7, 5.8_
+  - [x] 6.2 Write property test for install command format
+    - **Property 8: Install command format**
+    - **Validates: Requirements 5.2, 5.3, 5.4, 5.6, 5.7**
+  - [x] 6.3 Implement JIRA ticket extraction from branch names
+    - Create `extractJiraTicket()` function in `konductor/src/admin-utils.ts`
+    - Parse branch names matching `<prefix>/<KEY>-<number>-<description>` pattern
+    - Return `KEY-number` or null
+    - _Requirements: 7.7_
+  - [x] 6.4 Write property test for JIRA ticket extraction
+    - **Property 9: JIRA ticket extraction from branch names**
+    - **Validates: Requirements 7.7**
+  - [x] 6.5 Implement stale repo filtering for user table
+    - Create `filterStaleRepos()` function that excludes repos older than the threshold
+    - _Requirements: 7.4_
+  - [x] 6.6 Write property test for stale repo filtering
+    - **Property 10: Stale repo filtering**
+    - **Validates: Requirements 7.4**
+
+- [x] 7. Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 8. Admin API routes
+  - [x] 8.1 Add login page route and POST handler
+    - GET `/login` → serve login form HTML
+    - POST `/login` → validate userId + API key, set session cookie, redirect to `/admin`
+    - Handle invalid credentials with error message
+    - _Requirements: 2.1, 2.2, 2.3_
+  - [x] 8.2 Add admin dashboard route with auth middleware
+    - GET `/admin` → check auth (cookie or header), check admin status, serve dashboard HTML
+    - 302 redirect to `/login` if not authenticated
+    - 403 if authenticated but not admin
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.4_
+  - [x] 8.3 Add admin settings API endpoints
+    - GET `/api/admin/settings` → return all settings with source info
+    - PUT `/api/admin/settings/:key` → update setting (reject env-sourced), log CONFIG entry
+    - _Requirements: 3.1, 3.2, 3.3, 3.4_
+  - [x] 8.4 Add installer channel API endpoints
+    - GET `/api/admin/channels` → return all channel metadata
+    - POST `/api/admin/channels/promote` → promote channel, log SERVER entry
+    - POST `/api/admin/channels/rollback` → rollback channel
+    - _Requirements: 4.1, 4.5, 4.6, 4.8_
+  - [x] 8.5 Add user management API endpoints
+    - GET `/api/admin/users` → return all user records with admin source info
+    - PUT `/api/admin/users/:userId` → update channel override or admin flag (read-only if env-sourced)
+    - _Requirements: 7.1, 7.8, 7.9, 7.10_
+  - [x] 8.6 Add install commands API endpoint
+    - GET `/api/admin/install-commands` → return install command data based on mode and channels
+    - _Requirements: 5.1, 5.2, 5.3, 5.4_
+  - [x] 8.7 Add admin SSE event stream
+    - GET `/api/admin/events` → SSE stream for settings changes, user updates, channel operations
+    - _Requirements: 10.1, 10.2, 10.3, 10.4_
+  - [x] 8.8 Write unit tests for admin API routes
+    - Test auth middleware integration (cookie + header paths)
+    - Test settings CRUD, channel promote/rollback, user management
+    - Test error cases (403, 404, 400)
+    - _Requirements: 1.1–1.4, 2.1–2.5, 3.1–3.4, 4.1–4.8, 7.8–7.10_
+
+- [x] 9. Admin dashboard HTML page builder
+  - [x] 9.1 Create `admin-page-builder.ts` with login page and admin dashboard HTML
+    - Build login form page (userId + API key fields, error display)
+    - Build admin dashboard with five collapsible panels matching Baton design
+    - System Settings panel with form fields and Save button
+    - Global Client Settings panel with channel versions, promote/rollback buttons, default channel combo
+    - Client Install Commands panel with channel selector, command display, copy buttons
+    - User Management panel with sortable/filterable table
+    - Freshness Color Scale preview
+    - _Requirements: 3.1, 3.5, 4.1, 4.2, 4.4, 4.7, 4.9, 5.1, 5.5, 5.9, 7.1, 7.2, 7.11_
+  - [x] 9.2 Implement embedded JavaScript for admin dashboard
+    - SSE connection to `/api/admin/events` with reconnection and disconnection indicator
+    - Form submission handlers for settings, channel operations, user management
+    - Copy-to-clipboard for install commands
+    - Channel selector switching for install commands panel
+    - Table sorting and filtering for user management
+    - _Requirements: 5.4, 5.5, 7.12, 10.1, 10.4_
+
+- [x] 10. Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 11. Wire everything together in index.ts
+  - [x] 11.1 Initialize admin components at startup
+    - Create AdminSettingsStore, InstallerChannelStore instances
+    - Parse KONDUCTOR_ADMINS env var
+    - Pass to startSseServer deps
+    - _Requirements: 1.1, 1.6, 11.4_
+  - [x] 11.2 Register all admin routes in the HTTP request handler
+    - Wire login, admin dashboard, and all /api/admin/* routes
+    - Ensure existing routes (Baton, MCP, bundle) are unaffected
+    - _Requirements: All_
+  - [x] 11.3 Extend BatonEventEmitter with admin event types
+    - Add admin_settings_change, admin_user_change, admin_channel_change event types
+    - Wire settings store and channel store to emit events on changes
+    - _Requirements: 10.2, 10.3_
+
+- [x] 12. Documentation
+  - [x] 12.1 Update konductor/README.md with admin dashboard documentation
+    - Add section on accessing the admin page, available panels
+    - Document KONDUCTOR_ADMINS env var and admin access model
+    - Document KONDUCTOR_EXTERNAL_URL and install command display
+    - Document promotion/rollback flow with examples
+    - Document user management (auto-creation, channel assignment, admin flag)
+    - _Requirements: 13.1, 13.2, 13.3, 13.4_
+
+- [ ] 13. Final Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.

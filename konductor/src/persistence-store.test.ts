@@ -152,4 +152,109 @@ describe("PersistenceStore — Unit Tests", () => {
     expect(parsed).toHaveLength(1);
     expect(parsed[0].userId).toBe("bob");
   });
+
+  it("excludes passive PR sessions from persistence", async () => {
+    const store = new PersistenceStore(storePath);
+    const activeSession: WorkSession = {
+      sessionId: "00000000-0000-0000-0000-000000000010",
+      userId: "alice",
+      repo: "org/repo",
+      branch: "main",
+      files: ["src/index.ts"],
+      createdAt: new Date().toISOString(),
+      lastHeartbeat: new Date().toISOString(),
+    };
+    const prSession: WorkSession = {
+      sessionId: "00000000-0000-0000-0000-000000000011",
+      userId: "bob",
+      repo: "org/repo",
+      branch: "feature-x",
+      files: ["src/utils.ts"],
+      createdAt: new Date().toISOString(),
+      lastHeartbeat: new Date().toISOString(),
+      source: "github_pr",
+      prNumber: 42,
+      prUrl: "https://github.com/org/repo/pull/42",
+      prTargetBranch: "main",
+    };
+
+    await store.save([activeSession, prSession]);
+
+    const raw = await readFile(storePath, "utf-8");
+    const parsed = JSON.parse(raw);
+    expect(parsed).toHaveLength(1);
+    expect(parsed[0].userId).toBe("alice");
+  });
+
+  it("excludes passive commit sessions from persistence", async () => {
+    const store = new PersistenceStore(storePath);
+    const activeSession: WorkSession = {
+      sessionId: "00000000-0000-0000-0000-000000000020",
+      userId: "alice",
+      repo: "org/repo",
+      branch: "main",
+      files: ["src/index.ts"],
+      createdAt: new Date().toISOString(),
+      lastHeartbeat: new Date().toISOString(),
+    };
+    const commitSession: WorkSession = {
+      sessionId: "00000000-0000-0000-0000-000000000021",
+      userId: "carol",
+      repo: "org/repo",
+      branch: "main",
+      files: ["src/api.ts"],
+      createdAt: new Date().toISOString(),
+      lastHeartbeat: new Date().toISOString(),
+      source: "github_commit",
+      commitDateRange: { earliest: "2026-04-15T00:00:00Z", latest: "2026-04-16T00:00:00Z" },
+    };
+
+    await store.save([activeSession, commitSession]);
+
+    const raw = await readFile(storePath, "utf-8");
+    const parsed = JSON.parse(raw);
+    expect(parsed).toHaveLength(1);
+    expect(parsed[0].userId).toBe("alice");
+  });
+
+  it("persists sessions with source=active", async () => {
+    const store = new PersistenceStore(storePath);
+    const session: WorkSession = {
+      sessionId: "00000000-0000-0000-0000-000000000030",
+      userId: "dave",
+      repo: "org/repo",
+      branch: "main",
+      files: ["src/index.ts"],
+      createdAt: new Date().toISOString(),
+      lastHeartbeat: new Date().toISOString(),
+      source: "active",
+    };
+
+    await store.save([session]);
+
+    const raw = await readFile(storePath, "utf-8");
+    const parsed = JSON.parse(raw);
+    expect(parsed).toHaveLength(1);
+    expect(parsed[0].userId).toBe("dave");
+  });
+
+  it("persists sessions with no source field (backward compatible)", async () => {
+    const store = new PersistenceStore(storePath);
+    const session: WorkSession = {
+      sessionId: "00000000-0000-0000-0000-000000000040",
+      userId: "eve",
+      repo: "org/repo",
+      branch: "main",
+      files: ["src/index.ts"],
+      createdAt: new Date().toISOString(),
+      lastHeartbeat: new Date().toISOString(),
+    };
+
+    await store.save([session]);
+
+    const raw = await readFile(storePath, "utf-8");
+    const parsed = JSON.parse(raw);
+    expect(parsed).toHaveLength(1);
+    expect(parsed[0].userId).toBe("eve");
+  });
 });

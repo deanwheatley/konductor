@@ -1,6 +1,6 @@
 {
   "name": "konductor",
-  "version": "0.2.2",
+  "version": "0.4.1",
   "description": "Work Coordination MCP Server — tracks concurrent development and evaluates collision risk",
   "type": "module",
   "main": "dist/index.js",
@@ -11,7 +11,8 @@
     "build": "tsc",
     "test": "vitest --run",
     "test:watch": "vitest",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test:e2e": "playwright test --config playwright.config.ts"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -29,6 +30,7 @@
     "yaml": "^2.8.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/node": "^25.6.0",
     "@types/uuid": "^10.0.0",
     "fast-check": "^4.6.0",

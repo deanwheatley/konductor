@@ -25,7 +25,7 @@ function httpGet(url) {
   return new Promise((resolve, reject) => {
     const client = url.startsWith("https") ? https : http;
 
-    const req = client.get(url, { timeout: REQUEST_TIMEOUT_MS }, (res) => {
+    const req = client.get(url, { timeout: REQUEST_TIMEOUT_MS, rejectUnauthorized: false }, (res) => {
       const chunks = [];
       res.on("data", (chunk) => chunks.push(chunk));
       res.on("end", () => {
