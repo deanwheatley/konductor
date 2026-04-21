@@ -104,6 +104,11 @@ function rotateLogIfNeeded(filePath, maxSize) {
 
 let CFG = loadConfig();
 
+// ── TLS: accept self-signed certs for local HTTPS servers ───────────
+if (CFG.url.startsWith("https://")) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
+
 // ── Git context ─────────────────────────────────────────────────────
 
 function git(cmd) {
@@ -579,6 +584,10 @@ function shouldIgnore(filename) {
   const parts = filename.split(/[/\\]/);
   if (parts.some(p => ALWAYS_IGNORE.has(p))) return true;
   if (parts[0] && parts[0].startsWith(".") && parts.length === 1) return true;
+  // Ignore log files and session temp files to prevent feedback loops
+  const base = parts[parts.length - 1] || "";
+  if (base.endsWith(".log") || base.endsWith(".log.backup") || base.endsWith(".log.tobedeleted")) return true;
+  if (base.startsWith(".sessions-") && base.endsWith(".tmp")) return true;
   if (CFG.watchExtensions.size > 0 && !CFG.watchExtensions.has(extname(filename))) {
     debug(`Skipped (extension filter): ${filename}`);
     return true;

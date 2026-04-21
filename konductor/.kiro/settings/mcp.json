@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "konductor": {
+      "url": "http://localhost:3011/sse",
+      "headers": {
+        "Authorization": "Bearer kd-a7f3b9c2e1d4",
+        "X-Konductor-User": "deanwheatley-star"
+      },
+      "autoApprove": [
+        "register_session",
+        "check_status",
+        "deregister_session",
+        "list_sessions",
+        "who_is_active",
+        "who_overlaps",
+        "user_activity",
+        "risk_assessment",
+        "repo_hotspots",
+        "active_branches",
+        "coordination_advice",
+        "client_install_info",
+        "client_update_check"
+      ]
+    }
+  }
+}

@@ -15,5 +15,11 @@ konductor-watchdog.sh
 .konductor-watchdog.pid
 .konductor-version
 
+# Server runtime files
+*.log
+*.log.backup
+*.log.tobedeleted
+.sessions-*.tmp
+
 # TLS certs
 konductor/certs/

@@ -2934,8 +2934,10 @@ export function startSseServer(
 
   httpServer.listen(port, () => {
     console.error(`Konductor SSE server listening on ${protocol}://localhost:${port}`);
-    console.error(`  📊 Admin Dashboard: ${protocol}://localhost:${port}/admin`);
-    console.error(`  🔑 Login:           ${protocol}://localhost:${port}/login`);
+    if (tlsOptions) {
+      console.error(`  📊 Admin Dashboard: ${protocol}://localhost:${port}/admin`);
+      console.error(`  🔑 Login:           ${protocol}://localhost:${port}/login`);
+    }
   });
 
   return httpServer;
@@ -2997,7 +2999,6 @@ async function main() {
       const httpServerUrl = `http://${osHostname()}:${httpPort}`;
       const httpMcp = buildMcpServer({ ...components, serverVersion: mainPkgVersion, serverUrl: httpServerUrl });
       startSseServer(httpMcp, httpPort, apiKey, logger, components);
-      console.error(`Konductor HTTP fallback listening on http://localhost:${httpPort}`);
     }
 
     // Graceful shutdown: stop pollers when process exits
