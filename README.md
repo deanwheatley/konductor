@@ -125,6 +125,30 @@ GitHub API ←── polling ──────→      ├── GitHubPoller /
                                     └── PersistenceStore → sessions.json
 ```
 
+## Cloud Deployment (AWS POC)
+
+The `infra/` directory contains a minimal AWS CDK stack for running Konductor in the cloud. This is one way to deploy — the simplest path to a working cloud setup with HTTPS, persistent storage, and automated deploys. It is not the only way, and it's scoped as a proof-of-concept.
+
+The stack uses **App Runner** (managed container service with built-in HTTPS), **S3** (persistent storage for sessions/settings), **ECR** (Docker image registry), and **SSM Parameter Store** (secrets). No VPC, ALB, or EFS required. Estimated cost: ~$6–11/month.
+
+```
+Kiro IDE ─── HTTPS/SSE ───→ App Runner (Konductor) ──→ S3 (persistence)
+Browser  ─── HTTPS ────────→       ↑                 ──→ SSM (secrets)
+File Watcher ── HTTPS/REST →       │
+                            ECR ───┘ (image registry)
+                             ↑
+                      GitHub Actions (CI/CD)
+```
+
+Quick start:
+
+1. Create SSM parameters for your API key and GitHub token
+2. Bootstrap CDK and deploy: `cd infra && npm install && npx cdk deploy`
+3. Push a Docker image to ECR (or let GitHub Actions handle it)
+4. Connect clients: `npx https://<app-runner-url>/bundle/installer.tgz --server https://<app-runner-url> --api-key YOUR_KEY`
+
+See [`infra/README.md`](infra/README.md) for the full setup guide, step-by-step instructions, cost breakdown, architecture diagram, and alternative deployment options.
+
 ## Specs
 
 Detailed requirements, design, and implementation plans for each feature live in `.kiro/specs/`. Here's the current status:
@@ -157,7 +181,7 @@ Detailed requirements, design, and implementation plans for each feature live in
 | [`konductor-admin`](.kiro/specs/konductor-admin/) | Web-based admin dashboard — system config, user management, installer channels |
 | [`konductor-conflict-resolution`](.kiro/specs/konductor-conflict-resolution/) | Client-side merge detection to automatically clear resolved conflicts |
 | [`konductor-slack`](.kiro/specs/konductor-slack/) | Client-driven Slack notifications with per-project channel config |
-| [`konductor-production`](.kiro/specs/konductor-production/) | AWS ECS Fargate deployment with EFS, ALB, CloudWatch, CDK infrastructure |
+| [`konductor-production`](.kiro/specs/konductor-production/) | AWS App Runner deployment with S3 persistence, ECR, CDK infrastructure |
 
 ## Steering Rules
 

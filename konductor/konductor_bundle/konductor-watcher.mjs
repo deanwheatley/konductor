@@ -152,8 +152,9 @@ function refreshBranch() {
     log(`${FY}🔀 Branch changed: ${currentBranch} → ${newBranch}${R}`);
     termLog(`${FY}🔀 Branch changed: ${currentBranch} → ${newBranch}${R}`);
     currentBranch = newBranch;
-    // Clear pending files — new branch may have different file state (Req 7.2)
-    pendingFiles.clear();
+    // Do NOT clear pendingFiles — filesystem events are real changes that must
+    // be reported regardless of which branch they occurred on. Clearing them
+    // causes file edits around branch switches to be silently dropped. (Req 7.2)
   }
 }
 const DASHBOARD_URL = `${loadConfig().url}/repo/${REPO_SHORT}`;
@@ -233,14 +234,15 @@ const seenCollabRequests = new Map(); // requestId → status
 const offlineQueue = new Set();  // cumulative unique file paths
 let wasOffline = false;          // track offline→online transition
 
-async function runAutoUpdate(serverVersion) {
+async function runAutoUpdate(serverVersion, updateUrl) {
   if (lastUpdateVersion === serverVersion) {
     debug(`Already updated to v${serverVersion}, skipping`);
     return;
   }
   lastUpdateVersion = serverVersion;
 
-  const tgzUrl = `${CFG.url}/bundle/installer.tgz`;
+  // Use the channel-specific updateUrl from the server response (Bug B4 fix)
+  const tgzUrl = updateUrl || `${CFG.url}/bundle/installer.tgz`;
   log(""); log(`${BGY}${FW}${B} 🔄 UPDATING ${R} Konductor client v${CLIENT_VERSION || "unknown"} → v${serverVersion}`);
   log(`  ${FY}Running:${R} npx --yes ${tgzUrl} --workspace --server ${CFG.url}`);
   sep();
@@ -288,7 +290,7 @@ async function api(endpoint, body) {
     if (data.updateRequired && data.serverVersion) {
       log(`  ${FY}ℹ️  Server v${data.serverVersion} available (client: v${CLIENT_VERSION || "unknown"})${R}`);
       if (lastUpdateVersion !== data.serverVersion) {
-        await runAutoUpdate(data.serverVersion);
+        await runAutoUpdate(data.serverVersion, data.updateUrl);
       }
     }
     return data;
@@ -684,8 +686,15 @@ setInterval(async () => {
 
 // ── Startup ─────────────────────────────────────────────────────────
 
+// Write PID file so health checks can verify THIS workspace's watcher is running
+const PID_PATH = resolve(".konductor-watcher.pid");
+writeFileSync(PID_PATH, String(process.pid));
+process.on("exit", () => { try { unlinkSync(PID_PATH); } catch {} });
+process.on("SIGINT", () => { try { unlinkSync(PID_PATH); } catch {} process.exit(0); });
+process.on("SIGTERM", () => { try { unlinkSync(PID_PATH); } catch {} process.exit(0); });
+
 log(""); log(`${B}${FC}  ╔═══════════════════════════════════════╗${R}`);
-log(`${B}${FC}  ║       🔍 KONDUCTOR WATCHER v0.3.1    ║${R}`);
+log(`${B}${FC}  ║       🔍 KONDUCTOR WATCHER v0.3.2    ║${R}`);
 log(`${B}${FC}  ╚═══════════════════════════════════════╝${R}`); log("");
 log(`  ${B}User:${R}      ${USER_ID}`);
 log(`  ${B}Repo:${R}      ${REPO}`);

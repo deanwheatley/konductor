@@ -42,6 +42,10 @@ export interface UserRecord {
   admin: boolean;
   installerChannel: string | null;
   settings: Record<string, unknown>;
+  clientVersion?: string | null;
+  lastRepo?: string | null;
+  lastBranch?: string | null;
+  ipAddress?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -88,7 +92,7 @@ export interface ISessionHistoryStore {
   importJson(json: string): Promise<number>;
 
   // User records
-  upsertUser(userId: string, repo: string): Promise<void>;
+  upsertUser(userId: string, repo: string, extras?: { branch?: string; clientVersion?: string; ipAddress?: string }): Promise<void>;
   getUser(userId: string): Promise<UserRecord | null>;
   getAllUsers(): Promise<UserRecord[]>;
   updateUser(userId: string, updates: { installerChannel?: string; admin?: boolean }): Promise<boolean>;

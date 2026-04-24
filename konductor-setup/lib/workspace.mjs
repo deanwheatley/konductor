@@ -32,6 +32,7 @@ const KONDUCTOR_IGNORES = [
   "konductor-watchdog.sh",
   ".konductor-watcher.env",
   ".konductor-watcher.log",
+  ".konductor-watcher.pid",
   ".konductor-watchdog.pid",
   ".konductor-version",
 ];

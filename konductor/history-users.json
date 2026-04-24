@@ -1,0 +1,22 @@
+[
+  {
+    "userId": "testkonductor",
+    "repo": "deanwheatley/testrepo",
+    "branch": "main"
+  },
+  {
+    "userId": "deanwheatley",
+    "repo": "deanwheatley/testrepo",
+    "branch": "feature/updates",
+    "clientVersion": "0.4.0",
+    "ipAddress": "::1"
+  },
+  {
+    "userId": "deanwheatley-star",
+    "repo": "deanwheatley/testrepo"
+  },
+  {
+    "userId": "testuser",
+    "repo": "deanwheatley/testrepo"
+  }
+]

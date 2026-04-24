@@ -1307,7 +1307,7 @@ function buildScript(repo: string, apiBase: string, githubBase: string, repoShor
   };
 
   // -----------------------------------------------------------------------
-  // Render: Query Log
+  // Render: Activity Log
   // -----------------------------------------------------------------------
   function renderQueryLog() {
     var el = document.getElementById("querylog-section");
@@ -1323,23 +1323,24 @@ function buildScript(repo: string, apiBase: string, githubBase: string, repoShor
     });
 
     // Sort
-    filtered = sortRows(filtered, logSort, ["timestamp", "userId", "branch", "queryType", "parameters"]);
+    filtered = sortRows(filtered, logSort, ["timestamp", "userId", "branch", "queryType", "summary"]);
 
     var headerHtml = '<div class="panel-header collapsible" onclick="togglePanel(\\'querylog-panel\\')">' +
-      '<h2><span class="collapse-icon">▼</span> Query Log <span class="count-badge">' + entryCount + ' entries</span></h2></div>';
+      '<h2><span class="collapse-icon">▼</span> Activity Log <span class="count-badge">' + entryCount + ' entries</span></h2></div>';
 
     var filterHtml = '<div class="filter-bar">' +
       '<label>Filter:</label>' +
       '<input type="text" placeholder="Filter by user..." value="' + esc(logFilters.user) + '" oninput="setLogFilter(\\'user\\',this.value)">' +
-      '<select onchange="setLogFilter(\\'queryType\\',this.value)"><option value="">All Query Types</option>' +
-      ["who_is_active","who_overlaps","risk_assessment","repo_hotspots","active_branches","coordination_advice"].map(function(qt) {
-        return '<option value="' + qt + '"' + (logFilters.queryType === qt ? " selected" : "") + '>' + qt + '</option>';
+      '<select onchange="setLogFilter(\\'queryType\\',this.value)"><option value="">All Activities</option>' +
+      ["session","collision","who_is_active","who_overlaps","risk_assessment","repo_hotspots","active_branches","coordination_advice"].map(function(qt) {
+        var label = qt === "session" ? "Session" : qt === "collision" ? "Collision" : qt;
+        return '<option value="' + qt + '"' + (logFilters.queryType === qt ? " selected" : "") + '>' + label + '</option>';
       }).join("") +
       '</select>' +
       '<button class="reset-btn" onclick="resetLogFilters()">Reset</button>' +
       '</div>';
 
-    var cols = ["Timestamp", "User", "Branch", "Query Type", "Parameters"];
+    var cols = ["Timestamp", "User", "Branch", "Activity", "Summary"];
     var theadHtml = '<tr>' + cols.map(function(c, i) {
       var arrow = logSort.col === i ? (logSort.asc ? " ▲" : " ▼") : "";
       return '<th onclick="sortLog(' + i + ')">' + c + (arrow ? '<span class="sort-arrow">' + arrow + '</span>' : "") + '</th>';
@@ -1347,15 +1348,21 @@ function buildScript(repo: string, apiBase: string, githubBase: string, repoShor
 
     var rowsHtml = "";
     if (filtered.length === 0) {
-      rowsHtml = '<tr><td colspan="5" class="empty-state">No queries logged</td></tr>';
+      rowsHtml = '<tr><td colspan="5" class="empty-state">No activity yet</td></tr>';
     } else {
       filtered.forEach(function(e) {
-        var params = Object.entries(e.parameters || {}).map(function(kv) { return kv[0] + "=" + kv[1]; }).join(", ");
+        var activityClass = e.queryType === "collision" ? "badge-alerting"
+          : e.queryType === "session" ? "badge-healthy"
+          : "badge-warning";
+        var activityLabel = e.queryType === "session" ? "Session"
+          : e.queryType === "collision" ? "Collision"
+          : e.queryType.replace(/_/g, " ");
+        var summaryText = e.summary || Object.entries(e.parameters || {}).map(function(kv) { return kv[0] + "=" + kv[1]; }).join(", ");
         rowsHtml += '<tr><td style="white-space:nowrap">' + esc(fmtTs(e.timestamp)) + '</td>' +
           '<td><a class="user-link" href="https://github.com/' + esc(e.userId) + '">' + esc(e.userId) + '</a></td>' +
           '<td><a class="branch-link" href="' + GITHUB_BASE + '/tree/' + esc(e.branch) + '">' + esc(e.branch) + '</a></td>' +
-          '<td><span class="query-badge">' + esc(e.queryType) + '</span></td>' +
-          '<td class="params">' + esc(params) + '</td></tr>';
+          '<td><span class="badge ' + activityClass + '">' + esc(activityLabel) + '</span></td>' +
+          '<td>' + esc(summaryText) + '</td></tr>';
       });
     }
 

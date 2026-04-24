@@ -23,3 +23,12 @@ states:
   merge_hell:
     message: "Critical — multiple divergent changes on the same files."
     block_submissions: false
+
+# GitHub integration — polls open PRs and recent commits for collision detection
+github:
+  token_env: GITHUB_TOKEN
+  poll_interval_seconds: 60
+  include_drafts: true
+  commit_lookback_hours: 24
+  repositories:
+    - repo: "deanwheatley/testrepo"

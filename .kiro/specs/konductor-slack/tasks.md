@@ -1,0 +1,202 @@
+# Implementation Plan
+
+- [x] 1. Implement core Slack utilities and settings manager
+  - [x] 1.1 Implement `SlackSettingsManager` with per-repo config and bot token management
+    - Create `src/slack-settings.ts` implementing `ISlackSettingsManager`
+    - Implement `getRepoConfig(repo)` — read channel and verbosity from settings store, apply defaults (channel: `konductor-alerts-<sanitized_repo>`, verbosity: 2)
+    - Implement `setRepoChannel(repo, channel)` — validate channel name, persist to settings store with key `slack:<repo>:channel`
+    - Implement `setRepoVerbosity(repo, verbosity)` — validate 0–5 range, persist with key `slack:<repo>:verbosity`
+    - Implement `getBotToken()` — check `SLACK_BOT_TOKEN` env var first, then settings store key `slack:bot_token`
+    - Implement `setBotToken(token)` — persist to settings store (encrypted)
+    - Implement `getGlobalStatus()` — validate token via Slack `auth.test`, return configured/team/botUser
+    - Implement `sanitizeChannelName(repoName)` — lowercase, replace non-allowed chars with `-`, collapse consecutive hyphens, trim, max 80 chars, no leading hyphen
+    - Implement `validateChannelName(name)` — accept strings matching Slack naming rules, reject others
+    - Implement `validateVerbosity(n)` — accept integers 0–5, reject others
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 5.1, 5.2, 5.3, 6.5, 6.7, 11.3_
+  - [x] 1.2 Implement `shouldNotify` verbosity threshold function
+    - Create verbosity threshold mapping in `src/slack-settings.ts`
+    - Implement `shouldNotify(state, verbosity)` — return true iff state is in the set for the given level
+    - _Requirements: 5.1, 5.2_
+  - [x] 1.3 Write property tests for Slack utilities
+    - Create `src/slack-settings.property.test.ts`
+    - **Property 1: Verbosity threshold filtering** — generate random collision states × verbosity levels, verify `shouldNotify` correctness
+    - **Property 3: Channel name sanitization** — generate random repo name strings, verify sanitized output meets all Slack rules and is idempotent
+    - **Property 7: Bot token source precedence** — generate combinations of env var and database token, verify precedence
+    - **Property 8: Slack channel name validation** — generate random strings, verify validation accepts/rejects correctly
+    - **Property 9: Verbosity range validation** — generate random integers, verify validation accepts 0–5 only
+    - _Validates: Requirements 2.2, 5.1, 5.2, 5.3, 6.6, 6.7, 11.3_
+  - [x] 1.4 Write unit tests for SlackSettingsManager
+    - Create `src/slack-settings.test.ts`
+    - Test per-repo config read/write round-trip
+    - Test default channel name generation for various repo name formats
+    - Test bot token source precedence (env vs database)
+    - Test channel name validation (valid and invalid inputs)
+    - Test verbosity validation (boundary values)
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 5.3, 6.7_
+
+- [x] 2. Implement SlackNotifier and state tracking
+  - [x] 2.1 Implement `SlackStateTracker`
+    - Create `src/slack-state-tracker.ts` implementing `ISlackStateTracker`
+    - In-memory `Map<string, CollisionState>` keyed by repo
+    - Implement `getLastNotifiedState(repo)`, `setLastNotifiedState(repo, state)`, `clear(repo)`
+    - _Requirements: 9.1, 9.4_
+  - [x] 2.2 Implement `SlackNotifier`
+    - Create `src/slack-notifier.ts` implementing `ISlackNotifier`
+    - Implement `onCollisionEvaluated(repo, result, triggeringUserId)`:
+      - Read per-repo config via `SlackSettingsManager`
+      - Check `shouldNotify` against verbosity threshold
+      - Compare with `SlackStateTracker` to detect escalation vs de-escalation
+      - If escalation: build Block Kit message with header (emoji + repo), section (users, files, branches), context (footer)
+      - If de-escalation (previous above threshold, new below): build de-escalation message
+      - Post via `fetch` to `https://slack.com/api/chat.postMessage` with bot token
+      - Update `SlackStateTracker`
+      - Catch all exceptions internally, log via `KonductorLogger`, never throw
+    - Implement `sendTestMessage(channel)` — post a config confirmation message to the given channel
+    - Implement `validateToken()` — call `https://slack.com/api/auth.test` with bot token, return team/botUser
+    - Implement `isConfigured()` — check if bot token is available
+    - Implement `buildEscalationMessage(repo, result)` — return Block Kit JSON with header, section, context footer
+    - Implement `buildDeescalationMessage(repo, previousState)` — return Block Kit JSON with resolution text and footer
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 9.1, 9.2, 9.3_
+  - [x] 2.3 Write property tests for SlackNotifier
+    - Create `src/slack-notifier.property.test.ts`
+    - **Property 2: Message footer always present** — generate random repos and collision results, verify every built message contains the footer context block
+    - **Property 4: De-escalation detection** — generate random sequences of collision states with random verbosity, verify de-escalation is sent iff previous was above threshold and new is below
+    - **Property 5: Message content completeness** — generate random collision results, verify message contains emoji, repo, branches, files, and user names
+    - _Validates: Requirements 1.3, 1.4, 1.5, 8.2, 8.3, 8.4, 9.1, 9.2, 9.3_
+  - [x] 2.4 Write unit tests for SlackNotifier
+    - Create `src/slack-notifier.test.ts`
+    - Test posts message when threshold met (mocked fetch)
+    - Test skips when below threshold
+    - Test skips when bot token missing
+    - Test handles Slack API errors gracefully (channel_not_found, rate limit, network error)
+    - Test de-escalation message sent on state drop below threshold
+    - Test no de-escalation when previous state was already below threshold
+    - Test message format includes all required fields and footer
+    - Test emoji mapping for each collision state
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
+
+- [x] 3. Checkpoint
+  - Ensure all tests pass (`npm test --prefix konductor`), ask the user if questions arise.
+
+- [x] 4. Implement Slack settings API endpoints and SSE events
+  - [x] 4.1 Add per-repo Slack API routes to `index.ts`
+    - Add `GET /api/repo/:repoName/slack` — return channel, verbosity, enabled status, last notification info
+    - Add `PUT /api/repo/:repoName/slack` — validate input (channel name rules, verbosity 0–5), persist via `SlackSettingsManager`, emit `slack_config_change` via `BatonEventEmitter`, send test notification to new channel, log CONFIG entry
+    - Both endpoints require authentication (session cookie or Authorization header) but not admin access
+    - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.7, 3.4, 3.8, 4.1, 4.3_
+  - [x] 4.2 Add admin Slack API routes to `index.ts`
+    - Add `GET /api/admin/slack` — return global Slack auth status (configured, source, team, botUser, authMode)
+    - Add `PUT /api/admin/slack` — accept bot token or OAuth credentials, validate token via `auth.test`, persist
+    - Add `POST /api/admin/slack/test` — send test message to specified channel
+    - All admin endpoints require admin authentication
+    - _Requirements: 11.5, 11.6, 6.1, 6.2, 6.4, 6.5, 6.10_
+  - [x] 4.3 Add `slack_config_change` SSE event type
+    - Extend `BatonEvent` type with `slack_config_change` event
+    - Emit on Baton repo page SSE stream, MCP client SSE connections, and admin dashboard SSE stream
+    - Event payload: `{ channel, verbosity, changedBy, slackChannelLink }`
+    - _Requirements: 4.1, 4.4_
+  - [x] 4.4 Extend `register_session` response with `slackConfig`
+    - Add optional `slackConfig` field to `register_session` tool response containing channel, verbosity, enabled
+    - _Requirements: 3.1_
+  - [x] 4.5 Write property test for config change notification
+    - **Property 6: Config change notification delivery** — generate random config changes, verify emitted event contains correct channel, verbosity, changedBy, slackChannelLink, scoped to correct repo
+    - _Validates: Requirements 4.1, 4.2, 4.3_
+  - [x] 4.6 Write unit tests for Slack API routes
+    - Create `src/slack-repo-api.test.ts`
+    - Test GET /api/repo/:repo/slack returns correct config
+    - Test PUT /api/repo/:repo/slack updates and emits SSE event
+    - Test PUT with invalid channel returns 400
+    - Test PUT with invalid verbosity returns 400
+    - Test config change triggers test notification to new channel
+    - Test PUT emits slack_config_change event with correct payload
+    - Create `src/slack-admin-api.test.ts`
+    - Test GET /api/admin/slack returns auth status
+    - Test PUT /api/admin/slack validates and stores bot token
+    - Test POST /api/admin/slack/test sends test message
+    - Test admin endpoints reject non-admin users
+    - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7_
+
+- [x] 5. Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 6. Wire SlackNotifier into collision evaluation pipeline
+  - [x] 6.1 Integrate SlackNotifier into `index.ts` bootstrap
+    - Instantiate `SlackSettingsManager`, `SlackStateTracker`, `SlackNotifier` during server startup
+    - Pass `SlackNotifier` to MCP tool handlers
+    - After `register_session` and `check_status` collision evaluation, call `slackNotifier.onCollisionEvaluated(repo, result, userId)`
+    - Log Slack configuration status at startup (configured/not configured)
+    - _Requirements: 1.1, 1.2, 1.6_
+  - [x] 6.2 Register `get_slack_config` and `set_slack_config` MCP tools
+    - Register `get_slack_config` tool — input: `{ repo }`, returns `RepoSlackConfig`
+    - Register `set_slack_config` tool — input: `{ repo, channel?, verbosity? }`, validates, persists, emits SSE event, returns updated config
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
+  - [x] 6.3 Write integration tests for the collision → Slack pipeline
+    - Create `src/slack-integration.test.ts`
+    - Test full flow: configure bot token → set repo channel → register session with collision → verify Slack message posted (mocked fetch)
+    - Test de-escalation: register with collision_course → deregister overlapping session → register again → verify de-escalation message
+    - Test Slack disabled (verbosity 0): collision occurs but no Slack message posted
+    - Test bot token missing: collision occurs, warning logged, no Slack message
+    - _Requirements: 1.1, 1.5, 1.6, 5.1, 9.2_
+
+- [x] 7. Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 8. Implement Baton repo page Slack Integration panel
+  - [x] 8.1 Extend `baton-page-builder.ts` with Slack Integration panel
+    - Add collapsible "Slack Integration" panel after existing panels
+    - When Slack configured: show status, editable channel field, verbosity dropdown (0–5 with labels), Save button, Send Test Message button, last notification info, Slack channel link
+    - When Slack not configured: show warning message directing admin to Admin Dashboard
+    - Add client-side JS to handle Save (PUT /api/repo/:repoName/slack), Send Test Message, and SSE `slack_config_change` event for real-time updates
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8_
+  - [x] 8.2 Write unit tests for Baton Slack panel
+    - Test panel HTML contains Slack Integration section
+    - Test panel shows "not configured" message when bot token missing
+    - Test panel shows editable fields when configured
+    - Test verbosity dropdown has correct labels
+    - _Requirements: 3.1, 3.2, 3.3, 3.6_
+
+- [x] 9. Implement Admin Dashboard Slack Integration panel
+  - [x] 9.1 Extend `admin-page-builder.ts` with Slack Integration panel
+    - Add collapsible "Slack Integration" panel after Global Client Settings panel
+    - Show authentication mode selector (Bot Token / Slack App OAuth)
+    - Bot Token mode: token input field, Validate button, status display
+    - OAuth mode: Client ID and Client Secret fields, Install Slack App button
+    - Show source indicator (env var read-only vs database editable)
+    - Add Test section: channel input + Send button
+    - Add client-side JS for token validation, save, test message, and SSE updates
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.6, 6.8, 6.10_
+  - [x] 9.2 Implement Slack OAuth callback route
+    - Add `GET /auth/slack/callback` route to `index.ts`
+    - Exchange authorization code for bot token via `oauth.v2.access`
+    - Store bot token (encrypted) and OAuth credentials in settings store
+    - Validate token via `auth.test`
+    - Redirect to `/admin` with success/error message
+    - _Requirements: 6.3, 6.9_
+  - [x] 9.3 Write unit tests for Admin Slack panel and OAuth
+    - Create `src/slack-admin.test.ts`
+    - Test admin panel HTML contains Slack Integration section
+    - Test OAuth callback exchanges code and stores token
+    - Test OAuth callback rejects invalid state parameter
+    - Test token validation displays workspace info
+    - Test env var source shows read-only indicator
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.6, 6.9_
+
+- [x] 10. Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 11. Update steering rules and documentation
+  - [x] 11.1 Update steering rule with Slack chat commands
+    - Update `konductor-collision-awareness.md` in all 4 sync locations (steering/, .agent/rules/, konductor/konductor_bundle/kiro/steering/, konductor/konductor_bundle/agent/rules/)
+    - Add Slack commands to management command routing table: "show slack config", "change slack channel to X", "change slack verbosity to X", "disable slack", "enable slack"
+    - Add Slack commands to help output
+    - Add `slack_config_change` SSE event handling instruction
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 10.4_
+  - [x] 11.2 Update README.md with Slack integration section
+    - Add section describing: bot token configuration (admin dashboard or `SLACK_BOT_TOKEN` env var), per-repo channel configuration (Baton page or chat commands), verbosity levels with descriptions, message format with Block Kit JSON examples
+    - _Requirements: 10.1, 10.2, 10.3_
+  - [x] 11.3 Update `.env.local.example` with Slack env var
+    - Add `SLACK_BOT_TOKEN=` with comment explaining it's optional and overrides database-stored token
+    - _Requirements: 6.7_
+
+- [x] 12. Final Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.

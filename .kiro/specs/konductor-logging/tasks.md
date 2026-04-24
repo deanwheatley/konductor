@@ -1,0 +1,124 @@
+# Implementation Plan
+
+- [x] 1. Implement KonductorLogger core module
+  - [x] 1.1 Create logger with format/parse and environment-based configuration
+    - Create `src/logger.ts` with `KonductorLogger` class
+    - Implement `LogEntry` interface, `LogCategory` type, and `LoggerOptions`
+    - Implement `formatEntry()` producing `[TIMESTAMP] [CATEGORY] [ACTOR] message` format
+    - Implement `parseEntry()` reconstructing a `LogEntry` from a formatted string
+    - Implement constructor reading `VERBOSE_LOGGING` and `LOG_TO_TERMINAL` from env
+    - Implement `write()` internal method that outputs to stderr when enabled
+    - All log methods should no-op when `enabled` is false
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 2.5_
+  - [x] 1.2 Write property test: Log format consistency
+    - **Property 1: Log format consistency**
+    - **Validates: Requirements 2.1, 2.2, 2.3, 2.4**
+    - Create `src/logger.test.ts`
+    - Generate random valid LogEntry objects with fast-check
+    - Verify formatted output matches `[TIMESTAMP] [CATEGORY] [ACTOR] message` pattern
+  - [x] 1.3 Write property test: Log entry round-trip
+    - **Property 2: Log entry round-trip**
+    - **Validates: Requirements 2.5**
+    - Generate random valid LogEntry objects
+    - Verify `parseEntry(formatEntry(entry))` produces equivalent entry
+  - [x] 1.4 Write unit tests for KonductorLogger core
+    - Test logger disabled produces no output
+    - Test logger enabled writes to stderr
+    - Test each log category formats correctly
+    - Test parseEntry with malformed input
+    - _Requirements: 1.1, 1.2, 1.3, 2.1_
+
+- [x] 2. Implement all log event methods
+  - [x] 2.1 Implement connection event methods
+    - Implement `logConnection()`, `logAuthentication()`, `logDisconnection()`, `logAuthRejection()`
+    - Each method formats a CONN category entry with the appropriate actor and message
+    - _Requirements: 3.1, 3.2, 3.3, 3.4_
+  - [x] 2.2 Implement session event methods
+    - Implement `logSessionRegistered()`, `logSessionUpdated()`, `logSessionDeregistered()`, `logStaleCleanup()`
+    - Registration logs include userId, sessionId, repo, branch, and files
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
+  - [x] 2.3 Write property test: Registration log completeness
+    - **Property 3: Registration log completeness**
+    - **Validates: Requirements 4.1, 4.2**
+    - Generate random userId, sessionId, repo, branch, files
+    - Call `logSessionRegistered()`, capture output, verify all fields present
+  - [x] 2.4 Implement collision event methods
+    - Implement `logCollisionState()`, `logCollisionAction()`
+    - Collision logs include severity-appropriate detail (overlapping users, shared files, branches)
+    - _Requirements: 5.1, 5.2, 5.3, 5.4_
+  - [x] 2.5 Write property test: Collision log completeness by severity
+    - **Property 4: Collision log completeness by severity**
+    - **Validates: Requirements 5.1, 5.2, 5.3**
+    - Generate random collision results at each severity level
+    - Verify log contains required fields for that severity
+  - [x] 2.6 Implement config, server, and query event methods
+    - Implement `logConfigLoaded()`, `logConfigReloaded()`, `logConfigError()`
+    - Implement `logServerStart()`, `logSessionsRestored()`, `logHealthCheck()`
+    - Implement `logCheckStatus()`, `logListSessions()`
+    - _Requirements: 6.1, 6.2, 6.3, 7.1, 7.2, 7.3, 8.1, 8.2_
+  - [x] 2.7 Write unit tests for event methods
+    - Test connection log includes IP and hostname
+    - Test session registration log includes all fields
+    - Test collision log at each severity level
+    - Test config load/reload/error logs
+    - Test server start and health check logs
+    - Test query logs include user and result
+    - _Requirements: 3.1, 4.1, 5.1, 6.1, 7.1, 8.1_
+
+- [x] 3. Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 4. Integrate logger into existing components
+  - [x] 4.1 Wire logger into bootstrap and MCP tool handlers
+    - Create `KonductorLogger` instance in `createComponents()` based on env vars
+    - Pass logger to SessionManager, ConfigManager constructors
+    - Add CONN logging to SSE connection/auth/disconnect handlers in `startSseServer()`
+    - Add QUERY logging to `check_status` and `list_sessions` tool handlers
+    - Add COLLISION logging after `collisionEvaluator.evaluate()` calls in tool handlers
+    - Add SERVER logging on startup (transport mode, port, verbose status)
+    - Add SERVER logging for health check requests
+    - _Requirements: 1.1, 1.3, 3.1, 3.2, 3.3, 3.4, 5.1, 7.1, 7.3, 8.1, 8.2_
+  - [x] 4.2 Wire logger into SessionManager
+    - Add logger parameter to SessionManager constructor
+    - Call `logSessionRegistered()` in `register()`
+    - Call `logSessionUpdated()` in `update()`
+    - Call `logSessionDeregistered()` in `deregister()`
+    - Call `logStaleCleanup()` in `cleanupStale()`
+    - Call `logSessionsRestored()` in `init()` after loading from persistence
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 7.2_
+  - [x] 4.3 Wire logger into ConfigManager
+    - Add logger parameter to ConfigManager constructor
+    - Call `logConfigLoaded()` in `load()`
+    - Call `logConfigReloaded()` in `reload()`
+    - Call `logConfigError()` on parse failures
+    - _Requirements: 6.1, 6.2, 6.3_
+  - [x] 4.4 Add VERBOSE_LOGGING and LOG_TO_TERMINAL to .env.local and documentation
+    - Add `VERBOSE_LOGGING=true` and `LOG_TO_TERMINAL=true` to `.env.local`
+    - Add `VERBOSE_LOGGING=false` and `LOG_TO_TERMINAL=false` to `.env.local.example`
+    - Update `konductor/README.md` Environment Variables table
+    - _Requirements: 1.1, 1.3_
+
+- [x] 5. Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 6. Add file logging support
+  - [x] 6.1 Extend KonductorLogger to support file output
+    - Add `toFile` and `filePath` fields to `LoggerOptions` interface
+    - Update constructor to read `LOG_TO_FILE` and `LOG_FILENAME` from env when no options provided
+    - Default `filePath` to `konductor.log` when `LOG_FILENAME` is absent
+    - Update `write()` to append to the log file when `toFile` is true
+    - Use `fs.appendFileSync` for simplicity and atomicity per line
+    - _Requirements: 1.5, 1.6_
+  - [x] 6.2 Write unit tests for file logging
+    - Test that file logging writes to the specified file when enabled
+    - Test that file logging defaults to `konductor.log` when `LOG_FILENAME` is absent
+    - Test that file logging is skipped when `toFile` is false
+    - Test that both terminal and file output work simultaneously
+    - _Requirements: 1.5, 1.6_
+  - [x] 6.3 Update environment files and documentation
+    - Add `LOG_TO_FILE=false` and `LOG_FILENAME=konductor.log` to `.env.local.example`
+    - Update `konductor/README.md` Environment Variables table
+    - _Requirements: 1.5, 1.6_
+
+- [x] 7. Final Checkpoint
+  - Ensure all tests pass, ask the user if questions arise.

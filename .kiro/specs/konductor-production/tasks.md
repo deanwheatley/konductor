@@ -1,0 +1,122 @@
+# Implementation Plan
+
+- [ ] 1. Create the Dockerfile
+  - [ ] 1.1 Write multi-stage Dockerfile at `konductor/Dockerfile`
+    - Build stage: Node.js 20 Alpine, copy `konductor/` and `konductor-setup/`, install all deps, compile TypeScript
+    - Production stage: Node.js 20 Alpine, copy compiled `dist/`, `package.json`, `package-lock.json`, `konductor-setup/`, `konductor.yaml`, install production deps only
+    - Set `WORKDIR /app/konductor`, `EXPOSE 3100`, `ENV KONDUCTOR_PORT=3100 KONDUCTOR_PROTOCOL=http`
+    - Add `HEALTHCHECK --interval=30s --timeout=5s CMD node -e "fetch('http://localhost:3100/health').then(r=>{if(!r.ok)throw 1})"`
+    - `CMD ["node", "dist/index.js"]`
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
+  - [ ] 1.2 Add `.dockerignore` file at repo root
+    - Exclude `node_modules/`, `dist/`, `.git/`, `*.log`, `certs/`, test files, `infra/`
+    - _Requirements: 1.1_
+
+- [ ] 2. Implement S3 persistence layer
+  - [ ] 2.1 Add `@aws-sdk/client-s3` dependency to `konductor/package.json`
+    - _Requirements: 3.2_
+  - [ ] 2.2 Create `konductor/src/s3-persistence.ts`
+    - Implement `S3Persistence` class with `load()`, `save()`, `flush()`, `shutdown()` methods
+    - Load all data files from S3 on startup, handle missing objects gracefully (start with empty defaults)
+    - Serialize data as JSON with 2-space indentation (pretty-printer)
+    - Periodic flush every 30 seconds, flush on SIGTERM
+    - Use S3 PutObject for writes (atomic at the object level in S3)
+    - Wire into `NotificationStore`, `QueryLogStore`, `MemoryHistoryStore`, and `PersistenceStore`
+    - _Requirements: 3.2, 3.3, 3.4, 3.5, 3.6, 11.1, 11.2, 11.3, 11.4, 11.5_
+  - [ ] 2.3 Integrate S3 persistence into `konductor/src/index.ts`
+    - In `createComponents()`, when `KONDUCTOR_S3_BUCKET` is set, use `S3Persistence` instead of `LocalPersistence`
+    - Wire event emitter hooks for save triggers (same pattern as LocalPersistence)
+    - Register SIGTERM handler for graceful shutdown flush
+    - _Requirements: 3.2, 3.3, 3.4_
+  - [ ]* 2.4 Write property test for S3 persistence round-trip
+    - **Property 2: S3 persistence round-trip**
+    - **Validates: Requirements 3.2, 3.3, 11.1, 11.2, 11.4, 11.5**
+    - Use `fast-check` to generate random valid data structures (sessions, settings, history, query log)
+    - Serialize to JSON, deserialize, verify equivalence
+    - Test with empty objects, nested structures, special characters in strings
+
+- [ ] 3. Implement KONDUCTOR_EXTERNAL_URL server code change
+  - [ ] 3.1 Update `main()` in `konductor/src/index.ts` to use `KONDUCTOR_EXTERNAL_URL`
+    - Change `const serverUrl = ...` to check `process.env.KONDUCTOR_EXTERNAL_URL` first
+    - Apply the same override in `startSseServer()` where `serverUrl` is constructed
+    - Ensure the external URL is used for Baton dashboard URLs, installer commands, update URLs, and admin page URLs
+    - _Requirements: 8.1, 8.3_
+  - [ ]* 3.2 Write property test for external URL override
+    - **Property 1: External URL override**
+    - **Validates: Requirements 8.1, 8.3**
+    - Use `fast-check` to generate random valid URLs
+    - Verify that when `KONDUCTOR_EXTERNAL_URL` is set, the server uses it as `serverUrl`
+    - Verify that when unset/empty, the server falls back to hostname-derived URL
+
+- [ ] 4. Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 5. Initialize CDK infrastructure project
+  - [ ] 5.1 Initialize CDK app in `infra/` directory
+    - Run `npx cdk init app --language typescript` in `infra/`
+    - Add CDK dependencies: `aws-cdk-lib`, `constructs`, `@aws-cdk/aws-apprunner-alpha` (or use L1 constructs)
+    - Configure `infra/tsconfig.json` and `infra/cdk.json`
+    - _Requirements: 5.1, 5.2_
+
+- [ ] 6. Implement CDK stack
+  - [ ] 6.1 Create ECR repository
+    - Repository named `konductor`, scan on push enabled
+    - Lifecycle rule: retain 5 most recent images
+    - _Requirements: 5.3_
+  - [ ] 6.2 Create S3 bucket for persistence
+    - Bucket with versioning enabled
+    - Lifecycle rule: expire old versions after 30 days
+    - Block public access
+    - _Requirements: 3.1_
+  - [ ] 6.3 Create IAM roles
+    - Instance role: S3 read/write to data bucket, SSM GetParameter for secrets
+    - Access role: ECR pull access for App Runner
+    - _Requirements: 2.3, 5.2_
+  - [ ] 6.4 Create App Runner service
+    - Image source: ECR repository
+    - Instance: 0.25 vCPU, 512 MB memory
+    - Health check: `/health`, interval 30s
+    - Auto-scaling: min 1, max 1
+    - Environment variables: `KONDUCTOR_PORT`, `KONDUCTOR_PROTOCOL`, `KONDUCTOR_S3_BUCKET`, `KONDUCTOR_EXTERNAL_URL`, `LOG_TO_TERMINAL`
+    - Secrets from SSM: `KONDUCTOR_API_KEY` → `/konductor/api-key`, `GITHUB_TOKEN` → `/konductor/github-token`
+    - Port: 3100
+    - _Requirements: 4.1, 4.2, 4.3, 8.2_
+  - [ ] 6.5 Add CloudFormation outputs
+    - ECR repository URI
+    - App Runner service URL (HTTPS)
+    - Full Konductor URL
+    - S3 bucket name
+    - _Requirements: 4.4, 5.4_
+  - [ ]* 6.6 Write CDK assertion tests
+    - Verify App Runner service configuration (CPU, memory, health check, port)
+    - Verify ECR repository (scan on push, lifecycle rules)
+    - Verify S3 bucket (versioning, lifecycle rules)
+    - Verify IAM roles (S3 access, ECR pull, SSM read)
+    - Verify environment variables in App Runner configuration
+    - Verify CloudFormation outputs
+    - _Requirements: 3.1, 4.1, 4.2, 4.3, 5.2, 5.3, 8.2_
+
+- [ ] 7. Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 8. Create GitHub Actions deploy workflow
+  - [ ] 8.1 Write `.github/workflows/deploy.yml`
+    - Triggers: push to `main`, `workflow_dispatch`
+    - Job 1 (test): checkout, setup Node.js 20, `npm ci` in `konductor/`, `npm test` in `konductor/`
+    - Job 2 (deploy, needs test): checkout, configure AWS credentials from secrets, login to ECR, build Docker image (context: repo root, dockerfile: konductor/Dockerfile), tag with git SHA + `latest`, push to ECR, trigger App Runner deployment via `aws apprunner start-deployment`
+    - Use secrets: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_ACCOUNT_ID`
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
+
+- [ ] 9. Write infrastructure README
+  - [ ] 9.1 Create `infra/README.md` with deployment documentation
+    - Prerequisites: AWS CLI, Node.js 20, npm
+    - SSM parameter creation commands
+    - CDK bootstrap and deploy commands
+    - Example MCP client configuration pointing at App Runner HTTPS URL
+    - Example npx installer command pointing at App Runner HTTPS URL
+    - Client bundle lifecycle documentation
+    - Deployment checklist: AWS CLI setup, SSM secrets, CDK bootstrap, CDK deploy, health check, client config
+    - _Requirements: 2.4, 5.5, 7.1, 7.2, 7.3, 10.3_
+
+- [ ] 10. Final Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.

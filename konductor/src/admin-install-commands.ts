@@ -34,11 +34,18 @@ export interface InstallCommandData {
 
 /**
  * Build a single install command string.
- * Format: npx <serverUrl>/bundle/installer-<channel>.tgz --server <serverUrl> --api-key YOUR_API_KEY
+ * Format: npx <serverUrl>/bundle/installer-<channel>.tgz --server <serverUrl> --api-key <key>
+ * When apiKey is provided, it replaces the placeholder so admins can copy-paste directly.
+ * When wrapStrictSsl is true, wraps with npm strict-ssl disable/enable for mkcert HTTPS.
  */
-export function buildSingleCommand(serverUrl: string, channel: ChannelName): string {
+export function buildSingleCommand(serverUrl: string, channel: ChannelName, apiKey?: string, wrapStrictSsl?: boolean): string {
   const base = serverUrl.replace(/\/+$/, "");
-  return `npx ${base}/bundle/installer-${channel}.tgz --server ${base} --api-key YOUR_API_KEY`;
+  const key = apiKey || "YOUR_API_KEY";
+  const core = `npx ${base}/bundle/installer-${channel}.tgz --server ${base} --api-key ${key}`;
+  if (wrapStrictSsl) {
+    return `npm config set strict-ssl false && ${core}; npm config set strict-ssl true`;
+  }
+  return core;
 }
 
 /**
@@ -70,12 +77,14 @@ export function getNetworkIp(): string | null {
  * @param protocol        "http" or "https"
  * @param defaultChannel  The global default channel
  * @param externalUrl     KONDUCTOR_EXTERNAL_URL env var value (cloud mode when set)
+ * @param apiKey          Server API key to embed in commands (replaces YOUR_API_KEY placeholder)
  */
 export function buildInstallCommands(
   port: number,
   protocol: "http" | "https",
   defaultChannel: ChannelName,
   externalUrl?: string,
+  apiKey?: string,
 ): InstallCommandData {
   const isCloud = !!externalUrl;
   const mode: "local" | "cloud" = isCloud ? "cloud" : "local";
@@ -85,7 +94,7 @@ export function buildInstallCommands(
       const cloudBase = externalUrl!.replace(/\/+$/, "");
       return {
         channel,
-        cloudCommand: buildSingleCommand(cloudBase, channel),
+        cloudCommand: buildSingleCommand(cloudBase, channel, apiKey),
       };
     }
 
@@ -96,10 +105,13 @@ export function buildInstallCommands(
       ? `${protocol}://${networkIp}:${port}`
       : localUrl; // fallback to localhost if no network IP
 
+    // HTTPS with mkcert needs strict-ssl workaround for npx
+    const needsStrictSsl = protocol === "https";
+
     return {
       channel,
-      localCommand: buildSingleCommand(localUrl, channel),
-      remoteCommand: buildSingleCommand(remoteUrl, channel),
+      localCommand: buildSingleCommand(localUrl, channel, apiKey, needsStrictSsl),
+      remoteCommand: buildSingleCommand(remoteUrl, channel, apiKey, needsStrictSsl),
     };
   });
 

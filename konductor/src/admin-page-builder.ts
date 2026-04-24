@@ -284,7 +284,7 @@ function buildUserManagementPanel(): string {
         <option value="dev">Dev</option>
         <option value="uat">UAT</option>
         <option value="prod">Prod</option>
-        <option value="default">Default</option>
+        <option value="default">None</option>
       </select>
       <select id="user-filter-admin" onchange="renderUsers()">
         <option value="">All Roles</option>
@@ -299,12 +299,16 @@ function buildUserManagementPanel(): string {
           <tr>
             <th onclick="sortUsers(0)">Username <span class="sort-arrow" id="sort-0"></span></th>
             <th onclick="sortUsers(1)">Last Seen <span class="sort-arrow" id="sort-1"></span></th>
-            <th onclick="sortUsers(2)">Channel Override <span class="sort-arrow" id="sort-2"></span></th>
-            <th onclick="sortUsers(3)">Admin <span class="sort-arrow" id="sort-3"></span></th>
+            <th onclick="sortUsers(2)">Bundle Version <span class="sort-arrow" id="sort-2"></span></th>
+            <th onclick="sortUsers(3)">Last Repo <span class="sort-arrow" id="sort-3"></span></th>
+            <th onclick="sortUsers(4)">Last Branch <span class="sort-arrow" id="sort-4"></span></th>
+            <th onclick="sortUsers(5)">IP Address <span class="sort-arrow" id="sort-5"></span></th>
+            <th onclick="sortUsers(6)">Channel Override <span class="sort-arrow" id="sort-6"></span></th>
+            <th onclick="sortUsers(7)">Admin <span class="sort-arrow" id="sort-7"></span></th>
           </tr>
         </thead>
         <tbody id="users-body">
-          <tr><td colspan="4" class="empty-state">Loading users…</td></tr>
+          <tr><td colspan="8" class="empty-state">Loading users…</td></tr>
         </tbody>
       </table>
     </div>
@@ -1117,7 +1121,7 @@ function buildAdminScript(): string {
     });
 
     // Sort
-    var sortKeys = ["userId", "lastSeen", "installerChannel", "admin"];
+    var sortKeys = ["userId", "lastSeen", "clientVersion", "lastRepo", "lastBranch", "ipAddress", "installerChannel", "admin"];
     var key = sortKeys[userSort.col] || "userId";
     filtered.sort(function(a, b) {
       var va = a[key] || "";
@@ -1131,13 +1135,13 @@ function buildAdminScript(): string {
     if (countEl) countEl.textContent = users.length + " users";
 
     // Update sort arrows
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 8; i++) {
       var arrow = document.getElementById("sort-" + i);
       if (arrow) arrow.textContent = userSort.col === i ? (userSort.asc ? "▲" : "▼") : "";
     }
 
     if (filtered.length === 0) {
-      body.innerHTML = '<tr><td colspan="4" class="empty-state">No users found</td></tr>';
+      body.innerHTML = '<tr><td colspan="8" class="empty-state">No users found</td></tr>';
       return;
     }
 
@@ -1145,11 +1149,15 @@ function buildAdminScript(): string {
     filtered.forEach(function(u) {
       var userLink = '<a class="user-link" href="https://github.com/' + esc(u.userId) + '" target="_blank">' + esc(u.userId) + '</a>';
       var lastSeen = u.lastSeen ? fmtTs(u.lastSeen) : "Never";
+      var version = u.clientVersion ? esc(u.clientVersion) : '<span style="color:#666">—</span>';
+      var lastRepo = u.lastRepo ? esc(u.lastRepo) : '<span style="color:#666">—</span>';
+      var lastBranch = u.lastBranch ? esc(u.lastBranch) : '<span style="color:#666">—</span>';
+      var ip = u.ipAddress ? esc(u.ipAddress) : '<span style="color:#666">—</span>';
 
       // Channel dropdown
       var channelVal = u.installerChannel || "";
       var channelHtml = '<select onchange="updateUserChannel(\\'' + esc(u.userId) + '\\', this.value)">' +
-        '<option value=""' + (!channelVal ? " selected" : "") + '>Default</option>' +
+        '<option value=""' + (!channelVal ? " selected" : "") + '>None</option>' +
         '<option value="latest"' + (channelVal === "latest" ? " selected" : "") + '>Latest</option>' +
         '<option value="dev"' + (channelVal === "dev" ? " selected" : "") + '>Dev</option>' +
         '<option value="uat"' + (channelVal === "uat" ? " selected" : "") + '>UAT</option>' +
@@ -1165,7 +1173,7 @@ function buildAdminScript(): string {
           ' onchange="updateUserAdmin(\\'' + esc(u.userId) + '\\', this.checked)">';
       }
 
-      html += '<tr><td>' + userLink + '</td><td>' + esc(lastSeen) + '</td><td>' + channelHtml + '</td><td>' + adminHtml + '</td></tr>';
+      html += '<tr><td>' + userLink + '</td><td>' + esc(lastSeen) + '</td><td>' + version + '</td><td>' + lastRepo + '</td><td>' + lastBranch + '</td><td>' + ip + '</td><td>' + channelHtml + '</td><td>' + adminHtml + '</td></tr>';
     });
     body.innerHTML = html;
   };

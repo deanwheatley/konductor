@@ -141,11 +141,15 @@ export class MemoryHistoryStore implements ISessionHistoryStore {
 
   // ── User Records ──────────────────────────────────────────────────
 
-  async upsertUser(userId: string, repo: string): Promise<void> {
+  async upsertUser(userId: string, repo: string, extras?: { branch?: string; clientVersion?: string; ipAddress?: string }): Promise<void> {
     const now = new Date().toISOString();
     const existing = this.users.get(userId);
     if (existing) {
       existing.lastSeen = now;
+      if (extras?.clientVersion) existing.clientVersion = extras.clientVersion;
+      if (extras?.branch) existing.lastBranch = extras.branch;
+      if (extras?.ipAddress) existing.ipAddress = extras.ipAddress;
+      existing.lastRepo = repo;
       const repoEntry = existing.reposAccessed.find(r => r.repo === repo);
       if (repoEntry) {
         repoEntry.lastAccessed = now;
@@ -163,6 +167,10 @@ export class MemoryHistoryStore implements ISessionHistoryStore {
         admin: isFirstUser,
         installerChannel: null,
         settings: {},
+        clientVersion: extras?.clientVersion ?? null,
+        lastRepo: repo,
+        lastBranch: extras?.branch ?? null,
+        ipAddress: extras?.ipAddress ?? null,
       });
     }
   }

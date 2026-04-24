@@ -126,10 +126,11 @@ export interface QueryLogEntry {
   id: string;                       // UUID
   repo: string;                     // "owner/repo"
   timestamp: string;                // ISO 8601
-  userId: string;                   // Who made the query
+  userId: string;                   // Who triggered the activity
   branch: string;                   // Branch the user is on
-  queryType: string;                // Tool name: who_is_active, who_overlaps, etc.
+  queryType: string;                // Activity type: "session", "query", "collision", "files_changed", etc.
   parameters: Record<string, unknown>;
+  summary?: string;                 // Human-readable description of the activity
 }
 
 // ---------------------------------------------------------------------------
@@ -179,7 +180,7 @@ export type BatonEvent =
   | { type: "admin_settings_change"; repo: string; data: { key: string; value: unknown; category: string } }
   | { type: "admin_user_change"; repo: string; data: { userId: string; changes: Record<string, unknown> } }
   | { type: "admin_channel_change"; repo: string; data: { channel: string; action: "promote" | "rollback" | "upload" | "assign" | "stale"; version?: string; deletedVersion?: string } }
-  | { type: "bundle_change"; repo: string; data: { action: "delete"; version: string; staleChannels: string[] } }
+  | { type: "bundle_change"; repo: string; data: { action: "delete"; version: string; staleChannels: string[] } | { action: "rescan"; added: string[]; removed: string[] } }
   | { type: "slack_config_change"; repo: string; data: SlackConfigChangeEvent }
   | { type: "collab_request_update"; repo: string; data: CollabRequest };
 

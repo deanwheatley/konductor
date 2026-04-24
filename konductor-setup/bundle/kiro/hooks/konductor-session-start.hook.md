@@ -11,11 +11,20 @@ action:
     const fs = require('fs');
     const path = require('path');
 
-    // Check if watcher is already running
-    try {
-      const r = execSync('pgrep -f konductor-watcher.mjs', {encoding:'utf-8',stdio:['pipe','pipe','pipe']});
-      if (r.trim()) { process.stderr.write('Konductor: Watcher already running.\n'); process.exit(0); }
-    } catch {}
+    // Check if watcher is already running for THIS workspace via PID file
+    const pidFile = path.resolve('.konductor-watcher.pid');
+    if (fs.existsSync(pidFile)) {
+      try {
+        const pid = parseInt(fs.readFileSync(pidFile, 'utf-8').trim(), 10);
+        if (pid > 0) {
+          process.kill(pid, 0); // signal 0 = check if process exists
+          process.stderr.write('Konductor: Watcher already running.\n');
+          process.exit(0);
+        }
+      } catch {
+        // PID file exists but process is dead — stale PID, continue to relaunch
+      }
+    }
 
     // Find the watcher script
     const wp = path.resolve('konductor-watcher.mjs');

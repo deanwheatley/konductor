@@ -491,6 +491,101 @@ curl -sk https://localhost:3010/health
 
 Leave this running in a terminal (or use a process manager like `pm2`). Teammates connect their MCP clients to this instance.
 
+## GitHub Integration
+
+The Konductor can poll the GitHub API for open pull requests and recent commits, creating passive sessions that participate in collision detection alongside active user sessions. This powers the "Open PRs" and "Repo History" panels on the Baton dashboard and enables PR-based collision warnings.
+
+### Prerequisites
+
+You need a GitHub Personal Access Token (PAT). This is **not** the same as an SSH key — SSH keys authenticate git operations, while a PAT authenticates REST API calls.
+
+**Creating a token:**
+
+1. Go to https://github.com/settings/tokens
+2. Click **Generate new token** → **Fine-grained token** (recommended)
+3. Set a name (e.g. "Konductor") and expiration
+4. Under **Repository access**, select the repos you want to monitor (or "All repositories")
+5. Under **Permissions**, grant:
+   - **Pull requests**: Read
+   - **Contents**: Read
+6. Click **Generate token** and copy it (starts with `github_pat_`)
+
+Alternatively, create a **Classic token** with the `repo` scope (or `public_repo` for public repos only).
+
+### Configuration
+
+Two things are needed: the token in `.env.local` and the repo list in `konductor.yaml`.
+
+**1. Add the token to `.env.local`:**
+
+```bash
+GITHUB_TOKEN=github_pat_your_token_here
+```
+
+**2. Add the `github` section to `konductor.yaml`:**
+
+```yaml
+github:
+  token_env: GITHUB_TOKEN
+  poll_interval_seconds: 60
+  include_drafts: true
+  commit_lookback_hours: 24
+  repositories:
+    - repo: "owner/repo-name"
+    - repo: "owner/another-repo"
+```
+
+Replace `owner/repo-name` with the actual `owner/repo` format for each repository you want to monitor.
+
+### Configuration Options
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `token_env` | `GITHUB_TOKEN` | Name of the environment variable holding the PAT |
+| `poll_interval_seconds` | `60` | How often to poll GitHub for changes (seconds) |
+| `include_drafts` | `true` | Whether to create sessions for draft PRs |
+| `commit_lookback_hours` | `24` | How far back to look for recent commits |
+| `repositories` | *(required)* | List of repos to monitor in `owner/repo` format |
+
+Each repository entry can optionally specify which branches to poll for commits:
+
+```yaml
+repositories:
+  - repo: "myorg/myapp"
+    commit_branches:
+      - main
+      - develop
+```
+
+If `commit_branches` is omitted, all branches are polled.
+
+### Hot-Reload
+
+The `konductor.yaml` file is watched for changes. When you add, remove, or modify the `github` section, the pollers restart automatically — no server restart needed.
+
+However, changes to `.env.local` (like adding or changing `GITHUB_TOKEN`) require a server restart since environment variables are read at process startup.
+
+### What It Does
+
+Once configured, the GitHub poller:
+
+- Fetches all open PRs for each configured repository every `poll_interval_seconds`
+- Creates passive sessions for each PR (author, branch, changed files, review status)
+- Detects when PRs are closed/merged and removes their sessions
+- Suppresses self-collision: if a PR author also has an active Konductor session, the PR session is skipped to avoid false positives
+- Tracks approval status so the Baton dashboard can flag approved PRs as high-priority collision risks
+- Emits SSE events so the Baton dashboard updates in real time
+
+### Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| "Open PRs" panel shows "No open PRs" | Check that `konductor.yaml` has a `github` section and `GITHUB_TOKEN` is set in `.env.local`. Restart the server after adding the token. |
+| GitHub API returns 401 | Token is invalid or expired. Generate a new one. |
+| GitHub API returns 403 | Token doesn't have the required permissions, or rate limit exceeded. Check token scopes and the server log for rate limit warnings. |
+| PRs not updating | Check the server log for `[GITHUB]` entries. The poller logs each poll cycle with the number of PRs found. |
+| Token starts with `ghp_` vs `github_pat_` | Both work. `ghp_` is a classic token, `github_pat_` is a fine-grained token. Fine-grained is recommended for least-privilege access. |
+
 ## Baton Dashboard (Per-Repo Page)
 
 The Konductor Baton is a web dashboard that gives each repository its own dedicated page with real-time visibility into concurrent development activity. When running in SSE mode, the Baton is served on the same HTTP port as the MCP transport — no extra setup required.

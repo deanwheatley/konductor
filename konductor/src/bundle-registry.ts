@@ -8,7 +8,7 @@
  */
 
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync, statSync, existsSync, mkdirSync, unlinkSync } from "node:fs";
+import { readFileSync, readdirSync, statSync, existsSync, mkdirSync, unlinkSync, watch, type FSWatcher } from "node:fs";
 import { join } from "node:path";
 import { gunzipSync } from "node:zlib";
 
@@ -187,9 +187,21 @@ export interface LogFn {
 export class BundleRegistry {
   private readonly bundles = new Map<string, { metadata: BundleMetadata; tarball: Buffer }>();
   private readonly log: LogFn | undefined;
+  private watcher: FSWatcher | null = null;
+  private watchedDir: string | null = null;
+  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private onChange: ((added: string[], removed: string[]) => void) | null = null;
 
   constructor(log?: LogFn) {
     this.log = log;
+  }
+
+  /**
+   * Register a callback invoked when the registry changes due to fs watch or rescan.
+   * The callback receives arrays of added and removed version strings.
+   */
+  onRegistryChange(cb: (added: string[], removed: string[]) => void): void {
+    this.onChange = cb;
   }
 
   /**
@@ -197,6 +209,8 @@ export class BundleRegistry {
    * Creates the directory if it doesn't exist (Requirement 1.4).
    */
   async scanLocalStore(dir: string): Promise<void> {
+    this.watchedDir = dir;
+
     // Create directory if missing (Requirement 1.4)
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true });
@@ -204,7 +218,7 @@ export class BundleRegistry {
         "SERVER",
         `Bundle registry: created ${dir}/ — place installer bundles here.\n` +
         `  Naming convention: installer-<semver>.tgz (e.g. installer-1.0.0.tgz, installer-2.1.0-beta.1.tgz)\n` +
-        `  The server will discover bundles on next restart.`,
+        `  New bundles will be detected automatically.`,
       );
       return;
     }
@@ -275,6 +289,132 @@ export class BundleRegistry {
 
       // Log discovery (Requirement 1.6)
       this.log?.("SERVER", `Bundle registry: discovered v${versionFromFilename} (${(tgzBuffer.length / 1024).toFixed(0)} KB, created ${metadata.createdAt.slice(0, 10)})`);
+    }
+  }
+
+  /**
+   * Rescan the watched directory for new or removed bundles.
+   * Returns arrays of added and removed version strings.
+   * Safe to call even if no directory was previously scanned.
+   */
+  async rescan(): Promise<{ added: string[]; removed: string[] }> {
+    if (!this.watchedDir) return { added: [], removed: [] };
+    const dir = this.watchedDir;
+
+    if (!existsSync(dir)) return { added: [], removed: [] };
+
+    const added: string[] = [];
+    const removed: string[] = [];
+
+    // Detect files currently on disk
+    const filesOnDisk = new Set<string>();
+    const tgzFiles = readdirSync(dir).filter((f) => f.endsWith(".tgz"));
+    for (const file of tgzFiles) {
+      const match = file.match(/^installer-(.+)\.tgz$/);
+      if (!match) continue;
+      const ver = match[1];
+      if (["dev", "uat", "prod"].includes(ver)) continue;
+      if (!isValidSemver(ver)) continue;
+      filesOnDisk.add(ver);
+    }
+
+    // Detect removed bundles (in registry but no longer on disk)
+    for (const ver of this.bundles.keys()) {
+      if (!filesOnDisk.has(ver)) {
+        this.bundles.delete(ver);
+        removed.push(ver);
+        this.log?.("SERVER", `Bundle registry: v${ver} removed (file no longer on disk)`);
+      }
+    }
+
+    // Detect new bundles (on disk but not in registry)
+    for (const file of tgzFiles) {
+      const match = file.match(/^installer-(.+)\.tgz$/);
+      if (!match) continue;
+      const ver = match[1];
+      if (["dev", "uat", "prod"].includes(ver)) continue;
+      if (!isValidSemver(ver)) continue;
+      if (this.bundles.has(ver)) continue;
+
+      const filePath = join(dir, file);
+      let tgzBuffer: Buffer;
+      try {
+        tgzBuffer = readFileSync(filePath);
+      } catch {
+        continue; // file may be mid-write
+      }
+
+      // Skip empty/partial files (still being copied)
+      if (tgzBuffer.length === 0) continue;
+
+      const manifest = extractManifestFromTgz(tgzBuffer);
+      let stat;
+      try { stat = statSync(filePath); } catch { continue; }
+
+      const metadata: BundleMetadata = {
+        version: manifest?.version ?? ver,
+        createdAt: manifest?.createdAt ?? stat.mtime.toISOString(),
+        author: manifest?.author ?? "unknown",
+        summary: manifest?.summary ?? "",
+        hash: createHash("sha256").update(tgzBuffer).digest("hex"),
+        fileSize: tgzBuffer.length,
+        filePath,
+        channels: [],
+      };
+
+      this.bundles.set(ver, { metadata, tarball: tgzBuffer });
+      added.push(ver);
+      this.log?.("SERVER", `Bundle registry: discovered v${ver} (${(tgzBuffer.length / 1024).toFixed(0)} KB, created ${metadata.createdAt.slice(0, 10)})`);
+    }
+
+    if (added.length > 0 || removed.length > 0) {
+      this.onChange?.(added, removed);
+    }
+
+    return { added, removed };
+  }
+
+  /**
+   * Start watching the local store directory for changes.
+   * Debounces filesystem events and triggers a rescan.
+   */
+  watchLocalStore(dir: string): void {
+    this.watchedDir = dir;
+
+    if (!existsSync(dir)) return;
+
+    try {
+      this.watcher = watch(dir, (_eventType, filename) => {
+        // Only care about .tgz files
+        if (!filename || !filename.endsWith(".tgz")) return;
+
+        // Debounce: wait 500ms after last event before rescanning.
+        // This handles large file copies that trigger multiple events.
+        if (this.debounceTimer) clearTimeout(this.debounceTimer);
+        this.debounceTimer = setTimeout(() => {
+          this.rescan().catch((err) => {
+            this.log?.("SERVER", `Bundle registry: rescan error: ${err instanceof Error ? err.message : err}`);
+          });
+        }, 500);
+      });
+
+      this.log?.("SERVER", `Bundle registry: watching ${dir}/ for new bundles`);
+    } catch (err) {
+      this.log?.("SERVER", `Bundle registry: failed to watch ${dir}/: ${err instanceof Error ? err.message : err}`);
+    }
+  }
+
+  /**
+   * Stop watching the local store directory and clean up resources.
+   */
+  stopWatching(): void {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+    if (this.watcher) {
+      this.watcher.close();
+      this.watcher = null;
     }
   }
 

@@ -85,8 +85,12 @@ import type { ChannelName, EffectiveChannel } from "./installer-channel-store.js
 import { handleAdminRoute } from "./admin-routes.js";
 import { AdminSettingsStore } from "./admin-settings-store.js";
 import { MemorySettingsBackend } from "./settings-store.js";
+import { FileSettingsBackend } from "./file-settings-backend.js";
 import { parseKonductorAdmins } from "./admin-auth.js";
 import { SlackSettingsManager, validateChannelName, validateVerbosity } from "./slack-settings.js";
+import { formatLineRanges } from "./line-range-formatter.js";
+import { LocalPersistence } from "./local-persistence.js";
+import { S3Persistence } from "./s3-persistence.js";
 import { SlackNotifier } from "./slack-notifier.js";
 import { SlackStateTracker } from "./slack-state-tracker.js";
 import { SlackDebouncer } from "./slack-debouncer.js";
@@ -260,6 +264,81 @@ export function buildOpenPRs(sessions: WorkSession[]): OpenPREntry[] {
   return entries;
 }
 
+// ---------------------------------------------------------------------------
+// Collision activity log summary builder
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a human-readable collision summary for the Baton activity log.
+ *
+ * Examples:
+ *   "Collision detected. Proximity with bob on src/utils.ts — different sections (your lines 1-10, their lines 20-30)."
+ *   "Collision detected. Collision course with bob on src/index.ts — same lines (lines 5-15). High merge conflict risk."
+ *   "Neighbors with alice — different files."
+ *   "Crossroads with carol — same directories."
+ */
+export function buildCollisionSummary(result: CollisionResult, userId: string): string {
+  const stateLabel = result.state.replace(/_/g, " ");
+  const overlappingUsers = [...new Set(result.overlappingSessions.map((s) => s.userId))];
+  const userList = overlappingUsers.join(", ");
+
+  // Neighbors: no shared files, just different files in same repo
+  if (result.state === "neighbors") {
+    return `Neighbors with ${userList} — different files.`;
+  }
+
+  // Crossroads: same directories but different files
+  if (result.state === "crossroads") {
+    const dirs = result.sharedDirectories.length > 0
+      ? result.sharedDirectories.slice(0, 3).join(", ") + (result.sharedDirectories.length > 3 ? ` +${result.sharedDirectories.length - 3} more` : "")
+      : "shared directories";
+    return `Crossroads with ${userList} in ${dirs}.`;
+  }
+
+  // For proximity, collision_course, merge_hell — include file and line details
+  const sharedFiles = result.sharedFiles.length > 0 ? result.sharedFiles : [];
+  const fileDisplay = sharedFiles.length > 0
+    ? sharedFiles.slice(0, 3).join(", ") + (sharedFiles.length > 3 ? ` +${sharedFiles.length - 3} more` : "")
+    : "shared files";
+
+  let summary = `Collision detected. ${stateLabel.charAt(0).toUpperCase() + stateLabel.slice(1)} with ${userList} on ${fileDisplay}`;
+
+  // Add line-level context from overlapping details
+  const lineContextParts: string[] = [];
+  for (const detail of result.overlappingDetails) {
+    if (!detail.lineOverlapDetails || detail.lineOverlapDetails.length === 0) continue;
+    for (const lod of detail.lineOverlapDetails) {
+      if (lod.lineOverlap === true) {
+        const overlappingRanges = formatLineRanges(lod.userRanges);
+        const otherRanges = formatLineRanges(lod.otherRanges);
+        lineContextParts.push(`${lod.file}: same lines (your ${overlappingRanges}, their ${otherRanges})`);
+      } else if (lod.lineOverlap === false) {
+        const userRanges = formatLineRanges(lod.userRanges);
+        const otherRanges = formatLineRanges(lod.otherRanges);
+        lineContextParts.push(`${lod.file}: different sections (your ${userRanges}, their ${otherRanges})`);
+      }
+    }
+  }
+
+  if (lineContextParts.length > 0) {
+    const maxParts = 3;
+    const displayed = lineContextParts.slice(0, maxParts);
+    const extra = lineContextParts.length > maxParts ? ` +${lineContextParts.length - maxParts} more` : "";
+    summary += ` — ${displayed.join("; ")}${extra}`;
+  }
+
+  // Add severity context
+  if (result.overlapSeverity === "severe") {
+    summary += ". High merge conflict risk.";
+  } else if (result.overlapSeverity === "minimal") {
+    summary += ". Minor overlap — likely a quick merge resolution.";
+  } else {
+    summary += ".";
+  }
+
+  return summary;
+}
+
 function validateRepo(repo: string): string | null {
   if (!REPO_REGEX.test(repo)) {
     return `Invalid repo format "${repo}": expected "owner/repo"`;
@@ -304,13 +383,16 @@ export async function createComponents(configPath?: string, sessionsPath?: strin
   const queryLogStore = new QueryLogStore();
   const batonEventEmitter = new BatonEventEmitter();
 
+  // History store — must be created before GitHub pollers so they can upsert PR authors
+  const historyStore = new MemoryHistoryStore();
+
   // GitHub pollers — instantiate only when config is present (Req 5.1, 5.2)
   let githubPoller: GitHubPoller | undefined;
   let commitPoller: CommitPoller | undefined;
 
   const ghConfig = configManager.getGitHubConfig();
   if (ghConfig) {
-    githubPoller = new GitHubPoller(ghConfig, sessionManager, logger, undefined, batonEventEmitter);
+    githubPoller = new GitHubPoller(ghConfig, sessionManager, logger, undefined, batonEventEmitter, historyStore);
     commitPoller = new CommitPoller(ghConfig, sessionManager, logger);
   }
 
@@ -325,7 +407,7 @@ export async function createComponents(configPath?: string, sessionsPath?: strin
       if (githubPoller) {
         githubPoller.updateConfig(newGhConfig);
       } else {
-        githubPoller = new GitHubPoller(newGhConfig, sessionManager, logger, undefined, batonEventEmitter);
+        githubPoller = new GitHubPoller(newGhConfig, sessionManager, logger, undefined, batonEventEmitter, historyStore);
         githubPoller.start();
       }
       if (commitPoller) {
@@ -383,6 +465,18 @@ export async function createComponents(configPath?: string, sessionsPath?: strin
       logger.logSystem("SERVER", `Bundle registry: ${bundleRegistry.size} bundle(s) discovered — ${versions.join(", ")}`);
       localStoreSeeded = true;
     }
+
+    // Watch the installers/ directory for new bundles — no restart required
+    bundleRegistry.onRegistryChange((added, removed) => {
+      if (added.length > 0 || removed.length > 0) {
+        batonEventEmitter.emit({
+          type: "bundle_change",
+          repo: "__admin__",
+          data: { action: "rescan", added, removed },
+        });
+      }
+    });
+    bundleRegistry.watchLocalStore(localStoreDir);
   }
 
   // Seed Prod channel with the current installer tarball if not already seeded from local store.
@@ -427,8 +521,16 @@ export async function createComponents(configPath?: string, sessionsPath?: strin
   }
 
   // Admin settings store — wraps settings backend with JSON serialization and source tracking
-  const historyStore = new MemoryHistoryStore();
-  const adminSettingsStore = new AdminSettingsStore(historyStore as any, envOverrides);
+
+  // When running locally, persist settings to disk so Baton dashboard config survives restarts
+  const isLocal = process.env.KONDUCTOR_STARTUP_LOCAL === "true";
+  const settingsBackend = isLocal
+    ? new FileSettingsBackend(resolve(process.cwd(), "settings.json"))
+    : historyStore as any;
+  if (isLocal) {
+    logger.logSystem("SERVER", "Local mode: settings will persist to settings.json");
+  }
+  const adminSettingsStore = new AdminSettingsStore(settingsBackend, envOverrides);
 
   // History purger — periodic cleanup of expired sessions (Req 3.1–3.5)
   const historyPurger = new HistoryPurger(historyStore, logger, 30, 6);
@@ -453,7 +555,81 @@ export async function createComponents(configPath?: string, sessionsPath?: strin
   // Collaboration request store (Live Share integration — Requirements 3.1–3.11, 11.1, 11.2)
   const collabRequestStore = new CollabRequestStore();
 
-  return { configManager, sessionManager, collisionEvaluator, summaryFormatter, queryEngine, logger, notificationStore, queryLogStore, batonEventEmitter, githubPoller, commitPoller, batonAuth, installerChannelStore, adminSettingsStore, adminList, slackSettingsManager, slackNotifier, slackStateTracker, historyStore, historyPurger, bundleRegistry, collabRequestStore };
+  // Local persistence — persist Baton stores to disk when running locally
+  let localPersistence: LocalPersistence | undefined;
+  if (isLocal) {
+    localPersistence = new LocalPersistence({
+      notificationStore,
+      queryLogStore,
+      historyStore,
+      logger,
+      dataDir: process.cwd(),
+    });
+    await localPersistence.load();
+    logger.logSystem("SERVER", "Local persistence: loaded Baton data from disk");
+
+    // Hook into event emitter to trigger saves on state changes
+    batonEventEmitter.onAny((event) => {
+      switch (event.type) {
+        case "notification_added":
+        case "notification_resolved":
+          localPersistence!.saveNotifications();
+          break;
+        case "query_logged":
+          localPersistence!.saveQueryLog();
+          break;
+        case "session_change":
+        case "github_pr_change":
+          localPersistence!.saveHistoryUsers();
+          break;
+      }
+    });
+
+    // Wrap historyStore.upsertUser to trigger persistence on every call
+    // (covers check_status, register_session, and GitHub poller paths)
+    const originalUpsertUser = historyStore.upsertUser.bind(historyStore);
+    historyStore.upsertUser = async (...args: Parameters<typeof historyStore.upsertUser>) => {
+      await originalUpsertUser(...args);
+      localPersistence!.saveHistoryUsers();
+    };
+  }
+
+  // S3 persistence — persist Baton stores to S3 when running in AWS (KONDUCTOR_S3_BUCKET set)
+  let s3Persistence: S3Persistence | undefined;
+  const s3Bucket = process.env.KONDUCTOR_S3_BUCKET;
+  if (s3Bucket && !isLocal) {
+    s3Persistence = new S3Persistence({ bucketName: s3Bucket });
+    s3Persistence.setStores({ notificationStore, queryLogStore, historyStore, logger });
+    await s3Persistence.load();
+    s3Persistence.startPeriodicFlush();
+    logger.logSystem("SERVER", `S3 persistence enabled (bucket: ${s3Bucket})`);
+
+    // Hook into event emitter to mark stores dirty on state changes
+    batonEventEmitter.onAny((event) => {
+      switch (event.type) {
+        case "notification_added":
+        case "notification_resolved":
+          s3Persistence!.markDirty("notifications");
+          break;
+        case "query_logged":
+          s3Persistence!.markDirty("queryLog");
+          break;
+        case "session_change":
+        case "github_pr_change":
+          s3Persistence!.markDirty("historyUsers");
+          break;
+      }
+    });
+
+    // Wrap historyStore.upsertUser to mark dirty on every call
+    const origUpsert = historyStore.upsertUser.bind(historyStore);
+    historyStore.upsertUser = async (...args: Parameters<typeof historyStore.upsertUser>) => {
+      await origUpsert(...args);
+      s3Persistence!.markDirty("historyUsers");
+    };
+  }
+
+  return { configManager, sessionManager, collisionEvaluator, summaryFormatter, queryEngine, logger, notificationStore, queryLogStore, batonEventEmitter, githubPoller, commitPoller, batonAuth, installerChannelStore, adminSettingsStore, adminList, slackSettingsManager, slackNotifier, slackStateTracker, historyStore, historyPurger, bundleRegistry, collabRequestStore, settingsBackend, localPersistence, s3Persistence };
 }
 
 
@@ -531,6 +707,7 @@ export function buildMcpServer(deps: {
   bundleRegistry?: BundleRegistry;
   userTransportRegistry?: UserTransportRegistry;
   collabRequestStore?: CollabRequestStore;
+  adminList?: string[];
 }): McpServer {
   const { sessionManager, collisionEvaluator, summaryFormatter, configManager, queryEngine, logger, serverVersion, serverUrl, notificationStore, queryLogStore, batonEventEmitter, slackSettingsManager, slackNotifier, adminSettingsStore, installerChannelStore, collabRequestStore } = deps;
   const pkgVersion = serverVersion ?? "0.0.0";
@@ -577,7 +754,7 @@ export function buildMcpServer(deps: {
       // Record in history store and upsert user (Req 2.1, 8.1)
       if (deps.historyStore) {
         deps.historyStore.record({ sessionId: session.sessionId, userId, repo, branch, files, status: "active", createdAt: session.createdAt }).catch(() => {});
-        deps.historyStore.upsertUser(userId, repo).catch(() => {});
+        deps.historyStore.upsertUser(userId, repo, { branch, clientVersion: clientVersion ?? undefined }).catch(() => {});
       }
 
       const allSessions = await sessionManager.getActiveSessions(repo);
@@ -637,6 +814,43 @@ export function buildMcpServer(deps: {
         } catch { /* best effort */ }
       }
 
+      // Baton: log session registration as activity
+      if (queryLogStore) {
+        const fileList = files.length <= 3 ? files.join(", ") : `${files.slice(0, 3).join(", ")} +${files.length - 3} more`;
+        const sessionEntry = {
+          id: randomUUID(),
+          repo,
+          timestamp: new Date().toISOString(),
+          userId,
+          branch,
+          queryType: "session",
+          parameters: { files: files.length, fileList: files },
+          summary: `Registered with ${files.length} file${files.length !== 1 ? "s" : ""}: ${fileList}`,
+        };
+        queryLogStore.add(sessionEntry);
+        if (batonEventEmitter) {
+          batonEventEmitter.emit({ type: "query_logged", repo, data: sessionEntry });
+        }
+        // Log collision as separate activity entry
+        if (result.state !== "solo") {
+          const overlappingUsers = result.overlappingSessions.map((s) => s.userId);
+          const collisionEntry = {
+            id: randomUUID(),
+            repo,
+            timestamp: new Date().toISOString(),
+            userId,
+            branch,
+            queryType: "collision",
+            parameters: { state: result.state, sharedFiles: result.sharedFiles, overlapping: overlappingUsers },
+            summary: buildCollisionSummary(result, userId),
+          };
+          queryLogStore.add(collisionEntry);
+          if (batonEventEmitter) {
+            batonEventEmitter.emit({ type: "query_logged", repo, data: collisionEntry });
+          }
+        }
+      }
+
       // Slack: notify if collision state meets verbosity threshold (Requirement 1.1, 1.2)
       if (slackNotifier) {
         slackNotifier.onCollisionEvaluated(repo, result, userId).catch(() => { /* best effort — never block */ });
@@ -661,6 +875,20 @@ export function buildMcpServer(deps: {
         try {
           const parsed = new URL(serverUrl);
           responsePayload.repoPageUrl = buildRepoPageUrl(parsed.hostname, parseInt(parsed.port, 10), repo);
+          // Include admin page URL if user is an admin
+          const envAdminList = deps.adminList ?? [];
+          const isEnvAdmin = envAdminList.includes(userId.toLowerCase());
+          let isDbAdmin = false;
+          if (!isEnvAdmin && deps.historyStore) {
+            try {
+              const userRecord = await deps.historyStore.getUser(userId);
+              if (userRecord?.admin) isDbAdmin = true;
+            } catch { /* best effort */ }
+          }
+          if (isEnvAdmin || isDbAdmin) {
+            responsePayload.adminPageUrl = `${parsed.protocol}//${parsed.hostname}:${parsed.port}/admin`;
+            responsePayload.isAdmin = true;
+          }
         } catch { /* best effort — skip if serverUrl is malformed */ }
       }
 
@@ -668,9 +896,11 @@ export function buildMcpServer(deps: {
       // When user's effective channel is "latest", compare against the latest bundle's version
       // instead of the server's package version (Requirement 8.3 — latest users get updateRequired
       // when a new bundle is added to the registry).
+      // When the channel store exists but no version is assigned to the user's channel, skip the
+      // update check entirely — there's nothing to update to.
       const effectiveChannelVersion = await getEffectiveChannelVersion(userId, deps.historyStore, adminSettingsStore, installerChannelStore, deps.bundleRegistry);
-      const versionToCompare = effectiveChannelVersion ?? pkgVersion;
-      const versionCheck = compareVersions(clientVersion, versionToCompare);
+      const versionToCompare = installerChannelStore ? effectiveChannelVersion : (effectiveChannelVersion ?? pkgVersion);
+      const versionCheck = versionToCompare ? compareVersions(clientVersion, versionToCompare) : "current";
       if (versionCheck === "outdated") {
         responsePayload.updateRequired = true;
         responsePayload.serverVersion = versionToCompare;
@@ -758,6 +988,19 @@ export function buildMcpServer(deps: {
       // Find the user's existing session (if any)
       const existingSession = allSessions.find((s) => s.userId === userId);
 
+      // Refresh heartbeat if user has an active session — keeps the session
+      // alive while the file watcher is polling with check_status
+      if (existingSession) {
+        try {
+          await sessionManager.heartbeat(existingSession.sessionId);
+        } catch { /* best effort — session may have been cleaned up between find and heartbeat */ }
+      }
+
+      // Ensure user appears in admin panel even if they only call check_status
+      if (deps.historyStore) {
+        deps.historyStore.upsertUser(userId, repo, { branch: existingSession?.branch }).catch(() => {});
+      }
+
       if (!existingSession && (!files || files.length === 0)) {
         return {
           content: [{
@@ -811,13 +1054,26 @@ export function buildMcpServer(deps: {
       };
 
       // Append version check if clientVersion provided (Requirement 6.5)
-      const versionCheck = compareVersions(clientVersion, pkgVersion);
+      // Use channel-aware version resolution (Bug B2 fix — was using pkgVersion)
+      const effectiveChannelVersionForStatus = installerChannelStore
+        ? await getEffectiveChannelVersion(userId, deps.historyStore, adminSettingsStore, installerChannelStore, deps.bundleRegistry)
+        : null;
+      const versionToCompareForStatus = installerChannelStore ? effectiveChannelVersionForStatus : (effectiveChannelVersionForStatus ?? pkgVersion);
+      const versionCheck = versionToCompareForStatus ? compareVersions(clientVersion, versionToCompareForStatus) : "current";
       if (versionCheck === "outdated") {
         statusPayload.updateRequired = true;
-        statusPayload.serverVersion = pkgVersion;
+        statusPayload.serverVersion = versionToCompareForStatus;
         if (serverUrl) {
-          const defaultCh = adminSettingsStore ? await adminSettingsStore.get("defaultChannel") as string | null : null;
-          statusPayload.updateUrl = buildChannelUpdateUrl(serverUrl, defaultCh);
+          let userEffectiveChannel: string | null = null;
+          if (deps.historyStore) {
+            try {
+              const userRecord = await deps.historyStore.getUser(userId);
+              if (userRecord?.installerChannel && VALID_CHANNEL_OVERRIDES.includes(userRecord.installerChannel)) {
+                userEffectiveChannel = userRecord.installerChannel;
+              }
+            } catch { /* best effort */ }
+          }
+          statusPayload.updateUrl = buildChannelUpdateUrl(serverUrl, userEffectiveChannel ?? (adminSettingsStore ? await adminSettingsStore.get("defaultChannel") as string | null : null));
         }
       }
 
@@ -826,6 +1082,20 @@ export function buildMcpServer(deps: {
         try {
           const parsed = new URL(serverUrl);
           statusPayload.repoPageUrl = buildRepoPageUrl(parsed.hostname, parseInt(parsed.port, 10), repo);
+          // Include admin page URL if user is an admin
+          const envAdminList = deps.adminList ?? [];
+          const isEnvAdmin = envAdminList.includes(userId.toLowerCase());
+          let isDbAdmin = false;
+          if (!isEnvAdmin && deps.historyStore) {
+            try {
+              const userRecord = await deps.historyStore.getUser(userId);
+              if (userRecord?.admin) isDbAdmin = true;
+            } catch { /* best effort */ }
+          }
+          if (isEnvAdmin || isDbAdmin) {
+            statusPayload.adminPageUrl = `${parsed.protocol}//${parsed.hostname}:${parsed.port}/admin`;
+            statusPayload.isAdmin = true;
+          }
         } catch { /* best effort — skip if serverUrl is malformed */ }
       }
 
@@ -1126,11 +1396,29 @@ export function buildMcpServer(deps: {
       clientVersion: z.string().min(1).describe("Client version string (semver)"),
     },
     async ({ clientVersion }) => {
-      const status = compareVersions(clientVersion, pkgVersion);
+      // Use channel-aware version resolution when available (Bug B3 fix — was using pkgVersion)
+      // client_update_check doesn't have userId, so use global default channel only
+      let versionToCompare: string | null = pkgVersion;
+      if (installerChannelStore) {
+        const globalDefault = adminSettingsStore ? await adminSettingsStore.get("defaultChannel") as string | null : null;
+        const effectiveCh = resolveEffectiveChannel(null, (globalDefault ?? "prod") as ChannelName);
+        if (effectiveCh === "latest") {
+          if (deps.bundleRegistry && deps.bundleRegistry.size > 0) {
+            const latest = deps.bundleRegistry.getLatest();
+            versionToCompare = latest?.metadata.version ?? null;
+          } else {
+            versionToCompare = null;
+          }
+        } else {
+          const metadata = await installerChannelStore.getMetadata(effectiveCh);
+          versionToCompare = (metadata && !metadata.version.startsWith("__stale__")) ? metadata.version : null;
+        }
+      }
+      const status = versionToCompare ? compareVersions(clientVersion, versionToCompare) : "current";
       const url = serverUrl ?? "http://localhost:3010";
       const result: Record<string, unknown> = {
         clientVersion,
-        serverVersion: pkgVersion,
+        serverVersion: versionToCompare ?? pkgVersion,
         status,
       };
       if (status === "outdated") {
@@ -1640,6 +1928,33 @@ export function startSseServer(
   const transports = new Map<string, SSEServerTransport>();
   const userTransportRegistry = new UserTransportRegistry();
 
+  // Persistent mapping of short repo names → full "owner/repo" strings.
+  // Populated on every session registration so that Baton dashboard lookups
+  // work even after all sessions have expired (fixes empty tables issue).
+  const repoNameCache = new Map<string, string>();
+
+  // Seed the cache from any sessions that already exist at startup (including stale)
+  if (deps?.sessionManager) {
+    for (const repo of deps.sessionManager.getKnownRepos()) {
+      const short = extractRepoName(repo);
+      repoNameCache.set(short, repo);
+    }
+  }
+  // Also seed from notification store (notifications persist after sessions expire)
+  if (deps?.notificationStore) {
+    for (const repo of deps.notificationStore.getKnownRepos()) {
+      const short = extractRepoName(repo);
+      repoNameCache.set(short, repo);
+    }
+  }
+  // Also seed from query log store
+  if (deps?.queryLogStore) {
+    for (const repo of deps.queryLogStore.getKnownRepos()) {
+      const short = extractRepoName(repo);
+      repoNameCache.set(short, repo);
+    }
+  }
+
   // Build bundle manifest once at startup
   const bundleDir = resolve(process.cwd(), "konductor_bundle");
   const pkgJsonPath = resolve(process.cwd(), "package.json");
@@ -1652,7 +1967,7 @@ export function startSseServer(
 
   // Resolve server URL for client install info
   const protocol = tlsOptions ? "https" : "http";
-  const serverUrl = `${protocol}://${osHostname()}:${port}`;
+  const serverUrl = process.env.KONDUCTOR_EXTERNAL_URL || `${protocol}://${osHostname()}:${port}`;
 
   // Update batonAuth with the actual server URL (Req 5.6)
   if (deps?.batonAuth) {
@@ -1754,9 +2069,15 @@ export function startSseServer(
     if (req.method === "GET" && channelTgzMatch && deps?.installerChannelStore) {
       const channelName = channelTgzMatch[1] as import("./installer-channel-store.js").ChannelName;
       const tgz = await deps.installerChannelStore.getTarball(channelName);
-      if (!tgz) {
+      if (!tgz || tgz.length === 0) {
+        // Check if the channel is stale (bundle was deleted) vs simply unassigned
+        const metadata = await deps.installerChannelStore.getMetadata(channelName);
+        const isStale = metadata?.version?.startsWith("__stale__");
+        const message = isStale
+          ? `Channel "${channelName}" is stale — the assigned bundle was deleted by an admin`
+          : `Channel "${channelName}" has no installer available`;
         res.writeHead(404, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: `Channel "${channelName}" has no installer available` }));
+        res.end(JSON.stringify({ error: message }));
         return;
       }
       res.writeHead(200, {
@@ -1776,7 +2097,7 @@ export function startSseServer(
       // Try channel store first (Prod channel for backward compat)
       if (deps?.installerChannelStore) {
         const prodTgz = await deps.installerChannelStore.getTarball("prod");
-        if (prodTgz) {
+        if (prodTgz && prodTgz.length > 0) {
           res.writeHead(200, {
             "Content-Type": "application/gzip",
             "Content-Disposition": "attachment; filename=konductor-setup.tgz",
@@ -1842,6 +2163,10 @@ export function startSseServer(
             adminSource: adminList.includes(u.userId.toLowerCase()) ? "env" as const : (u.admin ? "database" as const : null),
             installerChannel: u.installerChannel,
             lastSeen: u.lastSeen,
+            clientVersion: u.clientVersion ?? null,
+            lastRepo: u.lastRepo ?? null,
+            lastBranch: u.lastBranch ?? null,
+            ipAddress: u.ipAddress ?? null,
           }));
         } : undefined,
         updateUser: deps.historyStore ? async (userId: string, updates: { installerChannel?: string; admin?: boolean }) => {
@@ -2152,14 +2477,20 @@ export function startSseServer(
     }
 
     // Helper: find the full "owner/repo" string from just the repo name
-    // by scanning active sessions. Returns the first match.
+    // by scanning active sessions, then falling back to the persistent cache.
     async function resolveRepoFromName(repoName: string): Promise<string | null> {
-      if (!deps) return null;
-      const allSessions = await deps.sessionManager.getAllActiveSessions();
-      for (const s of allSessions) {
-        if (extractRepoName(s.repo) === repoName) return s.repo;
+      // 1. Check active sessions
+      if (deps) {
+        const allSessions = await deps.sessionManager.getAllActiveSessions();
+        for (const s of allSessions) {
+          if (extractRepoName(s.repo) === repoName) {
+            repoNameCache.set(repoName, s.repo);
+            return s.repo;
+          }
+        }
       }
-      return null;
+      // 2. Check persistent cache (survives session expiry)
+      return repoNameCache.get(repoName) ?? null;
     }
 
     // Serve repo page HTML: GET /repo/:repoName (with auth middleware — Req 1.1, 2.1–2.5)
@@ -2577,10 +2908,15 @@ export function startSseServer(
         const hasLineData = fileChanges.some((fc) => fc.lineRanges && fc.lineRanges.length > 0);
         const session = await deps.sessionManager.register(userId, repo, branch, files, hasLineData ? fileChanges : undefined);
 
+        // Cache the repo name mapping so Baton dashboard lookups work after sessions expire
+        repoNameCache.set(extractRepoName(repo), repo);
+
         // Record in history store and upsert user (Req 2.1, 8.1)
+        // clientVersion may come from the POST body or the X-Konductor-Client-Version header (file watcher sends it as a header)
+        const bodyClientVersion = body.clientVersion || (req.headers["x-konductor-client-version"] as string | undefined);
         if (deps.historyStore) {
           deps.historyStore.record({ sessionId: session.sessionId, userId, repo, branch, files, status: "active", createdAt: session.createdAt }).catch(() => {});
-          deps.historyStore.upsertUser(userId, repo).catch(() => {});
+          deps.historyStore.upsertUser(userId, repo, { branch, clientVersion: bodyClientVersion, ipAddress: clientIp }).catch(() => {});
         }
 
         const allSessions = await deps.sessionManager.getActiveSessions(repo);
@@ -2636,6 +2972,42 @@ export function startSseServer(
           } catch { /* best effort */ }
         }
 
+        // Baton: log session registration as activity
+        if (deps.queryLogStore) {
+          const fileList = files.length <= 3 ? files.join(", ") : `${files.slice(0, 3).join(", ")} +${files.length - 3} more`;
+          const sessionEntry = {
+            id: randomUUID(),
+            repo,
+            timestamp: new Date().toISOString(),
+            userId,
+            branch,
+            queryType: "session",
+            parameters: { files: files.length, fileList: files },
+            summary: `Registered with ${files.length} file${files.length !== 1 ? "s" : ""}: ${fileList}`,
+          };
+          deps.queryLogStore.add(sessionEntry);
+          if (deps.batonEventEmitter) {
+            deps.batonEventEmitter.emit({ type: "query_logged", repo, data: sessionEntry });
+          }
+          if (result.state !== "solo") {
+            const overlappingUsers = result.overlappingSessions.map((s) => s.userId);
+            const collisionEntry = {
+              id: randomUUID(),
+              repo,
+              timestamp: new Date().toISOString(),
+              userId,
+              branch,
+              queryType: "collision",
+              parameters: { state: result.state, sharedFiles: result.sharedFiles, overlapping: overlappingUsers },
+              summary: buildCollisionSummary(result, userId),
+            };
+            deps.queryLogStore.add(collisionEntry);
+            if (deps.batonEventEmitter) {
+              deps.batonEventEmitter.emit({ type: "query_logged", repo, data: collisionEntry });
+            }
+          }
+        }
+
         // Slack: notify if collision state meets verbosity threshold (Requirement 1.1, 1.2)
         if (deps.slackNotifier) {
           deps.slackNotifier.onCollisionEvaluated(repo, result, userId).catch(() => { /* best effort — never block */ });
@@ -2654,14 +3026,29 @@ export function startSseServer(
         try {
           const parsed = new URL(serverUrl);
           registerPayload.repoPageUrl = buildRepoPageUrl(parsed.hostname, parseInt(parsed.port, 10), repo);
+          // Include admin page URL if user is an admin
+          const envAdminList = deps.adminList ?? [];
+          const isEnvAdmin = envAdminList.includes(userId.toLowerCase());
+          let isDbAdmin = false;
+          if (!isEnvAdmin && deps.historyStore) {
+            try {
+              const userRecord = await deps.historyStore.getUser(userId);
+              if (userRecord?.admin) isDbAdmin = true;
+            } catch { /* best effort */ }
+          }
+          if (isEnvAdmin || isDbAdmin) {
+            registerPayload.adminPageUrl = `${parsed.protocol}//${parsed.hostname}:${parsed.port}/admin`;
+            registerPayload.isAdmin = true;
+          }
         } catch { /* best effort — skip if serverUrl is malformed */ }
 
         // Version check from X-Konductor-Client-Version header (Requirement 6.5)
         const clientVersion = req.headers["x-konductor-client-version"] as string | undefined;
         // When user's effective channel is "latest", compare against the latest bundle's version (Requirement 8.3)
+        // When the channel store exists but no version is assigned, skip — nothing to update to.
         const effectiveChannelVersion = await getEffectiveChannelVersion(userId, deps.historyStore, deps.adminSettingsStore, deps.installerChannelStore, deps.bundleRegistry);
-        const versionToCompare = effectiveChannelVersion ?? pkgVersion;
-        const versionCheck = compareVersions(clientVersion, versionToCompare);
+        const versionToCompare = deps.installerChannelStore ? effectiveChannelVersion : (effectiveChannelVersion ?? pkgVersion);
+        const versionCheck = versionToCompare ? compareVersions(clientVersion, versionToCompare) : "current";
         if (versionCheck === "outdated") {
           registerPayload.updateRequired = true;
           registerPayload.serverVersion = versionToCompare;
@@ -2736,16 +3123,43 @@ export function startSseServer(
         }
         const allSessions = await deps.sessionManager.getActiveSessions(repo);
         const existingSession = allSessions.find((s) => s.userId === userId);
+
+        // Refresh heartbeat if user has an active session — keeps the session
+        // alive while the file watcher is polling with check_status
+        if (existingSession) {
+          try {
+            await deps.sessionManager.heartbeat(existingSession.sessionId);
+          } catch { /* best effort */ }
+        }
+
+        // Ensure user appears in admin panel even if they only call check_status
+        if (deps.historyStore) {
+          deps.historyStore.upsertUser(userId, repo, { branch: existingSession?.branch }).catch(() => {});
+        }
+
         if (!existingSession && (!files || files.length === 0)) {
           const earlyPayload: Record<string, unknown> = { collisionState: "none", overlappingSessions: [], sharedFiles: [], actions: [] };
           // Still check version even when no active session (Requirement 6.5)
+          // Use channel-aware version resolution (Bug B1 fix — was using pkgVersion)
           const clientVersion = req.headers["x-konductor-client-version"] as string | undefined;
-          const versionCheck = compareVersions(clientVersion, pkgVersion);
+          const earlyEffectiveVersion = deps.installerChannelStore
+            ? await getEffectiveChannelVersion(userId, deps.historyStore, deps.adminSettingsStore, deps.installerChannelStore, deps.bundleRegistry)
+            : null;
+          const earlyVersionToCompare = deps.installerChannelStore ? earlyEffectiveVersion : (earlyEffectiveVersion ?? pkgVersion);
+          const versionCheck = earlyVersionToCompare ? compareVersions(clientVersion, earlyVersionToCompare) : "current";
           if (versionCheck === "outdated") {
             earlyPayload.updateRequired = true;
-            earlyPayload.serverVersion = pkgVersion;
-            const defaultCh = deps.adminSettingsStore ? await deps.adminSettingsStore.get("defaultChannel") as string | null : null;
-            earlyPayload.updateUrl = buildChannelUpdateUrl(serverUrl, defaultCh);
+            earlyPayload.serverVersion = earlyVersionToCompare;
+            let earlyUserChannel: string | null = null;
+            if (deps.historyStore) {
+              try {
+                const userRecord = await deps.historyStore.getUser(userId);
+                if (userRecord?.installerChannel && VALID_CHANNEL_OVERRIDES.includes(userRecord.installerChannel)) {
+                  earlyUserChannel = userRecord.installerChannel;
+                }
+              } catch { /* best effort */ }
+            }
+            earlyPayload.updateUrl = buildChannelUpdateUrl(serverUrl, earlyUserChannel ?? (deps.adminSettingsStore ? await deps.adminSettingsStore.get("defaultChannel") as string | null : null));
           }
           // Piggyback pending collab requests even on early return (Requirement 5.1)
           const earlyPendingCollab = getPendingCollabRequests(deps.collabRequestStore, userId);
@@ -2780,13 +3194,26 @@ export function startSseServer(
         };
 
         // Version check from X-Konductor-Client-Version header (Requirement 6.5)
+        // Use channel-aware version resolution (Bug B1 fix — was using pkgVersion)
         const clientVersion = req.headers["x-konductor-client-version"] as string | undefined;
-        const versionCheck = compareVersions(clientVersion, pkgVersion);
+        const mainEffectiveVersion = deps.installerChannelStore
+          ? await getEffectiveChannelVersion(userId, deps.historyStore, deps.adminSettingsStore, deps.installerChannelStore, deps.bundleRegistry)
+          : null;
+        const mainVersionToCompare = deps.installerChannelStore ? mainEffectiveVersion : (mainEffectiveVersion ?? pkgVersion);
+        const versionCheck = mainVersionToCompare ? compareVersions(clientVersion, mainVersionToCompare) : "current";
         if (versionCheck === "outdated") {
           statusPayload.updateRequired = true;
-          statusPayload.serverVersion = pkgVersion;
-          const defaultCh = deps.adminSettingsStore ? await deps.adminSettingsStore.get("defaultChannel") as string | null : null;
-          statusPayload.updateUrl = buildChannelUpdateUrl(serverUrl, defaultCh);
+          statusPayload.serverVersion = mainVersionToCompare;
+          let mainUserChannel: string | null = null;
+          if (deps.historyStore) {
+            try {
+              const userRecord = await deps.historyStore.getUser(userId);
+              if (userRecord?.installerChannel && VALID_CHANNEL_OVERRIDES.includes(userRecord.installerChannel)) {
+                mainUserChannel = userRecord.installerChannel;
+              }
+            } catch { /* best effort */ }
+          }
+          statusPayload.updateUrl = buildChannelUpdateUrl(serverUrl, mainUserChannel ?? (deps.adminSettingsStore ? await deps.adminSettingsStore.get("defaultChannel") as string | null : null));
         }
 
         // Include repo page URL for dashboard link
@@ -2794,6 +3221,20 @@ export function startSseServer(
           try {
             const parsed = new URL(serverUrl);
             statusPayload.repoPageUrl = buildRepoPageUrl(parsed.hostname, parseInt(parsed.port, 10), repo);
+            // Include admin page URL if user is an admin
+            const envAdminList = deps.adminList ?? [];
+            const isEnvAdmin = envAdminList.includes(userId.toLowerCase());
+            let isDbAdmin = false;
+            if (!isEnvAdmin && deps.historyStore) {
+              try {
+                const userRecord = await deps.historyStore.getUser(userId);
+                if (userRecord?.admin) isDbAdmin = true;
+              } catch { /* best effort */ }
+            }
+            if (isEnvAdmin || isDbAdmin) {
+              statusPayload.adminPageUrl = `${parsed.protocol}//${parsed.hostname}:${parsed.port}/admin`;
+              statusPayload.isAdmin = true;
+            }
           } catch { /* best effort */ }
         }
 
@@ -2978,7 +3419,7 @@ async function main() {
     }
 
     const protocol = tlsOptions ? "https" : "http";
-    const serverUrl = `${protocol}://${osHostname()}:${port}`;
+    const serverUrl = process.env.KONDUCTOR_EXTERNAL_URL || `${protocol}://${osHostname()}:${port}`;
 
     const mcp = buildMcpServer({ ...components, serverVersion: mainPkgVersion, serverUrl });
     const { logger } = components;
@@ -3001,10 +3442,20 @@ async function main() {
       startSseServer(httpMcp, httpPort, apiKey, logger, components);
     }
 
-    // Graceful shutdown: stop pollers when process exits
-    const shutdownPollers = () => {
+    // Graceful shutdown: stop pollers and watchers when process exits
+    const shutdownPollers = async () => {
       if (components.githubPoller) components.githubPoller.stop();
       if (components.commitPoller) components.commitPoller.stop();
+      components.bundleRegistry?.stopWatching();
+      if (components.settingsBackend && "flush" in components.settingsBackend) {
+        await (components.settingsBackend as any).flush();
+      }
+      if (components.localPersistence) {
+        await components.localPersistence.flush();
+      }
+      if (components.s3Persistence) {
+        await components.s3Persistence.shutdown();
+      }
     };
     process.on("SIGTERM", shutdownPollers);
     process.on("SIGINT", shutdownPollers);

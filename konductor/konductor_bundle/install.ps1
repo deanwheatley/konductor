@@ -79,6 +79,7 @@ KONDUCTOR_POLL_INTERVAL=10
         "konductor-watchdog.sh"
         ".konductor-watcher.env"
         ".konductor-watcher.log"
+        ".konductor-watcher.pid"
         ".konductor-watchdog.pid"
     )
     if (-not (Test-Path $Gitignore)) { New-Item -ItemType File -Path $Gitignore -Force | Out-Null }

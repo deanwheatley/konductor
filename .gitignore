@@ -23,3 +23,6 @@ konductor-watchdog.sh
 
 # TLS certs
 konductor/certs/
+
+# CDK output
+infra/cdk.out/

@@ -105,6 +105,7 @@ function buildBundleTableSection(localStoreMode: boolean): string {
     <span class="count" id="bundle-count">0 bundles</span>
     <div class="spacer"></div>
     <input type="text" id="bundle-filter" placeholder="Filter by version…" class="filter-input" oninput="filterBundles()">
+    <button class="btn btn-primary btn-sm" id="rescan-btn" onclick="rescanBundles()" title="Rescan installers/ directory for new bundles">⟳ Rescan</button>
   </div>
   <div class="section-body">
     ${badge}
@@ -675,6 +676,34 @@ function buildBundleScript(): string {
     } catch (e) {
       alert("Delete failed: network error");
     }
+  };
+
+  window.rescanBundles = async function() {
+    var btn = document.getElementById("rescan-btn");
+    if (btn) { btn.disabled = true; btn.textContent = "Scanning…"; }
+    try {
+      var res = await fetch("/api/admin/bundles/rescan", { method: "POST" });
+      if (res.ok) {
+        var data = await res.json();
+        fetchBundles();
+        fetchChannels();
+        if (data.added && data.added.length > 0) {
+          btn && (btn.textContent = "✓ Found " + data.added.length + " new");
+        } else {
+          btn && (btn.textContent = "✓ No new bundles");
+        }
+      } else {
+        var err = await res.json();
+        alert("Rescan failed: " + (err.error || "Unknown error"));
+        btn && (btn.textContent = "⟳ Rescan");
+      }
+    } catch (e) {
+      alert("Rescan failed: network error");
+      btn && (btn.textContent = "⟳ Rescan");
+    }
+    setTimeout(function() {
+      if (btn) { btn.disabled = false; btn.textContent = "⟳ Rescan"; }
+    }, 2000);
   };
 
   // Sorting

@@ -7,3 +7,4 @@ konductor-watchdog.sh
 .konductor-watcher.log
 .konductor-watchdog.pid
 .konductor-version
+settings.json

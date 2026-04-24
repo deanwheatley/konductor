@@ -181,6 +181,7 @@ ENVEOF
     "konductor-watchdog.sh"
     ".konductor-watcher.env"
     ".konductor-watcher.log"
+    ".konductor-watcher.pid"
     ".konductor-watchdog.pid"
   )
   touch "$GITIGNORE"

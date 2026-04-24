@@ -4,7 +4,7 @@
       "url": "http://localhost:3011/sse",
       "headers": {
         "Authorization": "Bearer kd-a7f3b9c2e1d4",
-        "X-Konductor-User": "deanwheatley-star"
+        "X-Konductor-User": "deanwheatley"
       },
       "autoApprove": [
         "register_session",

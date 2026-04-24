@@ -14,7 +14,7 @@ This section takes absolute priority. It applies whether or not the Konductor se
 
 Before doing anything else:
 
-1. Check if the file watcher is running. Run: `pgrep -f konductor-watcher.mjs`
+1. Check if the file watcher is running. Read `.konductor-watcher.pid` and verify the PID is alive: `cat .konductor-watcher.pid 2>/dev/null && kill -0 $(cat .konductor-watcher.pid) 2>/dev/null`
    - If NOT running and `konductor-watcher.mjs` exists in the workspace root, start it detached: `node konductor-watcher.mjs &`. Note that the watcher was restarted.
    - If NOT running and the file doesn't exist, note that the watcher is not installed.
 
@@ -49,7 +49,7 @@ Track the connection state internally. When it changes, notify immediately:
 The agent MUST NOT cache the connection status and assume it remains valid across messages. Connections can drop at any time.
 
 - WHEN a Konductor MCP tool call fails (timeout, connection refused, error response), the agent MUST immediately update the connection state to disconnected and print the disconnection warning. Do NOT retry silently and report success.
-- WHEN the user asks "konductor, status" or "konductor, are you running?", the agent MUST perform a live check (call `check_status` or `list_sessions` AND run `pgrep -f konductor-watcher.mjs`). NEVER answer from memory.
+- WHEN the user asks "konductor, status" or "konductor, are you running?", the agent MUST perform a live check (call `check_status` or `list_sessions` AND verify `.konductor-watcher.pid` — read the PID and check it's alive with `kill -0`). NEVER answer from memory.
 - WHEN the agent is about to modify files and the last successful MCP call was more than 60 seconds ago, the agent SHOULD re-verify by calling `check_status` before registering.
 - WHEN reporting connection status in any context, the agent MUST base the report on the result of an actual tool call or health check performed in the current turn, not on a previous turn's result.
 
@@ -286,7 +286,7 @@ When the user asks a question prefixed with "konductor,", match it to the approp
 | "show PRs", "show open PRs", "what PRs are open?", "any open pull requests?" | Open the Baton dashboard to the repo page (use `repoPageUrl` from registration) or call `who_is_active` filtered to `github_pr` sources. Display PR number, author, branch, target, status (draft/approved/open), and file count. |
 | "show history", "show repo history", "what happened recently?", "recent activity" | Open the Baton dashboard to the repo page or fetch `/api/github/history/:repo` from the server. Display recent commits, PRs, and merges with timestamp, action, user, branch, and summary. |
 | "show slack config", "slack status", "slack settings" | Call `get_slack_config` MCP tool with the current repo. Display the Slack channel, verbosity level, and whether Slack is enabled. |
-| "show baton", "where is the repo website?", "show dashboard" | Display the `repoPageUrl` from the most recent `register_session` response. If no `repoPageUrl` is available (never registered or server unreachable), display: `⚠️ Konductor: Dashboard URL not available. Try registering first.` |
+| "show baton", "where is the repo website?", "show dashboard", "what is my repo webpage url?", "what's my repo url?", "repo page url", "repo url" | Display the `repoPageUrl` from the most recent `register_session` response. If no `repoPageUrl` is available (never registered or server unreachable), display: `⚠️ Konductor: Dashboard URL not available. Try registering first.` |
 | "open baton", "open dashboard" | Open the Baton repo page URL in the user's default browser using the platform-appropriate command (see Browser Open below). If no `repoPageUrl` is available, display: `⚠️ Konductor: Dashboard URL not available. Try registering first.` |
 | "open slack" | Open the configured Slack channel URL (`https://slack.com/app_redirect?channel=<channel>`) in the user's default browser using the platform-appropriate command (see Browser Open below). If no Slack channel is configured, display: `⚠️ Konductor: No Slack channel configured for this repo.` |
 | "is it safe to unstash?", "is it safe to resume?", "can I continue?", "is it safe?" | Call `check_status` or `who_overlaps` for the files that were previously stashed. If no overlap: `🟢 Safe to resume. <user> is no longer editing <files>.` If overlap persists: `⚠️ <user> is still editing <files>. Wait or coordinate.` |
@@ -330,15 +330,15 @@ When the user sends a management command prefixed with "konductor,", execute the
 
 | User says | Action |
 |---|---|
-| "are you running?", "status" | Call `check_status` or `list_sessions` as a health probe. Run `pgrep -f konductor-watcher.mjs` to check the file watcher. Report both MCP server and watcher status. |
+| "are you running?", "status" | Call `check_status` or `list_sessions` as a health probe. Check `.konductor-watcher.pid` — read the PID and verify it's alive with `kill -0`. Report both MCP server and watcher status. |
 
 ### Lifecycle Commands
 
 | User says | Action |
 |---|---|
 | "turn on", "start", "connect" | Launch the file watcher: `node konductor-watcher.mjs &`. Verify MCP connection. Call `register_session`. Print: `🟢 Konductor: Started.` |
-| "turn off", "stop", "disconnect" | Kill the watcher: `pkill -f konductor-watcher.mjs`. Call `deregister_session`. Print: `⏹️ Konductor: Stopped.` |
-| "restart", "reconnect" | Kill the watcher: `pkill -f konductor-watcher.mjs`. Relaunch: `node konductor-watcher.mjs &`. Verify MCP connection. Print: `🔄 Konductor: Restarted.` |
+| "turn off", "stop", "disconnect" | Kill the watcher using PID from `.konductor-watcher.pid`: `kill $(cat .konductor-watcher.pid) 2>/dev/null; rm -f .konductor-watcher.pid`. Call `deregister_session`. Print: `⏹️ Konductor: Stopped.` |
+| "restart", "reconnect" | Kill the watcher using PID from `.konductor-watcher.pid`: `kill $(cat .konductor-watcher.pid) 2>/dev/null; rm -f .konductor-watcher.pid`. Relaunch: `node konductor-watcher.mjs &`. Verify MCP connection. Print: `🔄 Konductor: Restarted.` |
 | "update" | Get the server URL from MCP config. Run: `npx <serverUrl>/bundle/installer.tgz --workspace --server <serverUrl>`. Print: `🔄 Konductor: Updating...` before, `✅ Konductor: Updated to v<version>.` after. If it fails: `⚠️ Konductor: Update failed.` with the manual command. |
 | "reinstall", "setup" | Run the installer: first call `client_install_info` to get the correct command, or build it manually: `npx <serverUrl>/bundle/installer.tgz --server <serverUrl>`. If the API key is known, append `--api-key <key>`. Print: `✅ Konductor: Reinstalled.` |
 
@@ -388,7 +388,7 @@ When the user asks "konductor, help", respond with:
   • "konductor, show PRs" — see open pull requests for this repo
   • "konductor, show history" — see recent commits, PRs, and merges
   • "konductor, slack status" — show Slack config for this repo
-  • "konductor, show baton" — display the Baton dashboard URL
+  • "konductor, show baton" / "what's my repo url?" — display the Baton dashboard URL
   • "konductor, open baton" — open the Baton dashboard in your browser
   • "konductor, open slack" — open the Slack channel in your browser
   • "konductor, is it safe?" — check if it's safe to resume after shelving

@@ -17,7 +17,9 @@
         "risk_assessment",
         "repo_hotspots",
         "active_branches",
-        "coordination_advice"
+        "coordination_advice",
+        "client_install_info",
+        "client_update_check"
       ]
     }
   }

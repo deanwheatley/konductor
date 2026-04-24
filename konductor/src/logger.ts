@@ -13,7 +13,7 @@ import { appendFileSync, statSync, renameSync, unlinkSync } from "node:fs";
 // Types
 // ---------------------------------------------------------------------------
 
-export type LogCategory = "CONN" | "SESSION" | "STATUS" | "CONFIG" | "SERVER" | "QUERY" | "GITHUB";
+export type LogCategory = "CONN" | "SESSION" | "STATUS" | "CONFIG" | "SERVER" | "QUERY" | "GITHUB" | "COLLAB";
 
 export interface LogEntry {
   timestamp: string;   // "2026-04-10 14:32:01"
@@ -35,7 +35,7 @@ export interface LoggerOptions {
 // ---------------------------------------------------------------------------
 
 const VALID_CATEGORIES: ReadonlySet<string> = new Set<LogCategory>([
-  "CONN", "SESSION", "STATUS", "CONFIG", "SERVER", "QUERY", "GITHUB",
+  "CONN", "SESSION", "STATUS", "CONFIG", "SERVER", "QUERY", "GITHUB", "COLLAB",
 ]);
 
 const LOG_LINE_REGEX = /^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\] \[([A-Z]+)\] \[([^\]]+)\] (.+)$/;

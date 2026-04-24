@@ -13,6 +13,7 @@ import type { GitHubConfig, GitHubRepoConfig, WorkSession } from "./types.js";
 import type { SessionManager } from "./session-manager.js";
 import type { KonductorLogger } from "./logger.js";
 import type { BatonEventEmitter } from "./baton-event-emitter.js";
+import type { ISessionHistoryStore } from "./session-history-types.js";
 import { randomUUID } from "node:crypto";
 
 // ---------------------------------------------------------------------------
@@ -79,6 +80,7 @@ export class GitHubPoller {
   private readonly sessionManager: SessionManager;
   private readonly logger?: KonductorLogger;
   private readonly batonEventEmitter?: BatonEventEmitter;
+  private readonly historyStore?: ISessionHistoryStore;
   private fetchFn: FetchFn;
 
   private timer: ReturnType<typeof setInterval> | null = null;
@@ -92,12 +94,14 @@ export class GitHubPoller {
     logger?: KonductorLogger,
     fetchFn?: FetchFn,
     batonEventEmitter?: BatonEventEmitter,
+    historyStore?: ISessionHistoryStore,
   ) {
     this.config = config;
     this.sessionManager = sessionManager;
     this.logger = logger;
     this.fetchFn = fetchFn ?? globalThis.fetch.bind(globalThis);
     this.batonEventEmitter = batonEventEmitter;
+    this.historyStore = historyStore;
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────
@@ -284,6 +288,11 @@ export class GitHubPoller {
 
     // Register directly into session manager as a passive session
     await this.sessionManager.registerPassive(session);
+
+    // Upsert user into history store so PR authors appear in admin panel
+    if (this.historyStore) {
+      this.historyStore.upsertUser(params.author, params.repo, { branch: params.headBranch }).catch(() => {});
+    }
 
     const tracked: TrackedPR = { ...params, sessionId };
     this.trackedPRs.set(`${params.repo}#${params.prNumber}`, tracked);

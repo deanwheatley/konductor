@@ -1,0 +1,3084 @@
+[
+  {
+    "id": "170794e9-3a3e-4383-ada8-e3778ffdbc66",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:42.468Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "92a4f5ac-f76f-47ef-9023-6e186a76084b",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:42.520Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "eec7e580-2903-4d1d-aec4-f7deda734bc6",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:42.568Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "3a4ab441-6000-4903-ad56-e27d17243ea6",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:42.618Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "6a5758a5-ff4b-4b7a-89c1-720495cb0390",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:42.672Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "7db65531-7b3c-4ad5-8b55-7c5a7011d717",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:42.719Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "ec71be8f-634d-4243-9d53-1f9a36f88bad",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:42.779Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "bc3e1f4f-4a26-4a8c-b9e1-12354b740d36",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:42.875Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "d8baf263-eb67-433c-92fa-ba90e47a7a31",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:42.924Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "f8d875f8-dff7-4ab6-8883-171ec14de6f7",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:42.970Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "98eeae51-b02f-408e-9e8e-67ef490abf27",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.023Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "2316877c-dc82-4ad2-aacb-d5a395d5b373",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.076Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "9d6cb045-d1a4-487d-a5fc-88c54fc048da",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.209Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "291f830d-2c9b-48da-8b6a-ecc31aa34cbe",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.271Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "9d3e197d-57e2-46f7-8d15-a203e82d5bd5",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.323Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "9be1cddb-6412-4256-a796-025332ec22d9",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.440Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "929a20e7-9535-4809-8d70-0e8f7aa81ad5",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.510Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "b6d1364e-4b7e-46cd-ba58-93837e218af1",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.557Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "de223142-a35b-4a83-b5ef-5a7fd297d2eb",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.604Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "f77b8598-e7dd-4a87-9ce4-7287fb15ec1f",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.685Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "9a135588-43ff-433e-90bc-ca94e6673f00",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.796Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "3f09d5a0-e212-4486-b8de-f98d9035643e",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.843Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "cfabe6d8-fa41-4f99-8dd5-a72b3ecd1f22",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.889Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "57e93598-b5f9-4820-b8a4-453fa9f6094b",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:43.934Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "b021abf4-048e-4ed6-bbd9-116485ed2583",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.000Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "75bfcf69-fde9-4ca4-b510-d2cc99639118",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.079Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "e6a66736-364d-4bd6-8650-670850342ead",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.158Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "ea9dbf9c-7b5a-44dc-a5de-5eaf80b76134",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.235Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "37ebf496-0b14-4193-a95d-daffe8e6ec3f",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.330Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "7918f010-7837-40b5-aae9-60f45bcfc548",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.445Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "a0d1fcc7-7665-49a5-9a07-1ec3d972aa88",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.506Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "06b69354-57b6-4f3a-8d10-2a5609dff8bc",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.589Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "d0243e20-9529-4bf6-9046-30e00899e7a7",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.665Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "2a3a7903-b5e9-459e-b283-7a35b5af76e0",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.731Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "9f1307bc-469e-486f-a62d-8dc2ab140dd7",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.794Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "c676a7de-76b4-44d4-98a8-d38e5768463c",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.852Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "c3be3ac1-0526-407e-89ea-c13e5a815a08",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.901Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "6e193564-00c7-416c-a142-e2d1546e2665",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:44.957Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "7baa9d1b-3438-45ea-86a4-9349469864c1",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:45.034Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "ca9fefd9-3ff9-4ed3-a228-1a12e84ea576",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:45.133Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "47f486f0-abf0-49a6-a4ea-6ed8a44cce93",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:45.199Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "0607239f-41e8-4010-a4eb-3cce3174c87e",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:45.296Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "87a862c6-ae59-47a3-b42a-4c620745be4b",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:45.396Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "ade949f2-f1ca-40dd-83fc-149fa8d962d2",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:45.457Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "57b33977-7ae8-4a78-92c2-06c61b3e17b7",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:45.565Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "e395ce5e-81a3-4c35-bfeb-69626c6015ab",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:45.664Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "4897ed7c-4089-44b2-a0b8-f7baea111477",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:45.736Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "1f1f67c3-5673-4923-a737-f2b71c60b0c3",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:45.837Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "100250e4-26c7-4da1-969d-15f82aec285c",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:45.937Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "7b4434bd-9cac-4d86-8425-5cec833a6024",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:45.996Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "7ae5c815-c19d-4e53-9b5f-2efbcd42e9fc",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:46.082Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "f9ccb2e7-51df-4992-b20b-339024b09f2f",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:46.232Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "790dc791-4147-4da5-bb4c-16923c657d60",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:46.272Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "0f6fd128-289e-4f15-bb3d-b3aba082660f",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:46.340Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "f9ca74b3-b14c-422a-9031-572fb51cc8d8",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:46.387Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "eccbaa0c-ff4f-4a66-bb2b-798759830e10",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:46.543Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "bd87d54d-77c0-4c1c-83ac-00ab4f1f9f6e",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:46.651Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "2f1697e1-3440-4aa8-82de-83b9c0bbf05d",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:46.778Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "92e804cd-0093-49c5-936b-7b7419679de8",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:46.872Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "bda62b07-c557-4b74-b5fe-f9f4ccb5bc00",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:46.974Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "d3e2c146-464c-4242-87bf-ff5c3894b3e7",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:47.020Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "c28c0bcf-dc0f-4c8d-a773-82d690f67615",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:47.128Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "2a50fe6d-83d2-4f8e-94e6-3cc196a69f80",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:47.243Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "cda56480-0de6-4816-a3ff-d0966dfa7953",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:47.377Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "c1548280-9455-4ae2-b784-bd6aa6eb564d",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:47.469Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "46f25d86-733c-4078-b44a-a52af27ff79d",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T19:59:47.609Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "29ec3979-614d-45cb-a77c-40b843a183d6",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T21:59:54.010Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "bfd9fc16-7909-4d5a-b7de-739dcd488ed5",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:39.042Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "cce9d80e-44e7-4e55-98ec-7997dd8e82d3",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:48.825Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "bfddb45e-1455-495e-b749-0cd4097f74eb",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:48.871Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "34f74e11-a0a6-4cd9-86ab-11e0a0bd25ac",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:48.914Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "ea062ba8-f4e3-4820-8f55-48dc68248372",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:48.957Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "a62a5d43-6b4c-4514-8c7b-771996cbf8f0",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:48.999Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "8f239a00-ddc9-4791-a498-574c5618362e",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:49.039Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "883245c8-2760-4ed9-9620-6def82981d0b",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:49.094Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "1ee0be9c-86b4-4894-bee2-26ebb676c7f7",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:49.649Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "5e10b231-0759-410b-b305-5e5f58366bb1",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:49.711Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "6ce54da8-aee6-472f-a090-e82746b6eea1",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:49.762Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "3c28666a-0f7d-4e86-98de-1f48d269920d",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:50.027Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "a246fa00-098b-4d10-9dae-f286428837f3",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:50.315Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "a177f9ba-c3ed-4e4a-87b1-335522087c56",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:50.691Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "d9bad1ed-47b3-45c7-baf5-0611032ef402",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:51.012Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "40158ac5-bf21-492b-9377-bce79d226b3e",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:51.300Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "b9eb615c-1351-4d27-9ef9-1b185323701b",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:51.662Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "58c298f5-40b8-40d6-8177-e4cf22cf3681",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:51.957Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "698bcc0b-2b83-469c-b18d-e23ec4ab323d",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:52.238Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "d11340d5-e348-48b1-bf1f-a729bb32a33f",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:52.535Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "06a19c5b-d46a-4fa8-b3bf-44c143407d31",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:52.852Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "78ee217c-5f87-4d95-af23-d77e522b5732",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:53.184Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "ecd9f3a8-7199-4a29-b4cf-f0fc839a505f",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:53.456Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "22edf35c-7fee-425e-81d9-b85e24363bd8",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:53.735Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "7f86fca5-c407-4836-95d6-e91c588e75a7",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:54.017Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "0e8add86-e833-4e4b-a956-597b3c9f10bc",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:54.331Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "630deda0-9452-4683-b08a-8f5e337a49e5",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:54.653Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "7745eb70-53d7-4ad7-846a-c87c44ec752a",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:54.969Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "2e5c75bd-90ca-4698-b05c-55ff88654eb3",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:55.288Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "758b3af8-6b7f-4ef4-b55c-dc0a0368dd8a",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:55.827Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "bb7dede3-b10e-481f-939e-d1ce227f3966",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:56.174Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "40f20432-1233-46f2-8c42-50cfc37c5ab5",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:56.472Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "63cbb5df-b716-41cc-8360-54e828398461",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:56.801Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "40cb0ec4-0384-417a-a270-4303661a76bc",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:57.125Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "03d751c9-7c48-477e-8c10-42d527c5122e",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:57.653Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "378c33f0-9ac1-42fb-b2fa-f344cdc1222a",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:57.957Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "6425ed33-1a8d-4ec6-a829-22bcf738f8c3",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:58.253Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "cbc90896-fe8a-455d-99ab-fbbef42706e3",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:58.533Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "6fde76c8-0b23-46f3-8cbe-e15dcb20fe41",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:58.827Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "0e333f7a-a910-4aea-903a-678c9e7deab4",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:59.387Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "192faaa6-9c06-4bf9-9290-e8572f0911c6",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:19:59.733Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "d36d68b3-fefe-426d-a838-f779b7cf6f2c",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:00.042Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "90d471eb-745c-46cb-9c8f-29ba1d878863",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:00.390Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "9d264186-c805-45ae-99a6-ff4d024eafce",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:00.721Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "e524ddaf-9d1e-4ca5-b53b-59b32f3ec85f",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:01.018Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "65427a8a-89d4-4a9d-846b-58e096de6d2d",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:01.614Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "dbc835f7-9045-423b-9cdb-396f7035aeb1",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:01.956Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "8d92ee28-600a-4ace-8a7d-61b8b03b1dfa",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:02.263Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "7078270e-489c-4053-b71f-3a8f27da5984",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:02.609Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "b90ce3a5-e83f-4a30-9c21-9976d92d06c4",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:02.958Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "09e6fc72-c82b-4c0f-a009-43cce4e364d0",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:03.249Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "4c1d54b4-c81d-4b10-bba5-98dd150d2365",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:03.577Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "38b5b199-c59c-4332-9a53-8b70e81bdb95",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:04.199Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "602f4007-ff3b-40c6-bd89-ad63ea3b0cf9",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:04.256Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "3c7e5fe5-dd9e-4b22-a72d-335b21ddaf84",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:04.558Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "92aca53b-3b45-4dc1-afc4-fa99a5bea988",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:04.834Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "6f161fe1-d2d3-4aa3-85b7-a17ccb0209b4",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:05.246Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "04f72e86-a90c-4e55-a050-24a65d27a5cf",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:05.810Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "9fb05daf-0dc7-418a-8700-b229ef3e0257",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:05.949Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "264ad2d5-cdf6-4ac3-8ffc-caedd4e6e578",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:06.282Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "7ee3dc25-88f2-4ad2-bb0b-570896124726",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:06.623Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "dff6bb87-7097-4e56-8276-88086fd81712",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:06.901Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "b418cd47-0a63-4405-bc82-6fd3b7c3b947",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:09.520Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "b794e731-97c0-4d1c-9165-d18491c8078c",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:09.860Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "eb4ef2a4-ac33-4d23-80f7-b43fb8cb4811",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:10.228Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "70f34cb1-1826-4526-903f-2edf2eff9446",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:10.772Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "id": "17a5a15d-f707-4586-bf89-60a34a7bf6ef",
+    "repo": "deanwheatley/testrepo",
+    "timestamp": "2026-04-23T22:20:10.942Z",
+    "notificationType": "healthy",
+    "collisionState": "proximity",
+    "jiras": [],
+    "summary": "[PROXIMITY] | repo:deanwheatley/testrepo | user:deanwheatley | overlaps:deanwheatley | dirs:\n  🟠 Warning — deanwheatley's PR #1 (https://github.com/deanwheatley/testrepo/pull/1) modifies .agent/rules/konductor-collision-awareness.md, .kiro/settings/mcp.json, .kiro/steering/konductor-collision-awareness.md, .konductor-watcher.env, client-verification.mjs, docs/01_hello.txt, docs/12_matrix.c, docs/14_http_status.txt, docs/16_hash_map.c, docs/17_design_patterns.md, docs/19_regex_notes.txt, konductor-watcher.mjs, targeting main.",
+    "users": [
+      {
+        "userId": "deanwheatley",
+        "branch": "main"
+      },
+      {
+        "userId": "deanwheatley",
+        "branch": "feature/updates",
+        "source": "github_pr",
+        "prNumber": 1,
+        "prUrl": "https://github.com/deanwheatley/testrepo/pull/1"
+      }
+    ],
+    "resolved": false
+  }
+]

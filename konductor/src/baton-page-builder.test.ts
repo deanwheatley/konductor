@@ -87,7 +87,7 @@ describe("buildRepoPage — Property Tests", () => {
    *
    * For any valid repository name in owner/repo format, the generated repo
    * page HTML should contain identifiable sections for Repository Summary,
-   * Notifications & Alerts, Query Log, Open PRs, and Repo History.
+   * Notifications & Alerts, Activity Log, Open PRs, and Repo History.
    */
   it("Property 1: Repo page contains all five sections", () => {
     fc.assert(
@@ -103,8 +103,8 @@ describe("buildRepoPage — Property Tests", () => {
         expect(html).toContain("Alerts");
         expect(html).toContain("notifications-section");
 
-        // Section 3: Query Log
-        expect(html).toContain("Query Log");
+        // Section 3: Activity Log
+        expect(html).toContain("Activity Log");
         expect(html).toContain("querylog-section");
 
         // Section 4: Open PRs

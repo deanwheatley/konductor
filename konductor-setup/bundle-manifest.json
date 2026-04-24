@@ -1,6 +1,6 @@
 {
-  "version": "0.4.1",
-  "createdAt": "2026-04-21T22:04:05.535Z",
+  "version": "0.5.1",
+  "createdAt": "2026-04-24T00:02:02.345Z",
   "author": "Dean Wheatley",
   "summary": "Line-Level Collision Detection: the collision evaluator now distinguishes between \"same file, different sections\" (Proximity) and \"same file, same lines\" (Collision Course) when line range data is available; New `Proximity` collision state (severity 2.5): same file as another user but non-overlapping line ranges — does not pause the agent, does not trigger Slack at default verbosity; File watcher reports modified line ranges via `git diff --unified=0` hunk headers alongside file paths"
 }

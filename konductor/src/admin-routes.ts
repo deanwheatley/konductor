@@ -65,6 +65,10 @@ export interface AdminUserRecord {
   adminSource: "env" | "database" | null;
   installerChannel?: string | null;
   lastSeen?: string | null;
+  clientVersion?: string | null;
+  lastRepo?: string | null;
+  lastBranch?: string | null;
+  ipAddress?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -680,7 +684,7 @@ export async function handleAdminRoute(
     if (req.method === "GET" && url.pathname === "/api/admin/install-commands") {
       const externalUrl = process.env.KONDUCTOR_EXTERNAL_URL;
       const defaultChannel = (await deps.adminSettingsStore.get("defaultChannel") as ChannelName) ?? "prod";
-      const data = buildInstallCommands(deps.port, deps.protocol, defaultChannel, externalUrl);
+      const data = buildInstallCommands(deps.port, deps.protocol, defaultChannel, externalUrl, deps.apiKey);
       // Include channel availability from the installer channel store
       // A channel is unavailable if it has no tarball OR if it's stale (zero-byte placeholder)
       const channelAvailability: Record<string, boolean> = {};
@@ -692,6 +696,32 @@ export async function handleAdminRoute(
       }
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ ...data, channelAvailability }));
+      return true;
+    }
+
+    // ── POST /api/admin/bundles/rescan — trigger a rescan of the local store directory
+    if (req.method === "POST" && url.pathname === "/api/admin/bundles/rescan") {
+      if (!deps.bundleRegistry) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Bundle registry is not available (local store mode is not enabled)" }));
+        return true;
+      }
+
+      try {
+        const { added, removed } = await deps.bundleRegistry.rescan();
+        if (deps.logger) {
+          deps.logger.logConfigReloaded(
+            `Bundle rescan: ${added.length} added, ${removed.length} removed` +
+            (added.length > 0 ? ` — new: ${added.join(", ")}` : ""),
+          );
+        }
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, added, removed }));
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: message }));
+      }
       return true;
     }
 

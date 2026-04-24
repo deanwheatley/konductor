@@ -183,6 +183,19 @@ export class SessionManager implements ISessionManager {
   }
 
   /**
+   * Return all unique repo identifiers from all sessions (including stale).
+   * Used to seed the repo name cache so Baton dashboard lookups work
+   * even after sessions expire.
+   */
+  getKnownRepos(): string[] {
+    const repos = new Set<string>();
+    for (const session of this.sessions.values()) {
+      repos.add(session.repo);
+    }
+    return [...repos];
+  }
+
+  /**
    * Remove all sessions whose lastHeartbeat is older than the timeout.
    * Returns the number of sessions removed.
    */

@@ -60,20 +60,43 @@ export class SlackDebouncer {
     callback: DebouncedCallback,
   ): void {
     const existing = this.pending.get(repo);
+
     if (existing) {
+      // If the collision state hasn't changed, let the existing timer run.
+      // This prevents perpetual deferral when sessions re-register at a
+      // rate faster than the debounce window (e.g. watcher polling every
+      // 10s with a 30s debounce — the timer would never fire).
+      if (existing.result.state === result.state) {
+        // Update the stored result/userId to the latest data, but keep the timer.
+        existing.result = result;
+        existing.triggeringUserId = userId;
+        return;
+      }
+
+      // State changed — cancel the old timer and start a new one so the
+      // notification reflects the latest collision state.
       clearTimeout(existing.timer);
     }
 
-    const timer = setTimeout(async () => {
+    const entry: PendingNotification = {
+      timer: undefined as unknown as ReturnType<typeof setTimeout>,
+      repo,
+      result,
+      triggeringUserId: userId,
+    };
+
+    entry.timer = setTimeout(async () => {
       this.pending.delete(repo);
       try {
-        await callback(repo, result, userId);
+        // Read from the entry so we always use the latest result/userId,
+        // even if they were updated while the timer was running.
+        await callback(entry.repo, entry.result, entry.triggeringUserId);
       } catch {
         // Best effort — never throw from timer
       }
     }, this.debounceMs);
 
-    this.pending.set(repo, { timer, repo, result, triggeringUserId: userId });
+    this.pending.set(repo, entry);
   }
 
   /**

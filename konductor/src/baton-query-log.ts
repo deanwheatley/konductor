@@ -15,6 +15,7 @@ import type { QueryLogEntry } from "./baton-types.js";
 export interface IQueryLogStore {
   add(entry: QueryLogEntry): void;
   getEntries(repo: string): QueryLogEntry[];
+  getKnownRepos(): string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -44,5 +45,9 @@ export class QueryLogStore implements IQueryLogStore {
     const repoEntries = this.entries.get(repo);
     if (!repoEntries) return [];
     return repoEntries.map((e) => ({ ...e, parameters: { ...e.parameters } }));
+  }
+
+  getKnownRepos(): string[] {
+    return [...this.entries.keys()];
   }
 }

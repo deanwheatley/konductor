@@ -75,17 +75,21 @@ action:
         const others = (statusData.overlappingSessions || []).filter(s => s.userId !== userId);
         const shared = statusData.sharedFiles || [];
         const repoShort = repo.split('/').pop();
+        const dashUrl = statusData.repoPageUrl || regData.repoPageUrl || '';
+        const dashLink = dashUrl ? ' 📊 ' + dashUrl : '';
 
         if (state === 'solo') {
           log('🟢 [Konductor] SOLO on ' + repoShort + '/' + branch + ' — saved: ./' + relFile);
         } else if (state === 'neighbors') {
           log('🟢 [Konductor] NEIGHBORS on ' + repoShort + '/' + branch + ' — ' + others.map(s=>s.userId).join(', ') + ' also active. Saved: ./' + relFile);
         } else if (state === 'crossroads') {
-          log('🟡 [Konductor] CROSSROADS on ' + repoShort + '/' + branch + ' — ' + others.map(s=>s.userId).join(', ') + ' in same dirs. Saved: ./' + relFile);
+          log('🟡 [Konductor] CROSSROADS on ' + repoShort + '/' + branch + ' — ' + others.map(s=>s.userId).join(', ') + ' in same dirs. Saved: ./' + relFile + dashLink);
+        } else if (state === 'proximity') {
+          log('🟢 [Konductor] PROXIMITY on ' + repoShort + '/' + branch + ' — same files as ' + others.map(s=>s.userId).join(', ') + ', different sections. Saved: ./' + relFile + dashLink);
         } else if (state === 'collision_course') {
-          log('🟠 [Konductor] COLLISION COURSE on ' + repoShort + '/' + branch + ' — ' + others.map(s=>s.userId).join(', ') + ' on same files: ' + shared.join(', ') + '. Saved: ./' + relFile);
+          log('🟠 [Konductor] COLLISION COURSE on ' + repoShort + '/' + branch + ' — ' + others.map(s=>s.userId).join(', ') + ' on same files: ' + shared.join(', ') + '. Saved: ./' + relFile + dashLink);
         } else if (state === 'merge_hell') {
-          log('🔴 [Konductor] MERGE HELL on ' + repoShort + '/' + branch + ' — divergent changes with ' + others.map(s=>s.userId).join(', ') + ' on: ' + shared.join(', ') + '. Saved: ./' + relFile);
+          log('🔴 [Konductor] MERGE HELL on ' + repoShort + '/' + branch + ' — divergent changes with ' + others.map(s=>s.userId).join(', ') + ' on: ' + shared.join(', ') + '. Saved: ./' + relFile + dashLink);
         } else {
           log('🟢 [Konductor] ' + state + ' — saved: ./' + relFile);
         }

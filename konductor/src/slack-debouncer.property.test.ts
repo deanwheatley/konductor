@@ -186,21 +186,25 @@ describe("Debounce Timer Resets on New State Change — Property Tests", () => {
   });
 
   /**
-   * **Feature: konductor-bugs-and-missing-features, Property 7: Debounce timer resets on new state change**
+   * **Feature: konductor-bugs-and-missing-features, Property 7: Debounce timer resets on state change**
    * **Validates: Requirements 4.2**
    *
-   * For any collision state change that occurs while a debounce timer is active
-   * for the same repo, the timer SHALL be reset, and the pending notification
-   * SHALL be updated to reflect the new state.
+   * When the collision state CHANGES while a debounce timer is active for the
+   * same repo, the timer SHALL be reset and the pending notification updated.
+   * When the state is the SAME, the timer SHALL NOT be reset (preventing
+   * perpetual deferral from rapid re-registrations at the same state).
    */
-  it("Property 7: scheduling a new change resets the timer — callback fires debounceMs after the LAST schedule", () => {
+  it("Property 7a: scheduling a DIFFERENT state resets the timer — callback fires debounceMs after the LAST schedule", () => {
     fc.assert(
       fc.property(
-        collisionResultArb(),
-        collisionResultArb(),
+        collisionResultArb(fc.constant(CollisionState.Crossroads)),
+        collisionResultArb(fc.constant(CollisionState.CollisionCourse)),
         repoArb,
         userIdArb,
         (firstResult, secondResult, repo, userId) => {
+          // Ensure states are actually different
+          fc.pre(firstResult.state !== secondResult.state);
+
           const debounceMs = 10_000;
           const debouncer = new SlackDebouncer(debounceMs);
           const callbackInvocations: Array<{ result: CollisionResult }> = [];
@@ -216,7 +220,7 @@ describe("Debounce Timer Resets on New State Change — Property Tests", () => {
           vi.advanceTimersByTime(debounceMs * 0.7);
           expect(callbackInvocations.length).toBe(0);
 
-          // Schedule second change — this should reset the timer
+          // Schedule second change with DIFFERENT state — this should reset the timer
           debouncer.schedule(repo, secondResult, userId, callback);
 
           // Advance another 70% — still within the NEW debounce window
@@ -228,7 +232,46 @@ describe("Debounce Timer Resets on New State Change — Property Tests", () => {
 
           // Now the callback should have fired exactly once with the second result
           expect(callbackInvocations.length).toBe(1);
-          expect(callbackInvocations[0].result).toBe(secondResult);
+          expect(callbackInvocations[0].result.state).toBe(secondResult.state);
+
+          debouncer.cancelAll();
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+
+  it("Property 7b: scheduling the SAME state does NOT reset the timer — callback fires on the original schedule", () => {
+    fc.assert(
+      fc.property(
+        collisionResultArb(fc.constant(CollisionState.CollisionCourse)),
+        collisionResultArb(fc.constant(CollisionState.CollisionCourse)),
+        repoArb,
+        userIdArb,
+        (firstResult, secondResult, repo, userId) => {
+          const debounceMs = 10_000;
+          const debouncer = new SlackDebouncer(debounceMs);
+          const callbackInvocations: Array<{ result: CollisionResult }> = [];
+
+          const callback = async (_r: string, result: CollisionResult) => {
+            callbackInvocations.push({ result });
+          };
+
+          // Schedule first change
+          debouncer.schedule(repo, firstResult, userId, callback);
+
+          // Advance 70% of the debounce period
+          vi.advanceTimersByTime(debounceMs * 0.7);
+          expect(callbackInvocations.length).toBe(0);
+
+          // Schedule second change with SAME state — timer should NOT reset
+          debouncer.schedule(repo, secondResult, userId, callback);
+
+          // Advance the remaining 30% of the ORIGINAL window
+          vi.advanceTimersByTime(debounceMs * 0.35);
+
+          // Callback should have fired — the timer was NOT reset
+          expect(callbackInvocations.length).toBe(1);
 
           debouncer.cancelAll();
         },

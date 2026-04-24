@@ -20,6 +20,7 @@ export interface INotificationStore {
   add(notification: BatonNotification): void;
   getActive(repo: string): BatonNotification[];
   getResolved(repo: string): BatonNotification[];
+  getKnownRepos(): string[];
   resolve(notificationId: string): boolean;
   serialize(): string;
   deserialize(json: string): void;
@@ -83,6 +84,14 @@ export class NotificationStore implements INotificationStore {
       }
     }
     return result;
+  }
+
+  getKnownRepos(): string[] {
+    const repos = new Set<string>();
+    for (const n of this.notifications.values()) {
+      repos.add(n.repo);
+    }
+    return [...repos];
   }
 
   resolve(notificationId: string): boolean {

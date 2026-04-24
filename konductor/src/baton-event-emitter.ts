@@ -15,6 +15,8 @@ import type { BatonEvent } from "./baton-types.js";
 export interface IBatonEventEmitter {
   emit(event: BatonEvent): void;
   subscribe(repo: string, callback: (event: BatonEvent) => void): () => void;
+  /** Subscribe to all events regardless of repo. */
+  onAny(callback: (event: BatonEvent) => void): () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -26,11 +28,16 @@ export class BatonEventEmitter implements IBatonEventEmitter {
     string,
     Set<(event: BatonEvent) => void>
   >();
+  private readonly globalSubscribers = new Set<(event: BatonEvent) => void>();
 
   emit(event: BatonEvent): void {
     const callbacks = this.subscribers.get(event.repo);
-    if (!callbacks) return;
-    for (const cb of callbacks) {
+    if (callbacks) {
+      for (const cb of callbacks) {
+        cb(event);
+      }
+    }
+    for (const cb of this.globalSubscribers) {
       cb(event);
     }
   }
@@ -51,6 +58,13 @@ export class BatonEventEmitter implements IBatonEventEmitter {
       if (callbacks!.size === 0) {
         this.subscribers.delete(repo);
       }
+    };
+  }
+
+  onAny(callback: (event: BatonEvent) => void): () => void {
+    this.globalSubscribers.add(callback);
+    return () => {
+      this.globalSubscribers.delete(callback);
     };
   }
 }

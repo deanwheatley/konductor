@@ -1,6 +1,6 @@
 {
   "name": "konductor",
-  "version": "0.4.1",
+  "version": "0.5.2",
   "description": "Work Coordination MCP Server — tracks concurrent development and evaluates collision risk",
   "type": "module",
   "main": "dist/index.js",
@@ -25,6 +25,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1036.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "uuid": "^13.0.0",
     "yaml": "^2.8.3"
